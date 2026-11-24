@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#1a1a2e">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>考研政治背诵播放器</title>
+<style>
+:root {
+  --bg: #0f0f1a;
+  --card: #1a1a2e;
+  --card2: #232340;
+  --accent: #ff6b6b;
+  --accent2: #4ecdc4;
+  --text: #e8e8f0;
+  --muted: #8888a0;
+  --border: #333355;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text);
+  font-family: -apple-system, "PingFang SC", "MiSans", "Microsoft YaHei", sans-serif;
+  overflow-x: hidden; }
+body { min-height: 100vh; padding-bottom: 140px; }
+
+/* ───── 顶部 ───── */
+.header {
+  position: sticky; top: 0; z-index: 100;
+  background: linear-gradient(180deg, var(--card) 0%, var(--bg) 100%);
+  padding: 16px 14px 10px; backdrop-filter: blur(10px);
+}
+.header h1 { margin: 0; font-size: 18px; font-weight: 600; text-align: center; }
+.header .sub { text-align: center; color: var(--muted); font-size: 12px; margin-top: 2px; }
+
+/* ───── 选择区 ───── */
+.section { padding: 12px 14px; }
+.section-title {
+  font-size: 13px; color: var(--muted); margin-bottom: 8px;
+  display: flex; align-items: center; gap: 6px;
+}
+.section-title::before {
+  content: ''; width: 3px; height: 14px;
+  background: var(--accent); border-radius: 2px;
+}
+
+.pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill {
+  padding: 8px 14px; border-radius: 20px;
+  background: var(--card); border: 1px solid var(--border);
+  color: var(--text); font-size: 14px; cursor: pointer;
+  transition: all .2s; user-select: none;
+}
+.pill.active {
+  background: linear-gradient(135deg, var(--accent), #ff8e53);
+  border-color: transparent; color: #fff; font-weight: 600;
+}
+.pill.disabled { opacity: .4; pointer-events: none; }
+.pill .count {
+  display: inline-block; margin-left: 4px;
+  font-size: 11px; opacity: .7;
+}
+
+/* 子分类下拉 */
+.sub-select-wrap { position: relative; }
+.sub-select {
+  width: 100%; padding: 10px 12px; font-size: 14px;
+  background: var(--card); border: 1px solid var(--border);
+  color: var(--text); border-radius: 10px; appearance: none;
+}
+
+/* ───── 当前播放 ───── */
+.now-playing {
+  margin: 12px 14px; padding: 16px; border-radius: 14px;
+  background: linear-gradient(135deg, #2a2a4a 0%, #1a1a2e 100%);
+  border: 1px solid var(--border);
+  min-height: 120px;
+}
+.now-playing .label { font-size: 12px; color: var(--muted); }
+.now-playing .meta { font-size: 13px; color: var(--accent2); margin-top: 4px; }
+.now-playing .text {
+  font-size: 16px; line-height: 1.7; margin-top: 10px;
+  max-height: 160px; overflow-y: auto; white-space: pre-wrap;
+}
+.now-playing .progress-bar {
+  margin-top: 10px; height: 3px; background: var(--border); border-radius: 2px; overflow: hidden;
+}
+.now-playing .progress-fill {
+  height: 100%; background: var(--accent); width: 0%;
+  transition: width .3s;
+}
+
+/* ───── 控制栏 ───── */
+.controls {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: var(--card); border-top: 1px solid var(--border);
+  padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
+  z-index: 200;
+}
+.controls .row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.controls .row + .row { margin-top: 10px; }
+
+.btn {
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 1px solid var(--border); background: var(--card2);
+  color: var(--text); font-size: 18px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s;
+}
+.btn:active { transform: scale(.92); background: var(--accent); }
+.btn.play {
+  width: 60px; height: 60px; font-size: 24px;
+  background: linear-gradient(135deg, var(--accent), #ff8e53);
+  border: none; box-shadow: 0 4px 20px rgba(255,107,107,.4);
+}
+.btn.play:active { transform: scale(.92); }
+.btn .ic { font-style: normal; }
+
+.btn-group { display: flex; gap: 6px; align-items: center; }
+.btn.small { width: 36px; height: 36px; font-size: 13px; border-radius: 10px; }
+.btn.speed { width: auto; padding: 0 12px; border-radius: 18px; font-size: 13px; font-weight: 600; }
+.btn.mode { font-size: 11px; width: 42px; height: 42px; border-radius: 12px; }
+
+/* 模式激活 */
+.btn.active-mode {
+  background: var(--accent); border-color: var(--accent);
+}
+
+/* 音量/总进度 */
+.info-text { font-size: 12px; color: var(--muted); min-width: 60px; text-align: center; }
+
+/* ───── 列表 ───── */
+.list { padding: 0 14px; }
+.list-item {
+  padding: 12px; background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; margin-bottom: 8px; cursor: pointer;
+  transition: all .15s;
+}
+.list-item.active {
+  background: var(--card2); border-color: var(--accent);
+}
+.list-item .idx { font-size: 11px; color: var(--muted); }
+.list-item .ls { font-size: 14px; margin-top: 4px; line-height: 1.5;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden; }
+
+/* 空状态 */
+.empty { padding: 40px; text-align: center; color: var(--muted); }
+
+/* 加载 */
+.loading {
+  position: fixed; inset: 0; background: var(--bg); z-index: 999;
+  display: flex; align-items: center; justify-content: center; flex-direction: column;
+}
+.loading .spinner {
+  width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--accent);
+  border-radius: 50%; animation: spin 1s linear infinite;
+}
+.loading p { margin-top: 12px; color: var(--muted); }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* toast */
+.toast {
+  position: fixed; top: 20%; left: 50%; transform: translateX(-50%);
+  background: rgba(0,0,0,.85); color: #fff; padding: 10px 20px; border-radius: 20px;
+  font-size: 14px; z-index: 1000; opacity: 0; pointer-events: none;
+  transition: opacity .3s;
+}
+.toast.show { opacity: 1; }
+
+/* 页脚说明 */
+.footer-note {
+  text-align: center; color: var(--muted); font-size: 11px;
+  padding: 20px;
+}
+</style>
+</head>
+<body>
+
+<div class="loading" id="loading">
+  <div class="spinner"></div>
+  <p>加载资料中...</p>
+</div>
+
+<div class="header">
+  <h1>📚 考研政治背诵播放器</h1>
+  <div class="sub">闭眼听 · 随时记 · 安心背</div>
+</div>
+
+<!-- 书籍选择 -->
+<div class="section">
+  <div class="section-title">选择资料</div>
+  <div class="pills" id="bookPills"></div>
+</div>
+
+<!-- 子分类筛选 -->
+<div class="section" id="subSection" style="display:none">
+  <div class="section-title">筛选子类 (可多选)</div>
+  <div class="pills" id="subPills"></div>
+</div>
+
+<!-- 当前播放 -->
+<div class="now-playing">
+  <div class="label">正在播放</div>
+  <div class="meta" id="nowMeta">—</div>
+  <div class="text" id="nowText">点击下方 ▶ 开始播放</div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+</div>
+
+<!-- 知识点列表 -->
+<div class="section">
+  <div class="section-title">知识点列表 <span id="listCount" style="color:var(--accent2);font-size:12px"></span></div>
+</div>
+<div class="list" id="list"></div>
+
+<div class="footer-note">
+  💡 支持浏览器后台播放 / 锁屏时可能需保持屏幕常亮<br>
+  语音引擎由系统提供 · 首次使用会提示授权
+</div>
+
+<!-- 底部控制栏 -->
+<div class="controls">
+  <div class="row">
+    <div class="btn-group">
+      <button class="btn small" id="btnList" title="列表">📋</button>
+    </div>
+    <div class="btn-group" style="flex:1;justify-content:center">
+      <button class="btn" id="btnPrev" title="上一条"><span class="ic">⏮</span></button>
+      <button class="btn play" id="btnPlay" title="播放/暂停"><span class="ic" id="playIc">▶</span></button>
+      <button class="btn" id="btnNext" title="下一条"><span class="ic">⏭</span></button>
+    </div>
+    <div class="info-text" id="idxInfo">0/0</div>
+  </div>
+  <div class="row">
+    <div class="btn-group">
+      <button class="btn speed" id="btnSpeed" title="倍速">1.0x</button>
+      <button class="btn speed" id="btnGap" title="段落停顿">自然</button>
+    </div>
+    <div class="btn-group" style="flex:1;justify-content:center">
+      <button class="btn small" id="btnReplay" title="重说">🔁</button>
+      <button class="btn small" id="btnStop" title="停止">⏹</button>
+    </div>
+    <div class="btn-group">
+      <button class="btn mode active-mode" data-mode="seq" title="顺序">顺序</button>
+      <button class="btn mode" data-mode="shuffle" title="乱序">乱序</button>
+      <button class="btn mode" data-mode="rand" title="随机">随机</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ─────────────────────────────────────
+ *  状态
+ * ───────────────────────────────────── */
+const state = {
+  data: null,
+  bookIdx: 0,
+  selectedSubs: null,   // null = 全部, [] = 空, [...] = 指定
+  flatList: [],          // 当前筛选后的段落 [{sub, text}]
+  queue: [],             // 播放顺序(索引)
+  queuePos: 0,
+  mode: 'seq',           // seq / shuffle / rand
+  speed: 1.0,
+  voices: [],
+  useAudio: true,        // 优先使用预生成音频
+  pauseGap: 900,         // 段落间停顿(ms)
+  audioEl: new Audio(),
+  audioAvailable: false
+};
+
+const LS_KEY = 'kaoyan_player_v2';
+
+/* ─────────────────────────────────────
+ *  初始化
+ * ───────────────────────────────────── */
+async function init() {
+  // 加载数据
+  try {
+    const r = await fetch('data.json', { cache: 'no-store' });
+    state.data = await r.json();
+  } catch(e) {
+    // 直接打开HTML时fetch会被CORS阻止，回退到相对路径
+    alert('无法加载 data.json，请使用本地服务器启动。\n\nWindows: 在本文件夹执行:\npython -m http.server 8000\n然后浏览器打开 http://localhost:8000/');
+    document.getElementById('loading').remove();
+    return;
+  }
+
+  // 加载语音列表
+  loadVoices();
+  if (speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = loadVoices;
+  }
+
+  // 恢复状态
+  loadState();
+
+  // 渲染UI
+  renderBookPills();
+  renderSubPills();
+  rebuildQueue();
+  renderList();
+
+  hideLoading();
+
+  // 页面可见性变化 → 暂停/恢复
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      // 不做暂停，让它继续在后台播
+    }
+  });
+}
+
+function loadVoices() {
+  state.voices = speechSynthesis.getVoices().filter(v =>
+    v.lang.toLowerCase().startsWith('zh') || v.name.includes('Chinese') || v.name.includes('普通话') || v.name.includes('中文')
+  );
+  console.log('可用中文语音:', state.voices.length);
+}
+
+function loadState() {
+  try {
+    const s = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
+    if (s.bookIdx != null) state.bookIdx = s.bookIdx;
+    if (s.selectedSubs != null) state.selectedSubs = s.selectedSubs;
+    if (s.mode) state.mode = s.mode;
+    if (s.speed) state.speed = s.speed;
+    if (s.queuePos != null) state.queuePos = s.queuePos;
+    if (s.pauseGap) state.pauseGap = s.pauseGap;
+  } catch(e) {}
+}
+function saveState() {
+  localStorage.setItem(LS_KEY, JSON.stringify({
+    bookIdx: state.bookIdx,
+    selectedSubs: state.selectedSubs,
+    mode: state.mode,
+    speed: state.speed,
+    queuePos: state.queuePos,
+    pauseGap: state.pauseGap
+  }));
+}
+
+/* ─────────────────────────────────────
+ *  UI 渲染
+ * ───────────────────────────────────── */
+function hideLoading() {
+  document.getElementById('loading').style.display = 'none';
+}
+
+function renderBookPills() {
+  const wrap = document.getElementById('bookPills');
+  wrap.innerHTML = '';
+  state.data.books.forEach((b, i) => {
+    if (b.is_scanned) return; // 跳过扫描版
+    const el = document.createElement('div');
+    el.className = 'pill' + (i === state.bookIdx ? ' active' : '');
+    el.innerHTML = `${b.main_category}<span class="count">${b.total_segments}</span>`;
+    el.onclick = () => {
+      state.bookIdx = i;
+      state.selectedSubs = null;
+      state.queuePos = 0;
+      renderBookPills();
+      renderSubPills();
+      rebuildQueue();
+      renderList();
+      saveState();
+      stopSpeech();
+    };
+    wrap.appendChild(el);
+  });
+}
+
+function renderSubPills() {
+  const wrap = document.getElementById('subPills');
+  const book = state.data.books[state.bookIdx];
+  if (!book || !book.sub_categories.length) {
+    document.getElementById('subSection').style.display = 'none';
+    return;
+  }
+  document.getElementById('subSection').style.display = 'block';
+  wrap.innerHTML = '';
+
+  // "全部"按钮
+  const allBtn = document.createElement('div');
+  allBtn.className = 'pill' + (state.selectedSubs === null ? ' active' : '');
+  allBtn.innerHTML = `全部<span class="count">${book.total_segments}</span>`;
+  allBtn.onclick = () => {
+    state.selectedSubs = null;
+    renderSubPills();
+    rebuildQueue(); renderList(); saveState();
+  };
+  wrap.appendChild(allBtn);
+
+  book.sub_categories.forEach(sub => {
+    const el = document.createElement('div');
+    const selected = state.selectedSubs && state.selectedSubs.includes(sub.name);
+    el.className = 'pill' + (selected ? ' active' : '');
+    el.innerHTML = `${sub.name}<span class="count">${sub.count}</span>`;
+    el.onclick = () => {
+      if (!state.selectedSubs) state.selectedSubs = [];
+      const idx = state.selectedSubs.indexOf(sub.name);
+      if (idx >= 0) state.selectedSubs.splice(idx, 1);
+      else state.selectedSubs.push(sub.name);
+      renderSubPills();
+      rebuildQueue(); renderList(); saveState();
+    };
+    wrap.appendChild(el);
+  });
+}
+
+function rebuildQueue() {
+  const book = state.data.books[state.bookIdx];
+  let subs = state.selectedSubs;
+  if (!subs || subs.length === 0) subs = null;
+
+  // 构建 flatList (当前筛选结果)
+  state.flatList = [];
+  if (subs === null) {
+    state.flatList = book.segments.slice();
+  } else {
+    const allowed = new Set(subs);
+    state.flatList = book.segments.filter(s => allowed.has(s.sub));
+  }
+
+  // 检查这本书是否有音频
+  state.audioAvailable = state.flatList.some(s => s.audio);
+
+  // queue: 索引列表
+  state.queue = state.flatList.map((_, i) => i);
+  state.queuePos = Math.min(state.queuePos, state.queue.length - 1);
+  if (state.queuePos < 0) state.queuePos = 0;
+
+  applyMode(state.mode);
+  updateIdxInfo();
+}
+
+function applyMode(mode) {
+  state.mode = mode;
+  document.querySelectorAll('.btn.mode').forEach(b => {
+    b.classList.toggle('active-mode', b.dataset.mode === mode);
+  });
+  if (mode === 'shuffle') {
+    // Fisher-Yates 洗牌
+    for (let i = state.queue.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [state.queue[i], state.queue[j]] = [state.queue[j], state.queue[i]];
+    }
+  }
+  saveState();
+}
+
+function updateIdxInfo() {
+  const total = state.queue.length;
+  const cur = state.queue[state.queuePos] != null ? state.queue[state.queuePos] + 1 : 0;
+  document.getElementById('idxInfo').textContent = `${cur}/${total}`;
+  document.getElementById('listCount').textContent = `· 共 ${total} 条`;
+}
+
+function renderList() {
+  const list = document.getElementById('list');
+  list.innerHTML = '';
+  if (state.flatList.length === 0) {
+    list.innerHTML = '<div class="empty">当前筛选下没有知识点</div>';
+    return;
+  }
+  state.flatList.forEach((seg, i) => {
+    const el = document.createElement('div');
+    el.className = 'list-item' + (i === state.queue[state.queuePos] && state.isPlaying ? ' active' : '');
+    el.innerHTML = `<div class="idx">#${i+1} · ${seg.sub || '未分类'}</div>
+      <div class="ls">${seg.text}</div>`;
+    el.onclick = () => {
+      state.queuePos = state.queue.indexOf(i);
+      if (state.queuePos < 0) { state.queue.push(i); state.queuePos = state.queue.length - 1; }
+      renderList();
+      play();
+    };
+    list.appendChild(el);
+  });
+}
+
+/* ─────────────────────────────────────
+ *  语音播放
+ * ───────────────────────────────────── */
+function getCurrentText() {
+  const flatIdx = state.queue[state.queuePos];
+  if (flatIdx == null) return null;
+  return state.flatList[flatIdx];
+}
+
+function pickVoice() {
+  // 优先选中文
+  const v = state.voices[0] || speechSynthesis.getVoices()[0];
+  return v || null;
+}
+
+/* ─────────────────────────────────────
+ *  播放状态机 (彻底重写)
+ *  状态: { currentMode, isPlaying, wasPaused }
+ * ───────────────────────────────────── */
+state.currentMode = null;   // 'audio' | 'tts' | null
+state.isPlaying = false;     // 当前是否在输出声音
+state.wasPaused = false;     // 是否被用户暂停过 (用于 resume 判断)
+state.autoNextTimer = null;  // setTimeout 句柄, 段落间停顿
+
+// UI helpers
+function setPlayIcon() {
+  document.getElementById('playIc').textContent = state.isPlaying ? '❚❚' : '▶';
+}
+function clearAutoNext() {
+  if (state.autoNextTimer) { clearTimeout(state.autoNextTimer); state.autoNextTimer = null; }
+}
+
+// 初始化 audio 事件 —— 只更新状态, 不触发 next/playCurrent
+(function initAudioState() {
+  const a = state.audioEl;
+  a.preload = 'metadata';
+  // play 事件: 真正开始出声
+  a.addEventListener('play', () => {
+    state.isPlaying = true;
+    state.wasPaused = false;
+    setPlayIcon();
+  });
+  // pause 事件: 暂停 (用户手动 or 调用 pause())
+  a.addEventListener('pause', () => {
+    // 只有在非 ended 情况下认为是"暂停中"
+    state.wasPaused = !a.ended;
+    state.isPlaying = false;
+    setPlayIcon();
+  });
+  // ended 事件: 播完一条, 触发自动下一条
+  a.addEventListener('ended', () => {
+    state.isPlaying = false;
+    state.wasPaused = false;
+    document.getElementById('progressFill').style.width = '100%';
+    setPlayIcon();
+    renderList();
+    clearAutoNext();
+    state.autoNextTimer = setTimeout(autoNextSeg, state.pauseGap);
+  });
+  a.addEventListener('error', () => {
+    console.warn('[audio] error, fallback to TTS:', a.src);
+    const seg = getCurrentText();
+    if (seg && state.currentMode === 'audio') {
+      playSegmentTTS(seg);
+    }
+  });
+  a.addEventListener('timeupdate', () => {
+    if (a.duration && !isNaN(a.duration)) {
+      document.getElementById('progressFill').style.width =
+        (a.currentTime / a.duration * 100) + '%';
+    }
+  });
+})();
+
+// 自动下一条 (区分顺序/乱序/随机)
+function autoNextSeg() {
+  clearAutoNext();
+  if (state.mode === 'rand') {
+    state.queuePos = Math.floor(Math.random() * state.flatList.length);
+  } else {
+    state.queuePos = (state.queuePos + 1) % state.queue.length;
+  }
+  updateIdxInfo();
+  renderList();
+  playSegment();
+}
+
+// 核心: 播放当前选中的那条
+function playSegment() {
+  clearAutoNext();
+  stopOutputOnly(); // 停掉 audio 和 TTS, 但不改 state.queuePos
+  state.wasPaused = false;
+
+  const seg = getCurrentText();
+  if (!seg) { toast('没有可播放内容'); return; }
+
+  // 更新 UI
+  const book = state.data.books[state.bookIdx];
+  const voiceTag = book.audio_voice ? '🎧' : '🔊';
+  document.getElementById('nowMeta').textContent =
+    `${voiceTag} ${book.main_category} · ${seg.sub || '未分类'} · #${state.queuePos+1}/${state.queue.length}`;
+  document.getElementById('nowText').textContent = seg.text;
+  document.getElementById('progressFill').style.width = '0%';
+
+  // 优先音频, 没有则TTS
+  if (state.useAudio && seg.audio) {
+    playSegmentAudio(seg);
+  } else {
+    playSegmentTTS(seg);
+  }
+  saveState();
+}
+
+function playSegmentAudio(seg) {
+  state.currentMode = 'audio';
+  state.audioEl.removeAttribute('src'); // 清旧 src
+  state.audioEl.src = seg.audio + '?t=' + Date.now();
+  state.audioEl.playbackRate = state.speed;
+  state.audioEl.currentTime = 0;
+  state.audioEl.play().catch(err => {
+    console.warn('[audio] play() rejected:', err);
+    // 只有明确是加载错误才回退, 其他浏览器可能只是因为 src 切换时机
+    if (err && (err.name === 'NotSupportedError' || err.name === 'NotReadableError')) {
+      playSegmentTTS(seg);
+    }
+  });
+}
+
+function playSegmentTTS(seg) {
+  state.currentMode = 'tts';
+  state.audioEl.pause();
+  state.audioEl.removeAttribute('src');
+
+  // 防止 onend 冒泡进我们的全局 ended 逻辑
+  const utter = new SpeechSynthesisUtterance(seg.text);
+  utter.lang = 'zh-CN';
+  utter.rate = state.speed;
+  utter.pitch = 1;
+  const v = pickVoice();
+  if (v) utter.voice = v;
+
+  utter.onend = () => {
+    state.isPlaying = false;
+    setPlayIcon();
+    document.getElementById('progressFill').style.width = '100%';
+    renderList();
+    clearAutoNext();
+    state.autoNextTimer = setTimeout(autoNextSeg, state.pauseGap);
+  };
+  utter.onerror = (e) => {
+    console.warn('[tts] error:', e);
+    state.isPlaying = false;
+    setPlayIcon();
+  };
+
+  speechSynthesis.cancel();
+  speechSynthesis.speak(utter);
+  // 同步标记, 即使浏览器的 onstart 不触发
+  state.isPlaying = true;
+  setPlayIcon();
+  // 兜底: speak 实际没发声时回退
+  setTimeout(() => {
+    if (state.isPlaying && !speechSynthesis.speaking && !speechSynthesis.pending) {
+      state.isPlaying = false;
+      setPlayIcon();
+    }
+  }, 600);
+}
+
+// 只停声音 (audio.pause + tts.cancel), 不改队列/进度
+function stopOutputOnly() {
+  clearAutoNext();
+  speechSynthesis.cancel();
+  try { state.audioEl.pause(); } catch(e) {}
+  state.isPlaying = false;
+  setPlayIcon();
+}
+
+// 彻底停止 (连"暂停状态"也清除, 下一次点击 play 就是从当前段从头来)
+function stopAll() {
+  stopOutputOnly();
+  state.wasPaused = false;
+  state.currentMode = null;
+}
+
+/* ─────────── 对外: togglePlay / next / prev / replay ─────────── */
+
+function togglePlay() {
+  if (state.isPlaying) {
+    // 正在出声 → 暂停当前 mode
+    if (state.currentMode === 'audio') {
+      state.audioEl.pause();
+      // pause 事件会设 state.wasPaused=true, state.isPlaying=false
+    } else if (state.currentMode === 'tts') {
+      speechSynthesis.pause();
+      state.isPlaying = false;
+      state.wasPaused = true;
+      setPlayIcon();
+    }
+    return;
+  }
+
+  // 没在出声
+  if (state.wasPaused) {
+    // 被暂停过 → 恢复! (不从头来)
+    if (state.currentMode === 'audio') {
+      state.audioEl.play().catch(() => { /* src 失效就从头 play */ });
+      // play 事件会设 state.isPlaying=true
+    } else if (state.currentMode === 'tts') {
+      speechSynthesis.resume();
+      state.isPlaying = true;
+      state.wasPaused = false;
+      setPlayIcon();
+    }
+    return;
+  }
+
+  // 第一次点 play / 或刚 next 完 → 从头播当前段
+  playSegment();
+}
+
+function next() {
+  clearAutoNext();
+  stopOutputOnly();
+  if (state.mode === 'rand') {
+    state.queuePos = Math.floor(Math.random() * state.flatList.length);
+  } else {
+    state.queuePos = (state.queuePos + 1) % state.queue.length;
+  }
+  state.wasPaused = false;
+  state.currentMode = null;
+  updateIdxInfo(); renderList(); playSegment();
+}
+
+function prev() {
+  clearAutoNext();
+  stopOutputOnly();
+  state.queuePos = (state.queuePos - 1 + state.queue.length) % state.queue.length;
+  state.wasPaused = false;
+  state.currentMode = null;
+  updateIdxInfo(); renderList(); playSegment();
+}
+
+function replay() {
+  clearAutoNext();
+  stopOutputOnly();
+  state.wasPaused = false;
+  state.currentMode = null;
+  playSegment();
+}
+
+
+/* ─────────────────────────────────────
+ *  倍速
+ * ───────────────────────────────────── */
+function cycleSpeed() {
+  const speeds = [0.6, 0.8, 1.0, 1.2, 1.5, 1.8, 2.0];
+  const cur = speeds.indexOf(state.speed);
+  state.speed = speeds[(cur + 1) % speeds.length];
+  document.getElementById('btnSpeed').textContent = state.speed.toFixed(1) + 'x';
+  saveState();
+  // 如果正在播: 音频改 playbackRate / TTS 重开
+  if (state.currentMode === 'audio' && state.isPlaying) {
+    state.audioEl.playbackRate = state.speed;
+  } else if (state.isPlaying) {
+    stopOutputOnly();
+    playSegment();
+  }
+  toast(`倍速 ${state.speed}x`);
+}
+
+/* ─────────────────────────────────────
+ *  段落停顿 (cycleGap)
+ * ───────────────────────────────────── */
+function cycleGap() {
+  const gaps = [400, 700, 900, 1200, 1800, 2500];
+  const cur = gaps.indexOf(state.pauseGap);
+  state.pauseGap = gaps[(cur + 1) % gaps.length];
+  const labels = {400:'紧凑', 700:'稍快', 900:'自然', 1200:'宽松', 1800:'长停', 2500:'深呼吸'};
+  const btn = document.getElementById('btnGap');
+  if (btn) btn.textContent = labels[state.pauseGap] || state.pauseGap + 'ms';
+  saveState();
+  toast(`段落停顿: ${labels[state.pauseGap]}`);
+}
+
+/* ─────────────────────────────────────
+ *  toast
+ * ───────────────────────────────────── */
+let _toastTimer;
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => t.classList.remove('show'), 1200);
+}
+
+/* ─────────────────────────────────────
+ *  事件绑定
+ * ───────────────────────────────────── */
+document.getElementById('btnPlay').onclick = togglePlay;
+document.getElementById('btnNext').onclick = next;
+document.getElementById('btnPrev').onclick = prev;
+document.getElementById('btnSpeed').onclick = cycleSpeed;
+document.getElementById('btnGap').onclick = cycleGap;
+document.getElementById('btnReplay').onclick = replay;
+document.getElementById('btnStop').onclick = stopAll;
+document.querySelectorAll('.btn.mode').forEach(b => {
+  b.onclick = () => {
+    applyMode(b.dataset.mode);
+    toast('模式: ' + b.textContent.trim());
+  };
+});
+document.getElementById('btnList').onclick = () => {
+  window.scrollTo({ top: document.querySelector('.list').offsetTop - 100, behavior: 'smooth' });
+};
+
+// 初始化显示
+document.getElementById('btnSpeed').textContent = state.speed.toFixed(1) + 'x';
+const gapsLabel = {400:'紧凑', 700:'稍快', 900:'自然', 1200:'宽松', 1800:'长停', 2500:'深呼吸'};
+document.getElementById('btnGap').textContent = gapsLabel[state.pauseGap] || '自然';
+
+/* ─────────────────────────────────────
+ *  启动
+ * ───────────────────────────────────── */
+init();
+
+// 注册 Service Worker (PWA 支持, 可添加到主屏幕)
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
