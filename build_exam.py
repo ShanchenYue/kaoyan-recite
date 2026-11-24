@@ -30,8 +30,10 @@ def paras(path):
         t = norm(p.text)
         if not t:
             continue
-        if re.search(r'微信公众号|微信扫码|考研政治真题第\s*\d+\s*页|自助打印|顺丰|淘宝|叮当助考|政治真题答案解析第'
+        if re.search(r'微信公众号|微信扫码|公众号|考研政治真题第\s*\d+\s*页|自助打印|顺丰|淘宝|叮当助考|政治真题答案解析第'
                      r'|考研政治讲真题|^\d{4}\s*年全国硕士研究生招生考试', t):
+            continue
+        if re.match(r'^[\u4e00-\u9fa5]$', t):
             continue
         if re.match(r'^[\u4e00-\u9fa5](\s+[\u4e00-\u9fa5]){1,8}$', t):
             continue
