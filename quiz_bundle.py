@@ -12,6 +12,7 @@ MAP = {
     'choice.json': ('__QUIZ_CHOICE__', {'version': 0, 'items': []}),
     'words.json':  ('__QUIZ_WORDS__',  {'version': 0, 'items': []}),
     'fill.json':   ('__QUIZ_FILL__',   {'version': 0, 'items': []}),
+    'math.json':   ('__QUIZ_MATH__',   {'version': 0, 'tests': []}),
 }
 
 parts = []
@@ -20,7 +21,7 @@ for fname, (gvar, default) in MAP.items():
     if os.path.isfile(path):
         with open(path, 'r', encoding='utf-8') as f:
             obj = json.load(f)
-        n = len(obj.get('items', []))
+        n = len(obj.get('items', obj.get('tests', [])))
         print(f"  {gvar}: {n} 条")
     else:
         obj = default

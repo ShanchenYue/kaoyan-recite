@@ -123,6 +123,26 @@ body{min-height:100vh;overflow-x:hidden;padding-bottom:96px}
 
 .empty{text-align:center;color:var(--muted);padding:48px 18px;font-size:14px;line-height:1.9}
 
+/* ── 数学公式图片题 ── */
+.mathwrap{margin-top:14px;border-radius:14px;overflow:hidden;background:#fff;position:relative;
+  border:1px solid var(--line)}
+.mathwrap img{width:100%;display:block}
+.mathwrap .zbtn{position:absolute;right:10px;bottom:10px;background:rgba(11,12,18,.78);color:#fff;
+  border:none;font-size:11px;padding:5px 10px;border-radius:9px;font-family:inherit}
+.ansblock{margin-top:12px;display:none}
+.ansblock.show{display:block}
+.ansblock .lbl{font-size:11px;color:var(--accent2);letter-spacing:1px;margin-bottom:8px}
+.ansblock img{width:100%;display:block;border-radius:10px;background:#fff;margin-top:8px;border:1px solid var(--line)}
+.mz{position:fixed;inset:0;z-index:300;background:rgba(6,7,12,.97);overflow:auto;display:none;
+  padding:calc(var(--safe-top) + 12px) 10px 24px}
+.mz.show{display:block}
+.mz img{width:100%;max-width:900px;margin:0 auto;display:block;background:#fff;border-radius:8px}
+.mz .bar{position:sticky;top:0;z-index:2;display:flex;gap:10px;justify-content:flex-end;
+  max-width:900px;margin:0 auto 10px}
+.mz .bar button{padding:8px 14px;border-radius:10px;border:1px solid var(--line);
+  background:var(--card);color:var(--text);font-family:inherit;font-size:13px}
+.kbadge.k5{background:rgba(96,165,250,.14);color:#93c5fd;border-color:rgba(96,165,250,.3)}
+
 /* ── 单词清单 ── */
 .seg{display:flex;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:3px;margin-top:12px}
 .seg button{flex:1;padding:8px 0;border:none;background:none;color:var(--muted);font-size:13.5px;
@@ -173,6 +193,7 @@ body{min-height:100vh;overflow-x:hidden;padding-bottom:96px}
 </style>
 </head>
 <body>
+<script src="auth.js"></script>
 
 <header class="appbar">
   <div class="title"><b>考研训练营</b><span>背诵 · 刷题 · 评估</span></div>
@@ -181,6 +202,7 @@ body{min-height:100vh;overflow-x:hidden;padding-bottom:96px}
     <button data-tab="choice">📝 选择</button>
     <button data-tab="words">🔤 单词</button>
     <button data-tab="fill">🧮 填空</button>
+    <button data-tab="math">📐 公式</button>
     <button data-tab="wrong">🔁 错题本</button>
     <button data-tab="stats">📊 评估</button>
     <a href="index.html" style="text-decoration:none"><button>🎧 背诵</button></a>
@@ -248,6 +270,18 @@ body{min-height:100vh;overflow-x:hidden;padding-bottom:96px}
   </div>
   <div class="statline" id="fillStat"></div>
   <div id="fillCard"></div>
+</section>
+
+<!-- ═════════ 数学公式 ═════════ -->
+<section class="page" id="page-math">
+  <div class="panel">
+    <div class="panel-head"><span>数学公式默写</span><span class="fake" id="mathScope">高数</span></div>
+    <div class="frow"><span class="flabel">类别</span><div class="pills" id="mathCatBar"></div></div>
+    <div class="frow"><span class="flabel">测试</span><div class="pills scroll" id="mathTestBar"></div></div>
+    <div class="frow"><span class="flabel">状态</span><div class="pills" id="mathStatusBar"></div></div>
+  </div>
+  <div class="statline" id="mathStat"></div>
+  <div id="mathCard"></div>
 </section>
 
 <!-- ═════════ 错题本 ═════════ -->
@@ -346,6 +380,7 @@ function setTab(name){
   window.scrollTo(0,0);
   if(name==='wrong') renderWrongBook();
   if(name==='stats') renderStats();
+  if(name==='math'){ mhRenderFilters(); mhShow(); }
   if(name==='words' && wdState.view==='list') renderWordsList();
 }
 document.querySelectorAll('#tabs [data-tab]').forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
@@ -841,19 +876,146 @@ function flJudge(ok){
   if(ok && rec.m) setTimeout(()=>flBuildList(), 1000);
 }
 
-/* ══════════════════ ⑤ 错题本 ══════════════════ */
+/* ══════════════════ ⑤ 数学公式（图片题） ══════════════════ */
+const MATH = (window.__QUIZ_MATH__ && window.__QUIZ_MATH__.tests) || [];
+const MATH_PAGES = [];
+MATH.forEach(t=>t.pages.forEach((src,i)=>MATH_PAGES.push({id:t.id+'_p'+(i+1), test:t, n:i, src:src})));
+const mhState = { cat:'gaoshu', test:'__all', status:'todo', idx:0, list:[], revealed:false };
+
+function mhCatNames(){ return [...new Set(MATH.map(t=>t.cat))] }
+function mhCatLabel(c){ const t=MATH.find(x=>x.cat===c); return t? t.catName : c; }
+function mhTests(){ return MATH.filter(t=>t.cat===mhState.cat) }
+function mhScope(){
+  return MATH_PAGES.filter(p=> p.test.cat===mhState.cat && (mhState.test==='__all'||p.test.id===mhState.test));
+}
+function mhBuildList(startId){
+  let arr = filterStatus('math', mhScope(), mhState.status);
+  if(mhState.status==='wrong') arr = sortWrong('math', arr);
+  mhState.list = arr;
+  mhState.idx = Math.max(0, startId? arr.findIndex(x=>x.id===startId):0);
+  mhRenderFilters(); mhShow();
+}
+function mhRenderFilters(){
+  renderPills(document.getElementById('mathCatBar'),
+    mhCatNames().map(c=>({v:c,t:mhCatLabel(c)})), mhState.cat,
+    v=>{ mhState.cat=v; mhState.test='__all'; mhBuildList(); });
+  renderPills(document.getElementById('mathTestBar'),
+    [{v:'__all',t:'全部测试'}].concat(mhTests().map(t=>({v:t.id,t:'第'+t.no+'次'}))), mhState.test,
+    v=>{ mhState.test=v; mhBuildList(); }, 'soft');
+  renderPills(document.getElementById('mathStatusBar'),
+    [{v:'todo',t:'待练'},{v:'wrong',t:'只练错题'},{v:'all',t:'全部'}], mhState.status,
+    v=>{ mhState.status=v; mhBuildList(); }, 'soft');
+  const cur = mhState.test==='__all'? '全部测试' : (MATH.find(t=>t.id===mhState.test)||{}).title;
+  document.getElementById('mathScope').textContent = mhCatLabel(mhState.cat)+(mhState.test==='__all'?'':' · '+cur);
+}
+function mhStatText(){
+  const total = mhScope().length, m = masteredCount('math');
+  const pct = total? Math.round(m/total*100):0;
+  document.getElementById('mathStat').innerHTML =
+    `<span>掌握 <b>${m}</b>/${MATH_PAGES.length}</span>
+     <div class="progress"><i style="width:${Math.min(100,pct)}%"></i></div>
+     <span>错题 <b>${wrongCount('math')}</b> · 本轮 <b>${mhState.list.length}</b></span>`;
+}
+function mhShow(){
+  mhStatText();
+  const box = document.getElementById('mathCard');
+  if(!MATH.length){ box.innerHTML='<div class="empty">公式题库尚未生成</div>'; return; }
+  if(!mhState.list.length){
+    box.innerHTML='<div class="empty">🎉 当前范围没有待练页面<br>切换「状态」可查看全部或错题</div>'; return;
+  }
+  if(mhState.idx>=mhState.list.length) mhState.idx=0;
+  const p = mhState.list[mhState.idx]; mhState.revealed=false;
+  const rec = getRec('math', p.id);
+  const ans = p.test.answers||[];
+  let ansImgs='';
+  if(ans.length){
+    if(ans.length===p.test.pages.length) ansImgs = `<img src="${ans[p.n]}" loading="lazy">`;
+    else ansImgs = ans.map(a=>`<img src="${a}" loading="lazy">`).join('');
+  }
+  let html=`<div class="card"><div class="meta">
+      <span class="chip">${esc(p.test.title)}</span>
+      <span class="chip a2">第 ${p.n+1}/${p.test.pages.length} 页</span>
+      <span class="chip">${mhState.idx+1}/${mhState.list.length}</span>
+      ${rec.c?`<span class="chip gold">已对 ${Math.min(rec.c,3)}/3</span>`:''}
+      ${rec.w?`<span class="chip" style="color:var(--red)">错 ${rec.w}</span>`:''}
+    </div>
+    <div class="mathwrap"><img src="${p.src}" id="mhImg" loading="lazy">
+      <button class="zbtn" id="mhZoom">🔍 放大</button></div>
+    <div class="ansblock" id="mhAns"><div class="lbl">解析（共 ${ans.length} 页）</div>${ansImgs}</div>
+    <div class="btnrow" id="mhJudge" style="display:none">
+      <button class="btn green" id="mhOk">✅ 默写正确</button>
+      <button class="btn red" id="mhNo">❌ 没记住</button>
+    </div>
+    <div class="feedback" id="mhFb"></div>
+  </div>
+  <div class="bottom">
+    <button class="btn ghost mini" id="mhPrev">◀</button>
+    <button class="btn ghost" id="mhReveal">👁 显示答案</button>
+    <button class="btn ghost mini" id="mhNext">▶</button>
+  </div>`;
+  box.innerHTML = html;
+  const img=document.getElementById('mhImg');
+  document.getElementById('mhZoom').onclick=()=>mhZoom(p.src);
+  img.onclick=()=>mhZoom(p.src);
+  document.getElementById('mhReveal').onclick=()=>mhReveal();
+  document.getElementById('mhPrev').onclick=()=>{ mhState.idx=(mhState.idx-1+mhState.list.length)%mhState.list.length; mhShow(); };
+  document.getElementById('mhNext').onclick=()=>{ mhState.idx=(mhState.idx+1)%mhState.list.length; mhShow(); };
+  document.getElementById('mhOk').onclick=()=>mhJudge(true);
+  document.getElementById('mhNo').onclick=()=>mhJudge(false);
+  mhStatText();
+}
+function mhReveal(){
+  if(mhState.revealed) return;
+  mhState.revealed=true;
+  document.getElementById('mhAns').classList.add('show');
+  document.getElementById('mhJudge').style.display='flex';
+  document.getElementById('mhReveal').textContent='👁 已显示';
+}
+function mhJudge(ok){
+  const p=mhState.list[mhState.idx];
+  const rec=markResult('math', p.id, ok);
+  const fb=document.getElementById('mhFb');
+  fb.className='feedback show '+(ok?'good':'bad');
+  fb.innerHTML = ok?`✅ 连对 ${rec.c}/3${rec.m?' 🎉 已掌握，移出题库':''}`:`❌ 已记入错题本，记得回看解析`;
+  document.getElementById('mhJudge').style.display='none';
+  mhStatText();
+  if(ok && rec.m) setTimeout(()=>mhBuildList(), 1000);
+}
+function mhZoom(src){
+  let m=document.getElementById('mzBox');
+  if(!m){
+    m=document.createElement('div'); m.id='mzBox'; m.className='mz';
+    m.innerHTML='<div class="bar"><button id="mzWide">放大 180%</button><button id="mzClose">关闭</button></div><img id="mzImg">';
+    document.body.appendChild(m);
+    m.querySelector('#mzClose').onclick=()=>m.classList.remove('show');
+    let wide=false;
+    m.querySelector('#mzWide').onclick=function(){
+      wide=!wide;
+      const im=m.querySelector('#mzImg');
+      im.style.width=wide?'180%':'100%'; im.style.maxWidth=wide?'none':'900px';
+      this.textContent=wide?'适应宽度':'放大 180%';
+    };
+  }
+  const im=m.querySelector('#mzImg');
+  im.style.width='100%'; im.style.maxWidth='900px';
+  m.querySelector('#mzWide').textContent='放大 180%';
+  im.src=src; m.classList.add('show'); m.scrollTop=0;
+}
+
+/* ══════════════════ ⑥ 错题本 ══════════════════ */
 const wrongState = { kind:'all' };
 const KIND_INFO = {
   cloze:{name:'挖空', cls:'', items:()=>CLZ, text:x=>esc((x.template||'').replace(/〔\d+〕/g,'____')).slice(0,120)},
   choice:{name:'选择', cls:'k2', items:()=>CH, text:x=>esc(x.stem).slice(0,120)},
   word:{name:'单词', cls:'k3', items:()=>WD, text:x=>`${esc(x.word)} <span style="color:var(--muted)">— ${esc(x.meaning)}</span>`},
-  fill:{name:'填空', cls:'k4', items:()=>FL, text:x=>esc(x.q).slice(0,120)}
+  fill:{name:'填空', cls:'k4', items:()=>FL, text:x=>esc(x.q).slice(0,120)},
+  math:{name:'公式', cls:'k5', items:()=>MATH_PAGES, text:x=>esc(x.test.title+' · 第'+(x.n+1)+'页')}
 };
-const KIND_BUILD = {cloze:clzBuildList, choice:chBuildList, word:wdBuildList, fill:flBuildList};
-const KIND_STATE = {cloze:clzState, choice:chState, word:wdState, fill:flState};
+const KIND_BUILD = {cloze:clzBuildList, choice:chBuildList, word:wdBuildList, fill:flBuildList, math:mhBuildList};
+const KIND_STATE = {cloze:clzState, choice:chState, word:wdState, fill:flState, math:mhState};
 
 function renderWrongBook(){
-  const kinds = wrongState.kind==='all'? ['cloze','choice','word','fill'] : [wrongState.kind];
+  const kinds = wrongState.kind==='all'? ['cloze','choice','word','fill','math'] : [wrongState.kind];
   let rows=[]; let total=0;
   kinds.forEach(k=>{
     const info=KIND_INFO[k];
@@ -865,11 +1027,12 @@ function renderWrongBook(){
   rows.sort((a,b)=>b.r.w-a.r.w);
   const bar=document.getElementById('wrongKindBar');
   renderPills(bar,[
-    {v:'all',t:'全部', n:['cloze','choice','word','fill'].reduce((s,k)=>s+wrongCount(k),0)},
+    {v:'all',t:'全部', n:['cloze','choice','word','fill','math'].reduce((s,k)=>s+wrongCount(k),0)},
     {v:'cloze',t:'挖空',n:wrongCount('cloze')},
     {v:'choice',t:'选择',n:wrongCount('choice')},
     {v:'word',t:'单词',n:wrongCount('word')},
-    {v:'fill',t:'填空',n:wrongCount('fill')}
+    {v:'fill',t:'填空',n:wrongCount('fill')},
+    {v:'math',t:'公式',n:wrongCount('math')}
   ], wrongState.kind, v=>{ wrongState.kind=v; renderWrongBook(); });
 
   document.getElementById('wrongTotal').textContent = total+' 道';
@@ -884,7 +1047,7 @@ function renderWrongBook(){
     return `<div class="wrow wrong" data-k="${row.k}" data-id="${row.it.id}">
       <div class="top">
         <span class="kbadge ${info.cls}">${info.name}</span>
-        <span style="font-size:11px;color:var(--muted)">${row.k==='choice'?esc(row.it.set.replace('肖八·',''))+' · 第'+row.it.no+'题':''}</span>
+        <span style="font-size:11px;color:var(--muted)">${row.k==='choice'?esc(row.it.set.replace('肖八·',''))+' · 第'+row.it.no+'题' : row.k==='math'?esc(row.it.test.title) : ''}</span>
         <span class="wcnt">错 ${row.r.w} 次 · 对 ${row.r.c} 次</span>
       </div>
       <div class="txt">${info.text(row.it)}</div>
@@ -897,6 +1060,10 @@ function renderWrongBook(){
 function practiceWrong(kind, id){
   const st=KIND_STATE[kind];
   st.status='wrong';
+  if(kind==='math'){
+    const p=MATH_PAGES.find(x=>x.id===id);
+    if(p){ mhState.cat=p.test.cat; mhState.test='__all'; }
+  }
   KIND_BUILD[kind](id);
   setTab(kind==='word'?'words':kind);
   if(kind==='word'){ wdState.view='practice'; document.querySelectorAll('#wordsSeg [data-wmode]').forEach(x=>x.classList.toggle('active', x.dataset.wmode==='practice')); document.getElementById('wordsPractice').style.display='block'; document.getElementById('wordsList').style.display='none'; }
@@ -922,7 +1089,8 @@ function renderStats(){
     {k:'cloze', name:'政治挖空', items:CLZ, total:CLZ.length},
     {k:'choice', name:'肖八选择', items:CH, total:CH.length},
     {k:'word', name:'英语单词', items:WD, total:WD.length},
-    {k:'fill', name:'数学/信号/政治填空', items:FL, total:FL.length}
+    {k:'fill', name:'数学/信号/政治填空', items:FL, total:FL.length},
+    {k:'math', name:'数学公式', items:MATH_PAGES, total:MATH_PAGES.length}
   ];
   let allC=0, allW=0;
   const cards = kinds.map(x=>{
@@ -943,7 +1111,8 @@ function renderStats(){
     ...groupStats('cloze', CLZ, it=>it.book+' · '+(it.sub||'综合')),
     ...groupStats('choice', CH, it=>it.set.replace('肖八·','套卷')),
     ...groupStats('word', WD, ()=> '英语词汇'),
-    ...groupStats('fill', FL, it=>(it.subject||'其他')+' · '+(it.sub||''))
+    ...groupStats('fill', FL, it=>(it.subject||'其他')+' · '+(it.sub||'')),
+    ...groupStats('math', MATH_PAGES, p=>p.test.title)
   ].sort((a,b)=>a.acc-b.acc || b.att-a.att);
 
   const shown = groups.filter(g=>g.att>=1).slice(0,14);
@@ -969,7 +1138,7 @@ function renderStats(){
     }).join('');
   }
   const overall = (allC+allW)? Math.round(allC/(allC+allW)*100):0;
-  advice += `<div class="advice" style="border-left-color:var(--accent2)">📈 总体正确率 <b>${allC+allW?overall+'%':'—'}</b>（累计作答 ${allC+allW} 次）· 已掌握 ${masteredCount('cloze')+masteredCount('choice')+masteredCount('word')+masteredCount('fill')} 题 · 错题 ${wrongCount('cloze')+wrongCount('choice')+wrongCount('word')+wrongCount('fill')} 道</div>`;
+  advice += `<div class="advice" style="border-left-color:var(--accent2)">📈 总体正确率 <b>${allC+allW?overall+'%':'—'}</b>（累计作答 ${allC+allW} 次）· 已掌握 ${masteredCount('cloze')+masteredCount('choice')+masteredCount('word')+masteredCount('fill')+masteredCount('math')} 题 · 错题 ${wrongCount('cloze')+wrongCount('choice')+wrongCount('word')+wrongCount('fill')+wrongCount('math')} 道</div>`;
   document.getElementById('statsAdvice').innerHTML = advice;
 }
 
@@ -979,7 +1148,7 @@ function boot(){
   if(booted) return;
   booted=true;
   refreshMasteredAudio();
-  clzBuildList(); chBuildList(); wdBuildList(); flBuildList();
+  clzBuildList(); chBuildList(); wdBuildList(); flBuildList(); mhBuildList();
 }
 document.addEventListener('DOMContentLoaded',boot);
 if(document.readyState!=='loading') boot();

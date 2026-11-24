@@ -75,7 +75,7 @@ else:
     print("  ⚠️  没有 audios 目录, 跳过")
 
 # 7. 复制其他静态文件
-for fname in ['sw.js', 'manifest.json', 'icon.svg', 'quiz.html', 'quiz_data.js']:
+for fname in ['sw.js', 'manifest.json', 'icon.svg', 'quiz.html', 'quiz_data.js', 'auth.js']:
     src = os.path.join(APP_DIR, fname)
     if os.path.isfile(src):
         shutil.copy2(src, os.path.join(ASSETS, fname))
@@ -89,6 +89,16 @@ if os.path.isdir(src_katex):
         shutil.rmtree(dst_katex)
     shutil.copytree(src_katex, dst_katex)
     print("  ✅ vendor/katex 同步")
+
+# 7.2 复制数学公式题图片
+src_math = os.path.join(APP_DIR, 'math')
+dst_math = os.path.join(ASSETS, 'math')
+if os.path.isdir(src_math):
+    if os.path.exists(dst_math):
+        shutil.rmtree(dst_math)
+    shutil.copytree(src_math, dst_math)
+    n = sum(1 for _ in os.walk(dst_math) for f in _[2] if f.endswith('.webp'))
+    print(f"  ✅ math 公式题图片同步 ({n} 张)")
 
 # 8. 同步 data.json 到 assets (备份, 以防万一)
 shutil.copy2(os.path.join(APP_DIR, 'data.json'), os.path.join(ASSETS, 'data.json'))
