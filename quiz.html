@@ -247,6 +247,7 @@ body.focus-on{padding-top:calc(var(--safe-top) + 66px)}
     <button data-tab="words">🔤 单词</button>
     <button data-tab="fill">🧮 填空</button>
     <button data-tab="math">📐 公式</button>
+    <button data-tab="essay">📜 大题</button>
     <button data-tab="wrong">🔁 错题本</button>
     <button data-tab="stats">📊 评估</button>
     <a href="index.html" style="text-decoration:none"><button>🎧 背诵</button></a>
@@ -332,6 +333,18 @@ body.focus-on{padding-top:calc(var(--safe-top) + 66px)}
   </div>
   <div class="statline" id="mathStat"></div>
   <div id="mathCard"></div>
+</section>
+
+<!-- ═════════ 真题大题 ═════════ -->
+<section class="page" id="page-essay">
+  <div class="panel">
+    <div class="panel-head"><span>政治真题 · 材料分析</span><span class="fake" id="essayScope">全部年份</span></div>
+    <div class="frow"><span class="flabel">年份</span><div class="pills scroll" id="essayYearBar"></div></div>
+    <div class="frow"><span class="flabel">模块</span><div class="pills" id="essayTagBar"></div></div>
+    <div class="frow"><span class="flabel">状态</span><div class="pills" id="essayStatusBar"></div></div>
+  </div>
+  <div class="statline" id="essayStat"></div>
+  <div id="essayCard"></div>
 </section>
 
 <!-- ═════════ 错题本 ═════════ -->
@@ -450,6 +463,7 @@ function setTab(name){
   if(name==='wrong') renderWrongBook();
   if(name==='stats') renderStats();
   if(name==='math'){ mhRenderFilters(); mhShow(); }
+  if(name==='essay'){ esRenderFilters(); esShow(); }
   if(name==='words' && wdState.view==='list') renderWordsList();
 }
 document.querySelectorAll('#tabs [data-tab]').forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
@@ -606,7 +620,10 @@ function clzCheck(){
 }
 
 /* ══════════════════ ② 选择题 ══════════════════ */
-const CH = (window.__QUIZ_CHOICE__ && window.__QUIZ_CHOICE__.items) || [];
+const CH = [].concat(
+  (window.__QUIZ_CHOICE__ && window.__QUIZ_CHOICE__.items) || [],
+  (window.__QUIZ_EXAM_CHOICE__ && window.__QUIZ_EXAM_CHOICE__.items) || []
+);
 const chState = { set:'__all', type:'all', status:'todo', order:'seq', idx:0, list:[], answered:false, timer:null, done:{} };
 
 function chSets(){ return [...new Set(CH.map(x=>x.set))] }
@@ -1071,6 +1088,103 @@ function mhZoom(src){
   im.src=src; m.classList.add('show'); m.scrollTop=0;
 }
 
+/* ══════════════════ ⑦ 真题大题 ══════════════════ */
+const ES = (window.__QUIZ_ESSAY__ && window.__QUIZ_ESSAY__.items) || [];
+const esState = { year:'__all', tag:'all', status:'todo', idx:0, list:[], revealed:false };
+
+function esYears(){ return [...new Set(ES.map(x=>String(x.year)))].sort(); }
+function esScope(){
+  return ES.filter(x=> esState.year==='__all' || String(x.year)===esState.year)
+           .filter(x=> esState.tag==='all' || x.tag===esState.tag);
+}
+function esBuildList(startId){
+  let arr = filterStatus('essay', esScope(), esState.status);
+  if(esState.status==='wrong') arr = sortWrong('essay', arr);
+  esState.list = arr;
+  esState.idx = Math.max(0, startId? arr.findIndex(x=>x.id===startId):0);
+  esRenderFilters(); esShow();
+}
+function esRenderFilters(){
+  renderPills(document.getElementById('essayYearBar'),
+    [{v:'__all',t:'全部'}].concat(esYears().map(y=>({v:y,t:y}))), esState.year,
+    v=>{ esState.year=v; esBuildList(); });
+  renderPills(document.getElementById('essayTagBar'),
+    [{v:'all',t:'全部'}].concat(['马原','毛中特','史纲','思修','当代'].map(t=>({v:t,t}))), esState.tag,
+    v=>{ esState.tag=v; esBuildList(); }, 'soft');
+  renderPills(document.getElementById('essayStatusBar'),
+    [{v:'todo',t:'待练'},{v:'wrong',t:'需复习'},{v:'all',t:'全部'}], esState.status,
+    v=>{ esState.status=v; esBuildList(); }, 'soft');
+  document.getElementById('essayScope').textContent =
+    (esState.year==='__all'?'全部年份':esState.year+'年') + (esState.tag==='all'?'':' · '+esState.tag);
+}
+function esStatText(){
+  const total = esScope().length, m = masteredCount('essay');
+  const pct = total? Math.round(m/total*100):0;
+  document.getElementById('essayStat').innerHTML =
+    `<span>掌握 <b>${m}</b>/${total}</span>
+     <div class="progress"><i style="width:${pct}%"></i></div>
+     <span>需复习 <b>${wrongCount('essay')}</b> · 本轮 <b>${esState.list.length}</b></span>`;
+}
+function esShow(){
+  esStatText();
+  const box = document.getElementById('essayCard');
+  if(!ES.length){ box.innerHTML='<div class="empty">真题大题尚未生成</div>'; return; }
+  if(!esState.list.length){
+    box.innerHTML='<div class="empty">🎉 当前范围没有题目<br>切换「状态」可查看全部</div>'; return;
+  }
+  if(esState.idx>=esState.list.length) esState.idx=0;
+  const it = esState.list[esState.idx], rec = getRec('essay', it.id);
+  esState.revealed = false;
+  let html=`<div class="card"><div class="meta">
+      <span class="chip">${it.year} 年</span>
+      <span class="chip">第 ${it.no} 题</span>
+      <span class="chip a2">${esc(it.tag||'材料分析')}</span>
+      <span class="chip">${esState.idx+1}/${esState.list.length}</span>
+      ${rec.c?`<span class="chip gold">已掌握</span>`:''}
+      ${rec.w?`<span class="chip" style="color:var(--red)">需复习 ${rec.w}</span>`:''}
+    </div>
+    <div class="qtext">${esc(it.material)}</div>
+    ${it.questions?`<div class="qtext" style="margin-top:14px;color:#cfd4e6">${esc(it.questions)}</div>`:''}
+    <div class="answer" id="esAns"><div class="lbl">参考答案与解析 · 请自行对照</div>
+      <div class="body" style="white-space:pre-wrap">${esc(it.answer)}</div></div>
+    <div class="btnrow" id="esJudge" style="display:none">
+      <button class="btn green" id="esOk">✅ 答得不错</button>
+      <button class="btn red" id="esNo">❌ 需要加强</button>
+    </div>
+    <div class="feedback" id="esFb"></div>
+  </div>
+  <div class="bottom">
+    <button class="btn ghost mini" id="esPrev">◀</button>
+    <button class="btn ghost" id="esReveal">👁 查看参考答案</button>
+    <button class="btn ghost mini" id="esNext">▶</button>
+  </div>`;
+  box.innerHTML = html;
+  document.getElementById('esReveal').onclick = esReveal;
+  document.getElementById('esPrev').onclick = ()=>{ esState.idx=(esState.idx-1+esState.list.length)%esState.list.length; esShow(); };
+  document.getElementById('esNext').onclick = ()=>{ esState.idx=(esState.idx+1)%esState.list.length; esShow(); };
+  document.getElementById('esOk').onclick = ()=>esJudge(true);
+  document.getElementById('esNo').onclick = ()=>esJudge(false);
+  esStatText();
+}
+function esReveal(){
+  if(esState.revealed) return;
+  esState.revealed = true;
+  document.getElementById('esAns').classList.add('show');
+  document.getElementById('esJudge').style.display = 'flex';
+  document.getElementById('esReveal').textContent = '👁 已显示';
+}
+function esJudge(ok){
+  const it = esState.list[esState.idx];
+  const rec = markResult('essay', it.id, ok);
+  const fb = document.getElementById('esFb');
+  fb.className = 'feedback show ' + (ok?'good':'bad');
+  fb.innerHTML = ok
+    ? `✅ 已记录${rec.m?'，本题已掌握':''}`
+    : `❌ 已加入「需复习」，过几天再自测一次`;
+  document.getElementById('esJudge').style.display = 'none';
+  esStatText();
+}
+
 /* ══════════════════ ⑥ 错题本 ══════════════════ */
 const wrongState = { kind:'all' };
 const KIND_INFO = {
@@ -1078,13 +1192,14 @@ const KIND_INFO = {
   choice:{name:'选择', cls:'k2', items:()=>CH, text:x=>esc(x.stem).slice(0,120)},
   word:{name:'单词', cls:'k3', items:()=>WD, text:x=>`${esc(x.word)} <span style="color:var(--muted)">— ${esc(x.meaning)}</span>`},
   fill:{name:'填空', cls:'k4', items:()=>FL, text:x=>esc(x.q).slice(0,120)},
-  math:{name:'公式', cls:'k5', items:()=>MATH_PAGES, text:x=>esc(x.test.title+' · 第'+(x.n+1)+'页')}
+  math:{name:'公式', cls:'k5', items:()=>MATH_PAGES, text:x=>esc(x.test.title+' · 第'+(x.n+1)+'页')},
+  essay:{name:'大题', cls:'k5', items:()=>ES, text:x=>esc(`第${x.no}题 `+(x.questions||x.material)).slice(0,120)}
 };
-const KIND_BUILD = {cloze:clzBuildList, choice:chBuildList, word:wdBuildList, fill:flBuildList, math:mhBuildList};
-const KIND_STATE = {cloze:clzState, choice:chState, word:wdState, fill:flState, math:mhState};
+const KIND_BUILD = {cloze:clzBuildList, choice:chBuildList, word:wdBuildList, fill:flBuildList, math:mhBuildList, essay:esBuildList};
+const KIND_STATE = {cloze:clzState, choice:chState, word:wdState, fill:flState, math:mhState, essay:esState};
 
 function renderWrongBook(){
-  const kinds = wrongState.kind==='all'? ['cloze','choice','word','fill','math'] : [wrongState.kind];
+  const kinds = wrongState.kind==='all'? ['cloze','choice','word','fill','math','essay'] : [wrongState.kind];
   let rows=[]; let total=0;
   kinds.forEach(k=>{
     const info=KIND_INFO[k];
@@ -1096,12 +1211,13 @@ function renderWrongBook(){
   rows.sort((a,b)=>b.r.w-a.r.w);
   const bar=document.getElementById('wrongKindBar');
   renderPills(bar,[
-    {v:'all',t:'全部', n:['cloze','choice','word','fill','math'].reduce((s,k)=>s+wrongCount(k),0)},
+    {v:'all',t:'全部', n:['cloze','choice','word','fill','math','essay'].reduce((s,k)=>s+wrongCount(k),0)},
     {v:'cloze',t:'挖空',n:wrongCount('cloze')},
     {v:'choice',t:'选择',n:wrongCount('choice')},
     {v:'word',t:'单词',n:wrongCount('word')},
     {v:'fill',t:'填空',n:wrongCount('fill')},
-    {v:'math',t:'公式',n:wrongCount('math')}
+    {v:'math',t:'公式',n:wrongCount('math')},
+    {v:'essay',t:'大题',n:wrongCount('essay')}
   ], wrongState.kind, v=>{ wrongState.kind=v; renderWrongBook(); });
 
   document.getElementById('wrongTotal').textContent = total+' 道';
@@ -1116,7 +1232,7 @@ function renderWrongBook(){
     return `<div class="wrow wrong" data-k="${row.k}" data-id="${row.it.id}">
       <div class="top">
         <span class="kbadge ${info.cls}">${info.name}</span>
-        <span style="font-size:11px;color:var(--muted)">${row.k==='choice'?esc(row.it.set.replace('肖八·',''))+' · 第'+row.it.no+'题' : row.k==='math'?esc(row.it.test.title) : ''}</span>
+        <span style="font-size:11px;color:var(--muted)">${row.k==='choice'?esc(row.it.set.replace('肖八·',''))+' · 第'+row.it.no+'题' : row.k==='math'?esc(row.it.test.title) : row.k==='essay'?esc(row.it.year+'年 · 第'+row.it.no+'题') : ''}</span>
         <span class="wcnt">错 ${row.r.w} 次 · 对 ${row.r.c} 次</span>
       </div>
       <div class="txt">${info.text(row.it)}</div>
@@ -1132,6 +1248,10 @@ function practiceWrong(kind, id){
   if(kind==='math'){
     const p=MATH_PAGES.find(x=>x.id===id);
     if(p){ mhState.cat=p.test.cat; mhState.test='__all'; }
+  }
+  if(kind==='essay'){
+    const p=ES.find(x=>x.id===id);
+    if(p){ esState.year=String(p.year); esState.tag='all'; }
   }
   KIND_BUILD[kind](id);
   setTab(kind==='word'?'words':kind);
@@ -1156,10 +1276,11 @@ function barColor(acc){ return acc<0.5?'bad':acc<0.75?'warn':''; }
 function renderStats(){
   const kinds=[
     {k:'cloze', name:'政治挖空', items:CLZ, total:CLZ.length},
-    {k:'choice', name:'肖八选择', items:CH, total:CH.length},
+    {k:'choice', name:'政治选择', items:CH, total:CH.length},
     {k:'word', name:'英语单词', items:WD, total:WD.length},
     {k:'fill', name:'数学/信号/政治填空', items:FL, total:FL.length},
-    {k:'math', name:'数学公式', items:MATH_PAGES, total:MATH_PAGES.length}
+    {k:'math', name:'数学公式', items:MATH_PAGES, total:MATH_PAGES.length},
+    {k:'essay', name:'真题大题', items:ES, total:ES.length}
   ];
   let allC=0, allW=0;
   const cards = kinds.map(x=>{
@@ -1181,7 +1302,8 @@ function renderStats(){
     ...groupStats('choice', CH, it=>it.set.replace('肖八·','套卷')),
     ...groupStats('word', WD, ()=> '英语词汇'),
     ...groupStats('fill', FL, it=>(it.subject||'其他')+' · '+(it.sub||'')),
-    ...groupStats('math', MATH_PAGES, p=>p.test.title)
+    ...groupStats('math', MATH_PAGES, p=>p.test.title),
+    ...groupStats('essay', ES, it=>it.year+'年 · '+(it.tag||'大题'))
   ].sort((a,b)=>a.acc-b.acc || b.att-a.att);
 
   const shown = groups.filter(g=>g.att>=1).slice(0,14);
@@ -1207,7 +1329,7 @@ function renderStats(){
     }).join('');
   }
   const overall = (allC+allW)? Math.round(allC/(allC+allW)*100):0;
-  advice += `<div class="advice" style="border-left-color:var(--accent2)">📈 总体正确率 <b>${allC+allW?overall+'%':'—'}</b>（累计作答 ${allC+allW} 次）· 已掌握 ${masteredCount('cloze')+masteredCount('choice')+masteredCount('word')+masteredCount('fill')+masteredCount('math')} 题 · 错题 ${wrongCount('cloze')+wrongCount('choice')+wrongCount('word')+wrongCount('fill')+wrongCount('math')} 道</div>`;
+  advice += `<div class="advice" style="border-left-color:var(--accent2)">📈 总体正确率 <b>${allC+allW?overall+'%':'—'}</b>（累计作答 ${allC+allW} 次）· 已掌握 ${masteredCount('cloze')+masteredCount('choice')+masteredCount('word')+masteredCount('fill')+masteredCount('math')+masteredCount('essay')} 题 · 错题 ${wrongCount('cloze')+wrongCount('choice')+wrongCount('word')+wrongCount('fill')+wrongCount('math')+wrongCount('essay')} 道</div>`;
   document.getElementById('statsAdvice').innerHTML = advice;
 }
 
@@ -1331,7 +1453,7 @@ function boot(){
   if(booted) return;
   booted=true;
   refreshMasteredAudio();
-  clzBuildList(); chBuildList(); wdBuildList(); flBuildList(); mhBuildList();
+  clzBuildList(); chBuildList(); wdBuildList(); flBuildList(); mhBuildList(); esBuildList();
 }
 document.addEventListener('DOMContentLoaded',boot);
 if(document.readyState!=='loading') boot();

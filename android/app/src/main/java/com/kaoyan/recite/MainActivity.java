@@ -105,6 +105,7 @@ public class MainActivity extends Activity {
         // ─── 注册原生 TTS Bridge ───
         webView.addJavascriptInterface(new TTSBridge(), "AndroidTTS");
         webView.addJavascriptInterface(new FocusBridge(), "AndroidFocus");
+        webView.addJavascriptInterface(new LicenseBridge(), "AndroidLicense");
 
         webView.setWebViewClient(new WebViewClient() {
             @Override
@@ -154,6 +155,33 @@ public class MainActivity extends Activity {
         public void pause() {
             if (tts != null) {
                 tts.stop();  // TextToSpeech 没有真正的 pause, 用 stop 代替
+            }
+        }
+    }
+
+    /**
+     * 授权状态持久化：SharedPreferences 不受 WebView 存储清理影响，
+     * 激活一次后重启/升级都不再弹窗。
+     */
+    public class LicenseBridge {
+        private static final String PREF = "kaoyan_license";
+        private static final String KEY = "lic";
+
+        @JavascriptInterface
+        public String getLicense() {
+            try {
+                return getSharedPreferences(PREF, MODE_PRIVATE).getString(KEY, "");
+            } catch (Exception e) {
+                return "";
+            }
+        }
+
+        @JavascriptInterface
+        public void setLicense(String id) {
+            try {
+                getSharedPreferences(PREF, MODE_PRIVATE).edit().putString(KEY, id).apply();
+            } catch (Exception e) {
+                Log.w(TAG, "setLicense 失败: " + e.getMessage());
             }
         }
     }

@@ -128,13 +128,33 @@
     } catch (e) {}
   }
 
+  function nativeGet() {
+    try {
+      if (window.AndroidLicense && AndroidLicense.getLicense) return AndroidLicense.getLicense() || '';
+    } catch (e) {}
+    return '';
+  }
+  function nativeSet(id) {
+    try {
+      if (window.AndroidLicense && AndroidLicense.setLicense) AndroidLicense.setLicense(id);
+    } catch (e) {}
+  }
+
   function verified() {
     try {
-      var s = db(); if (!s) return false;
-      var lic = JSON.parse(s.getItem(LS_LIC) || 'null');
-      if (!lic || !lic.id) return false;
-      return !!parseKey(lic.id);
-    } catch (e) { return false; }
+      var s = db();
+      if (s) {
+        var lic = JSON.parse(s.getItem(LS_LIC) || 'null');
+        if (lic && lic.id && parseKey(lic.id)) return true;
+      }
+      // 本地存储被清理时，回退读取原生 SharedPreferences
+      var id = nativeGet();
+      if (id && parseKey(id)) {
+        try { s.setItem(LS_LIC, JSON.stringify({ id: id, exp: 0, ts: Date.now() })); } catch (e) {}
+        return true;
+      }
+    } catch (e) {}
+    return false;
   }
 
   var STYLE = '' +
@@ -194,6 +214,7 @@
       if (!k) { err.textContent = norm(v).length !== 20 ? '秘钥格式不正确（应为 20 位）' : '秘钥无效，请核对后重试'; return; }
       if (usedList().indexOf(k.id) >= 0) { err.textContent = '此秘钥已在本机使用过'; return; }
       try { db().setItem(LS_LIC, JSON.stringify({ id: k.id, exp: k.exp, ts: Date.now() })); } catch (e) {}
+      nativeSet(k.id);
       markUsed(k.id);
       g.classList.add('out');
       document.body.style.overflow = '';

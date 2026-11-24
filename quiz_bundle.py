@@ -13,6 +13,8 @@ MAP = {
     'words.json':  ('__QUIZ_WORDS__',  {'version': 0, 'items': []}),
     'fill.json':   ('__QUIZ_FILL__',   {'version': 0, 'items': []}),
     'math.json':   ('__QUIZ_MATH__',   {'version': 0, 'tests': []}),
+    'exam_choice.json': ('__QUIZ_EXAM_CHOICE__', {'version': 0, 'items': []}),
+    'essay.json':  ('__QUIZ_ESSAY__',  {'version': 0, 'items': []}),
 }
 
 parts = []
