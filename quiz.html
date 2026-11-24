@@ -232,13 +232,37 @@ body.focus-on{padding-top:calc(var(--safe-top) + 66px)}
   font-size:13px;z-index:500;opacity:0;pointer-events:none;transition:.25s;
   max-width:82vw;text-align:center;line-height:1.5}
 .focus-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── 平板 / 横屏适配 ── */
+@media (min-width: 820px) {
+  .page{max-width:1040px;padding-left:20px;padding-right:20px}
+  .bottom{max-width:1040px}
+  .appbar .title b{font-size:19px}
+  .tabs{gap:8px}
+  .tabs button{padding:9px 18px;font-size:13.5px}
+  .card{padding:20px 22px}
+  .qtext{font-size:17px}
+  .opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .opt{height:100%}
+  .wrow{font-size:14.5px}
+}
+@media (orientation: landscape) and (max-height: 560px) {
+  .appbar{padding-top:calc(var(--safe-top) + 4px)}
+  .appbar .title{padding:0 16px 4px}
+  .appbar .title b{font-size:16px}
+  .appbar .title span{display:none}
+  .tabs{padding-bottom:6px}
+  .tabs button{padding:6px 12px;font-size:12.5px}
+  .page{padding-top:6px}
+  .bottom{padding-top:6px;padding-bottom:calc(var(--safe-bottom) + 6px)}
+}
 </style>
 </head>
 <body>
 <script src="auth.js"></script>
 
 <header class="appbar">
-  <div class="title"><b>考研训练营</b><span>背诵 · 刷题 · 评估</span>
+  <div class="title"><b>考研训练营</b><span>制作人 LZH · 背诵 / 刷题 / 评估</span>
     <button class="focus-entry" id="focusBtn">🎯 专注</button>
   </div>
   <nav class="tabs" id="tabs">
@@ -390,7 +414,7 @@ body.focus-on{padding-top:calc(var(--safe-top) + 66px)}
 /* ══════════════════ 基础工具 ══════════════════ */
 const PROG_KEY = 'kaoyan_quiz_prog_v1';
 function loadProg(){ try{ return JSON.parse(localStorage.getItem(PROG_KEY))||{} }catch(e){ return {} } }
-function saveProg(p){ try{ localStorage.setItem(PROG_KEY, JSON.stringify(p)) }catch(e){} }
+function saveProg(p){ var v=JSON.stringify(p); try{ if(window.KYStore) KYStore.save(PROG_KEY, v); else localStorage.setItem(PROG_KEY, v) }catch(e){} }
 let PROG = loadProg();
 
 function getRec(kind,id){
@@ -415,7 +439,8 @@ function refreshMasteredAudio(){
   Object.entries(PROG.cloze||{}).forEach(([id,r])=>{
     if(r.m){ const it=CLZ.find(x=>x.id===id); if(it && it.audio) arr.push(it.audio); }
   });
-  try{ localStorage.setItem('kaoyan_mastered_audio', JSON.stringify(arr)); }catch(e){}
+  var v = JSON.stringify(arr);
+  try{ if(window.KYStore) KYStore.save('kaoyan_mastered_audio', v); else localStorage.setItem('kaoyan_mastered_audio', v); }catch(e){}
 }
 
 function renderMath(root){

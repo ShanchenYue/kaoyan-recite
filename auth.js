@@ -94,6 +94,34 @@
 
   function db() { try { return window.localStorage; } catch (e) { return null; } }
 
+  /* ── 学习记录双写：localStorage + 原生 SharedPreferences，升级/清缓存不丢 ── */
+  var STORE_KEYS = ['kaoyan_player_v2', 'kaoyan_quiz_prog_v1', 'kaoyan_mastered_audio', 'kaoyan_license_v1', 'kaoyan_used_keys_v1'];
+  function nativeStore() { try { return window.AndroidStore || null; } catch (e) { return null; } }
+  function restoreStore() {
+    var s = db(), b = nativeStore();
+    if (!s || !b) return;
+    for (var i = 0; i < STORE_KEYS.length; i++) {
+      var k = STORE_KEYS[i];
+      try {
+        if (s.getItem(k) === null) {
+          var v = b.get(k);
+          if (v) s.setItem(k, v);
+        }
+      } catch (e) {}
+    }
+  }
+  function mirror(k, v) {
+    var b = nativeStore();
+    if (b) { try { b.set(k, String(v)); } catch (e) {} }
+  }
+  window.KYStore = {
+    save: function (k, v) {
+      try { db().setItem(k, v); } catch (e) {}
+      mirror(k, v);
+    }
+  };
+  restoreStore();
+
   /* 解析并校验签名，格式：20 位 Base32（版本 1 + 到期分钟 4 字节 + 随机序号 3 字节 + 签名 4 字节） */
   function parseKey(raw) {
     var s = norm(raw);
@@ -124,7 +152,12 @@
     try {
       var s = db(); if (!s) return;
       var a = usedList();
-      if (a.indexOf(id) < 0) { a.push(id); s.setItem(LS_USED, JSON.stringify(a)); }
+      if (a.indexOf(id) < 0) {
+        a.push(id);
+        var v = JSON.stringify(a);
+        s.setItem(LS_USED, v);
+        mirror(LS_USED, v);
+      }
     } catch (e) {}
   }
 

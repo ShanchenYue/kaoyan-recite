@@ -30,11 +30,39 @@ jobs:
     - name: Sync web assets → Android (inline data.json into index.html)
       run: python sync_android.py
 
+    - name: Configure stable signing
+      env:
+        KEYSTORE_B64: ${{ secrets.KEYSTORE_B64 }}
+        KS_PASS: ${{ secrets.KEYSTORE_PASS }}
+        KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        KEY_PASS: ${{ secrets.KEY_PASS }}
+      run: |
+        if [ -n "$KEYSTORE_B64" ]; then
+          echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/kaoyan.p12"
+          {
+            echo "ANDROID_KEYSTORE_PATH=$RUNNER_TEMP/kaoyan.p12"
+            echo "ANDROID_KEYSTORE_PASS=$KS_PASS"
+            echo "ANDROID_KEY_ALIAS=$KEY_ALIAS"
+            echo "ANDROID_KEY_PASS=$KEY_PASS"
+          } >> "$GITHUB_ENV"
+          echo "✅ 已启用固定签名（后续升级可覆盖安装，记录保留）"
+        else
+          echo "⚠️ 未配置签名密钥，将输出未签名包"
+        fi
+
     - name: Build Debug APK
       run: cd android && chmod +x gradlew && ./gradlew assembleDebug --no-daemon
 
     - name: Build Release APK
       run: cd android && ./gradlew assembleRelease --no-daemon
+
+    - name: Verify APK signatures
+      run: |
+        APKSIGNER=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | tail -1)
+        echo "── Debug ──"
+        "$APKSIGNER" verify --print-certs android/app/build/outputs/apk/debug/*.apk
+        echo "── Release ──"
+        "$APKSIGNER" verify --print-certs android/app/build/outputs/apk/release/*.apk
 
     - name: Upload Debug APK
       uses: actions/upload-artifact@v4

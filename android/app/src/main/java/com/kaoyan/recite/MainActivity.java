@@ -106,6 +106,7 @@ public class MainActivity extends Activity {
         webView.addJavascriptInterface(new TTSBridge(), "AndroidTTS");
         webView.addJavascriptInterface(new FocusBridge(), "AndroidFocus");
         webView.addJavascriptInterface(new LicenseBridge(), "AndroidLicense");
+        webView.addJavascriptInterface(new StoreBridge(), "AndroidStore");
 
         webView.setWebViewClient(new WebViewClient() {
             @Override
@@ -182,6 +183,41 @@ public class MainActivity extends Activity {
                 getSharedPreferences(PREF, MODE_PRIVATE).edit().putString(KEY, id).apply();
             } catch (Exception e) {
                 Log.w(TAG, "setLicense 失败: " + e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * 学习记录持久化：把 localStorage 中的进度/错题/背诵位置镜像到原生，
+     * 即使 WebView 存储被系统清理，升级后也能自动恢复。
+     */
+    public class StoreBridge {
+        private static final String PREF = "kaoyan_webstore";
+
+        @JavascriptInterface
+        public String get(String k) {
+            try {
+                return getSharedPreferences(PREF, MODE_PRIVATE).getString(k, "");
+            } catch (Exception e) {
+                return "";
+            }
+        }
+
+        @JavascriptInterface
+        public void set(String k, String v) {
+            try {
+                getSharedPreferences(PREF, MODE_PRIVATE).edit().putString(k, v).apply();
+            } catch (Exception e) {
+                Log.w(TAG, "StoreBridge.set 失败: " + e.getMessage());
+            }
+        }
+
+        @JavascriptInterface
+        public void remove(String k) {
+            try {
+                getSharedPreferences(PREF, MODE_PRIVATE).edit().remove(k).apply();
+            } catch (Exception e) {
+                Log.w(TAG, "StoreBridge.remove 失败: " + e.getMessage());
             }
         }
     }

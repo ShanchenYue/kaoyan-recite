@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#1a1a2e">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
-<title>考研政治背诵播放器</title>
+<title>考研训练营</title>
 <style>
 :root {
   --bg: #0f0f1a;
@@ -173,6 +173,29 @@ body { min-height: 100vh; padding-bottom: 140px; }
   text-align: center; color: var(--muted); font-size: 11px;
   padding: 20px;
 }
+
+/* ── 平板 / 横屏适配 ── */
+@media (min-width: 820px) {
+  .header, .section, .now-playing, .list, .footer-note {
+    max-width: 980px; margin-left: auto; margin-right: auto;
+  }
+  .header h1 { font-size: 23px; }
+  .header .sub { font-size: 13px; }
+  .now-playing { padding: 20px 22px; }
+  .controls {
+    max-width: 980px; margin: 0 auto; border-radius: 18px 18px 0 0;
+    border-left: 1px solid #2a2a44; border-right: 1px solid #2a2a44;
+  }
+  .book-item { padding: 13px 16px; }
+}
+@media (orientation: landscape) and (max-height: 560px) {
+  .header { padding: 8px 14px 6px; }
+  .header h1 { font-size: 17px; }
+  .header .sub { display: none; }
+  .header a { margin-top: 2px !important; }
+  .now-playing { min-height: 84px; padding: 12px 14px; }
+  .loading p { display: none; }
+}
 </style>
 </head>
 <body>
@@ -184,12 +207,12 @@ body { min-height: 100vh; padding-bottom: 140px; }
 </div>
 
 <div class="header">
-  <h1>📚 考研政治背诵播放器</h1>
-  <div class="sub">闭眼听 · 随时记 · 安心背</div>
+  <h1>🎧 考研训练营</h1>
+  <div class="sub">听 · 背 · 练 一体化 · 制作人 LZH</div>
   <a href="quiz.html" style="display:block;text-align:center;margin-top:8px;text-decoration:none">
     <span style="display:inline-block;padding:7px 18px;border-radius:20px;font-size:13px;
       background:linear-gradient(135deg,#4ecdc4,#44a08d);color:#fff;font-weight:600">
-      📝 进入刷题训练营（挖空 / 选择 / 单词 / 填空）
+      📝 进入刷题训练营（挖空 / 选择 / 单词 / 填空 / 真题大题）
     </span>
   </a>
 </div>
@@ -407,14 +430,16 @@ function loadState() {
   } catch(e) {}
 }
 function saveState() {
-  localStorage.setItem(LS_KEY, JSON.stringify({
+  var data = JSON.stringify({
     bookIdx: state.bookIdx,
     selectedSubs: state.selectedSubs,
     mode: state.mode,
     speed: state.speed,
     queuePos: state.queuePos,
     pauseGap: state.pauseGap
-  }));
+  });
+  if (window.KYStore) KYStore.save(LS_KEY, data);
+  else try { localStorage.setItem(LS_KEY, data); } catch(e) {}
 }
 
 /* ─────────────────────────────────────

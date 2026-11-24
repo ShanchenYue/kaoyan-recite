@@ -1,5 +1,8 @@
 plugins { id 'com.android.application' }
 
+def ksPath = System.getenv("ANDROID_KEYSTORE_PATH")
+def hasStableKey = ksPath != null && !ksPath.trim().isEmpty() && new File(ksPath).exists()
+
 android {
     namespace 'com.kaoyan.recite'
     compileSdk 35
@@ -8,16 +11,33 @@ android {
         applicationId "com.kaoyan.recite"
         minSdk 24
         targetSdk 35
-        versionCode 8
-        versionName "1.7.0"
+        versionCode 9
+        versionName "1.8.0"
+    }
+
+    signingConfigs {
+        stable {
+            if (hasStableKey) {
+                storeFile new File(ksPath)
+                storeType 'PKCS12'
+                storePassword System.getenv("ANDROID_KEYSTORE_PASS")
+                keyAlias System.getenv("ANDROID_KEY_ALIAS")
+                keyPassword System.getenv("ANDROID_KEY_PASS")
+                enableV1Signing true
+                enableV2Signing true
+                enableV3Signing true
+            }
+        }
     }
 
     buildTypes {
         release {
+            if (hasStableKey) signingConfig signingConfigs.stable
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
+            if (hasStableKey) signingConfig signingConfigs.stable
             applicationIdSuffix ".debug"
             debuggable true
         }
