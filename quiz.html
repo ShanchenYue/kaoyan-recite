@@ -946,7 +946,7 @@ function renderStats(){
     ...groupStats('fill', FL, it=>(it.subject||'其他')+' · '+(it.sub||''))
   ].sort((a,b)=>a.acc-b.acc || b.att-a.att);
 
-  const shown = groups.filter(g=>g.att>=2).slice(0,14);
+  const shown = groups.filter(g=>g.att>=1).slice(0,14);
   document.getElementById('statsGroups').innerHTML = shown.length? `<div class="bars">${
     shown.map(g=>`<div class="brow">
       <div class="bt"><span>${esc(g.name)}</span><span>${Math.round(g.acc*100)}% · ${g.att}次</span></div>
@@ -958,6 +958,8 @@ function renderStats(){
   let advice='';
   if(!groups.length){
     advice = `<div class="advice">📌 还没有作答数据。建议先各科目做 10 题以上，系统会自动分析你的薄弱章节。</div>`;
+  } else if(!groups.some(g=>g.att>=2)){
+    advice = `<div class="advice">📌 目前作答样本还比较少（共 ${allC+allW} 次）。每个章节练到 2 次以上后，这里会给出更准确的薄弱章节分析和建议。</div>`;
   } else if(!weak.length){
     advice = `<div class="advice">🌟 目前各章节正确率都在 75% 以上，状态不错！建议保持每日训练，并把错题本里的题重练一遍巩固。</div>`;
   } else {
