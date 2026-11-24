@@ -388,6 +388,22 @@ body.focus-on{padding-top:calc(var(--safe-top) + 66px)}
   <div id="statsGroups"></div>
   <div class="section-title">薄弱点与建议</div>
   <div id="statsAdvice"></div>
+
+  <div class="panel" style="margin-top:14px">
+    <div class="panel-head"><span>学习记录备份 · 升级 / 换机</span><span class="fake">本地保存</span></div>
+    <div class="btnrow" style="margin-top:10px">
+      <button class="btn ghost" id="expBtn">📤 导出记录</button>
+      <button class="btn ghost" id="impBtn">📥 导入记录</button>
+    </div>
+    <textarea id="backupArea" style="display:none;width:100%;height:150px;margin-top:10px;
+      padding:10px;border-radius:10px;background:var(--card2);border:1px solid var(--line);
+      color:var(--text);font-size:12px;font-family:monospace;resize:vertical"></textarea>
+    <div class="btnrow" id="backupOps" style="display:none">
+      <button class="btn" id="backupDo">导出</button>
+      <button class="btn ghost" id="backupCancel">取消</button>
+    </div>
+    <div class="feedback" id="backupFb"></div>
+  </div>
 </section>
 
 <div class="focusmask" id="focusMask">
@@ -1298,6 +1314,65 @@ function groupStats(kind, items, keyFn){
   return Object.values(map).map(g=>Object.assign(g,{acc: g.att? g.ok/g.att:0}));
 }
 function barColor(acc){ return acc<0.5?'bad':acc<0.75?'warn':''; }
+/* ══════════════════ 学习记录备份 ══════════════════ */
+const BK_KEYS = ['kaoyan_player_v2', 'kaoyan_quiz_prog_v1', 'kaoyan_mastered_audio'];
+let bkMode = 'export';
+function bkFb(msg, ok){
+  const el = document.getElementById('backupFb');
+  if(!el) return;
+  el.className = 'feedback show ' + (ok?'good':'bad');
+  el.textContent = msg;
+}
+function bkSave(k, v){
+  if(window.KYStore) KYStore.save(k, v);
+  else try{ localStorage.setItem(k, v); }catch(e){}
+}
+function bkInit(){
+  const exp = document.getElementById('expBtn'), imp = document.getElementById('impBtn');
+  const area = document.getElementById('backupArea'), ops = document.getElementById('backupOps');
+  const ok = document.getElementById('backupDo'), cancel = document.getElementById('backupCancel');
+  if(!exp || !area) return;
+  exp.onclick = ()=>{
+    bkMode = 'export';
+    const data = {};
+    BK_KEYS.forEach(k=>{ const v = localStorage.getItem(k); if(v) data[k] = v; });
+    area.value = JSON.stringify({app:'kaoyan', v:1, ts:new Date().toISOString().slice(0,10), data});
+    area.style.display = 'block'; area.focus(); area.select();
+    ops.style.display = 'flex'; ok.textContent = '复制全部';
+    bkFb('已生成备份，点「复制全部」保存到备忘录或发给自己', true);
+  };
+  imp.onclick = ()=>{
+    bkMode = 'import';
+    area.value = ''; area.style.display = 'block'; area.focus();
+    ops.style.display = 'flex'; ok.textContent = '确认导入';
+    bkFb('把之前导出的备份内容粘贴到上方文本框，再点「确认导入」', true);
+  };
+  ok.onclick = ()=>{
+    if(bkMode === 'export'){
+      area.select();
+      try{ document.execCommand('copy'); bkFb('✅ 已复制到剪贴板，请妥善保存', true); }
+      catch(e){ bkFb('已全选，请长按手动复制', true); }
+      return;
+    }
+    try{
+      const obj = JSON.parse(area.value.trim());
+      const data = obj.data || {};
+      let n = 0;
+      BK_KEYS.forEach(k=>{
+        if(typeof data[k] === 'string' && data[k]){
+          bkSave(k, data[k]); n++;
+        }
+      });
+      if(!n) throw new Error('empty');
+      bkFb('✅ 已导入 ' + n + ' 项记录，正在重新加载…', true);
+      setTimeout(()=>location.reload(), 700);
+    }catch(e){
+      bkFb('❌ 导入失败：备份内容格式不正确', false);
+    }
+  };
+  cancel.onclick = ()=>{ area.style.display = 'none'; ops.style.display = 'none'; };
+}
+
 function renderStats(){
   const kinds=[
     {k:'cloze', name:'政治挖空', items:CLZ, total:CLZ.length},
@@ -1479,6 +1554,7 @@ function boot(){
   booted=true;
   refreshMasteredAudio();
   clzBuildList(); chBuildList(); wdBuildList(); flBuildList(); mhBuildList(); esBuildList();
+  bkInit();
 }
 document.addEventListener('DOMContentLoaded',boot);
 if(document.readyState!=='loading') boot();
