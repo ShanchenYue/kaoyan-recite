@@ -627,9 +627,21 @@ function playSegmentAudio(seg) {
   });
 }
 
+// ─────────── TTS 播放 (重写: 不依赖 onend, 用估算时长 + 定时自动切下一条) ───────────
+
+// 估算一段中文文本朗读时间 (毫秒)
+// 正常语速约 4 字/秒, 考虑停顿按 3.5 字/秒估算
+function estimateTTSTime(text, rate) {
+  if (!text) return 2000;
+  const chars = text.replace(/\s+/g, '').length;
+  const baseMs = (chars / 3.5) * 1000;
+  // rate 越快, 时间越短
+  const adjusted = baseMs / (rate || 1);
+  return Math.max(1500, Math.round(adjusted));
+}
+
 function playSegmentTTS(seg) {
   if (typeof SpeechSynthesisUtterance === 'undefined' || !('speechSynthesis' in window)) {
-    // WebView 不支持 TTS, 回退到提示
     showToast('当前环境不支持系统语音, 请使用 MP3 模式');
     return;
   }
@@ -637,7 +649,9 @@ function playSegmentTTS(seg) {
   state.audioEl.pause();
   state.audioEl.removeAttribute('src');
 
-  // 防止 onend 冒泡进我们的全局 ended 逻辑
+  // 停掉之前可能残留的 TTS
+  trySS(() => speechSynthesis.cancel());
+
   const utter = new SpeechSynthesisUtterance(seg.text);
   utter.lang = 'zh-CN';
   utter.rate = state.speed;
@@ -645,33 +659,36 @@ function playSegmentTTS(seg) {
   const v = pickVoice();
   if (v) utter.voice = v;
 
-  utter.onend = () => {
-    state.isPlaying = false;
-    setPlayIcon();
-    document.getElementById('progressFill').style.width = '100%';
-    renderList();
-    clearAutoNext();
-    state.autoNextTimer = setTimeout(autoNextSeg, state.pauseGap);
-  };
   utter.onerror = (e) => {
     console.warn('[tts] error:', e);
+    // 出错也要让状态机复位
     state.isPlaying = false;
     setPlayIcon();
   };
 
-  trySS(() => speechSynthesis.cancel());
   trySS(() => speechSynthesis.speak(utter));
-  // 同步标记, 即使浏览器的 onstart 不触发
   state.isPlaying = true;
+  state.wasPaused = false;
   setPlayIcon();
-  // 兜底: speak 实际没发声时回退
-  setTimeout(() => {
-    const ss = 'speechSynthesis' in window ? speechSynthesis : null;
-    if (state.isPlaying && ss && !ss.speaking && !ss.pending) {
-      state.isPlaying = false;
-      setPlayIcon();
+  document.getElementById('progressFill').style.width = '0%';
+
+  // 估算时长 + 缓冲 + 段落停顿 = 总等待时间
+  const segMs = estimateTTSTime(seg.text, state.speed);
+  const totalWait = segMs + state.pauseGap;
+
+  clearAutoNext();
+  state.autoNextTimer = setTimeout(() => {
+    // 时间到, 切下一条
+    state.isPlaying = false;
+    setPlayIcon();
+    document.getElementById('progressFill').style.width = '100%';
+    renderList();
+    if (state.wasPaused) {
+      // 暂停过就不自动下一条
+      return;
     }
-  }, 600);
+    autoNextSeg();
+  }, totalWait);
 }
 
 // 只停声音 (audio.pause + tts.cancel), 不改队列/进度
@@ -700,6 +717,7 @@ function togglePlay() {
       // pause 事件会设 state.wasPaused=true, state.isPlaying=false
     } else if (state.currentMode === 'tts') {
       trySS(() => speechSynthesis.pause());
+      clearAutoNext();  // 暂停自动下一条定时器
       state.isPlaying = false;
       state.wasPaused = true;
       setPlayIcon();
@@ -709,15 +727,14 @@ function togglePlay() {
 
   // 没在出声
   if (state.wasPaused) {
-    // 被暂停过 → 恢复! (不从头来)
+    // 被暂停过 → 恢复
     if (state.currentMode === 'audio') {
       state.audioEl.play().catch(() => { /* src 失效就从头 play */ });
-      // play 事件会设 state.isPlaying=true
     } else if (state.currentMode === 'tts') {
-      trySS(() => speechSynthesis.resume());
-      state.isPlaying = true;
+      // WebView 的 speechSynthesis.resume() 经常不工作, 直接重播当前段
       state.wasPaused = false;
-      setPlayIcon();
+      playSegment();
+      return;
     }
     return;
   }
