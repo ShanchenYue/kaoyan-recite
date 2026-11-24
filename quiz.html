@@ -41,6 +41,9 @@ body{min-height:100vh;overflow-x:hidden;padding-bottom:96px}
 .panel-head{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--muted)}
 .panel-head .fake{font-size:11px;color:var(--accent2);border:1px solid rgba(79,209,197,.35);
   background:rgba(79,209,197,.08);padding:2px 8px;border-radius:10px}
+.srcnote{margin-top:11px;padding-top:9px;border-top:1px dashed var(--line);
+  font-size:11px;line-height:1.65;color:var(--muted)}
+.srcnote b{color:var(--accent2);font-weight:600}
 .frow{display:flex;gap:8px;align-items:flex-start;margin-top:10px}
 .frow .flabel{flex:0 0 34px;font-size:11px;color:var(--muted);padding-top:7px;letter-spacing:.5px}
 .pills{display:flex;flex-wrap:wrap;gap:6px;flex:1}
@@ -292,6 +295,7 @@ body.focus-on{padding-top:calc(var(--safe-top) + 66px)}
     <div class="frow"><span class="flabel">章节</span><div class="pills scroll" id="clozeSubBar"></div></div>
     <div class="frow"><span class="flabel">状态</span><div class="pills" id="clozeStatusBar"></div></div>
     <div class="frow"><span class="flabel">设置</span><div class="pills" id="clozeModeBar"></div></div>
+    <div class="srcnote">📚 题源：肖秀荣《背诵手册》挖空 + 肖190题客观题 + 1-10月时政热点 + 主观题背诵包（本地题库）</div>
   </div>
   <div class="statline" id="clozeStat"></div>
   <div id="clozeCard"></div>
@@ -305,6 +309,7 @@ body.focus-on{padding-top:calc(var(--safe-top) + 66px)}
     <div class="frow"><span class="flabel">题型</span><div class="pills" id="choiceTypeBar"></div></div>
     <div class="frow"><span class="flabel">状态</span><div class="pills" id="choiceStatusBar"></div></div>
     <div class="frow"><span class="flabel">顺序</span><div class="pills" id="choiceOrderBar"></div></div>
+    <div class="srcnote">📚 题源：<b>肖八套卷 1-8 套</b> 全部单选/多选 + <b>2016-2025 考研政治真题</b>选择题（共 519 题）</div>
   </div>
   <div class="statline" id="choiceStat"></div>
   <div id="choiceCard"></div>
@@ -322,6 +327,7 @@ body.focus-on{padding-top:calc(var(--safe-top) + 66px)}
       <div class="frow"><span class="flabel">范围</span><div class="pills" id="wordsRangeBar"></div></div>
       <div class="frow"><span class="flabel">状态</span><div class="pills" id="wordsStatusBar"></div></div>
       <div class="frow"><span class="flabel">顺序</span><div class="pills" id="wordsOrderBar"></div></div>
+      <div class="srcnote">📚 词库：考研英语高频词汇（按真题词频标注，🔥 为高频词）</div>
     </div>
     <div class="statline" id="wordsStat"></div>
     <div id="wordsCard"></div>
@@ -342,6 +348,7 @@ body.focus-on{padding-top:calc(var(--safe-top) + 66px)}
     <div class="frow" id="fillSubRow"><span class="flabel">章节</span><div class="pills scroll" id="fillSubBar"></div></div>
     <div class="frow"><span class="flabel">状态</span><div class="pills" id="fillStatusBar"></div></div>
     <div class="frow"><span class="flabel">顺序</span><div class="pills" id="fillOrderBar"></div></div>
+    <div class="srcnote">📚 题源：政治 / 数学 / 信号与系统 核心知识点填空（本地题库，含 451 题）</div>
   </div>
   <div class="statline" id="fillStat"></div>
   <div id="fillCard"></div>
@@ -354,6 +361,7 @@ body.focus-on{padding-top:calc(var(--safe-top) + 66px)}
     <div class="frow"><span class="flabel">类别</span><div class="pills" id="mathCatBar"></div></div>
     <div class="frow"><span class="flabel">测试</span><div class="pills scroll" id="mathTestBar"></div></div>
     <div class="frow"><span class="flabel">状态</span><div class="pills" id="mathStatusBar"></div></div>
+    <div class="srcnote">📚 题源：考研数学公式默写（高数 / 线代 / 概率，来源于数学复习资料）</div>
   </div>
   <div class="statline" id="mathStat"></div>
   <div id="mathCard"></div>
@@ -366,6 +374,7 @@ body.focus-on{padding-top:calc(var(--safe-top) + 66px)}
     <div class="frow"><span class="flabel">年份</span><div class="pills scroll" id="essayYearBar"></div></div>
     <div class="frow"><span class="flabel">模块</span><div class="pills" id="essayTagBar"></div></div>
     <div class="frow"><span class="flabel">状态</span><div class="pills" id="essayStatusBar"></div></div>
+    <div class="srcnote">📚 题源：<b>2016-2025 考研政治真题</b>材料分析题（马原 / 毛中特 / 史纲 / 思修 / 时政，共 50 题）</div>
   </div>
   <div class="statline" id="essayStat"></div>
   <div id="essayCard"></div>
