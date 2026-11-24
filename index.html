@@ -655,9 +655,22 @@ function clearAutoNext() {
     state.autoNextTimer = setTimeout(autoNextSeg, state.pauseGap);
   });
   a.addEventListener('error', () => {
-    console.warn('[audio] error:', a.src);
-    showToast('音频加载失败, 文件可能不存在');
+    if (!a.error) return;                    // 忽略清空 src 引起的伪错误
+    console.warn('[audio] error:', a.currentSrc || a.src, 'code=', a.error.code);
+    state.isPlaying = false;
+    state.wasPaused = false;                 // 出错后允许再次点击重试
+    setPlayIcon();
+    state.audioErrStreak = (state.audioErrStreak || 0) + 1;
+    if (state.audioErrStreak > 3) {
+      clearAutoNext();
+      toast('连续音频加载失败，已暂停，请检查网络或重新进入');
+      return;
+    }
+    toast('音频加载失败，自动跳过');
+    clearAutoNext();
+    state.autoNextTimer = setTimeout(autoNextSeg, 1200);
   });
+  a.addEventListener('playing', () => { state.audioErrStreak = 0; });
   a.addEventListener('timeupdate', () => {
     if (a.duration && !isNaN(a.duration)) {
       document.getElementById('progressFill').style.width =
@@ -699,28 +712,32 @@ function playSegment() {
   if (seg.audio && seg.audio.length > 3) {
     playSegmentAudio(seg);
   } else {
-    showToast('该段落无 MP3 语音, 请先生成语音包');
+    toast('该段落无 MP3 语音, 请先生成语音包');
   }
   saveState();
 }
 
 function playSegmentAudio(seg) {
   state.currentMode = 'audio';
-  state.audioEl.pause();
-  state.audioEl.removeAttribute('src');
-  // Android WebView assets 绝对路径
-  const src = seg.audio.startsWith('file://')
-    ? seg.audio
-    : (seg.audio.startsWith('audios/') || seg.audio.startsWith('assets/')
-        ? 'file:///android_asset/' + seg.audio.replace(/^assets\//, '')
-        : seg.audio);
-  state.audioEl.src = src;
-  state.audioEl.playbackRate = state.speed;
-  state.audioEl.currentTime = 0;
-  state.audioEl.load();
-  state.audioEl.play().catch(err => {
+  state.wasPaused = false;
+  const a = state.audioEl;
+  const myToken = (state.audioToken = (state.audioToken || 0) + 1);
+
+  // 只有真正运行在 Android WebView 的 assets 里，才需要 android_asset 绝对路径；
+  // 浏览器（http 或直接双击打开 file://）一律用相对路径
+  const base = location.href.indexOf('/android_asset/') >= 0 ? 'file:///android_asset/' : '';
+  let src = seg.audio || '';
+  if (src && !/^[a-z][a-z0-9+.-]*:/i.test(src)) {
+    src = base + src.replace(/^\/+/, '');
+  }
+
+  a.src = src;
+  a.playbackRate = state.speed;
+  a.play().catch(err => {
+    if (state.audioToken !== myToken) return;   // 已切到其他段，忽略
+    if (err && err.name === 'AbortError') return;
     console.warn('[audio] play() rejected:', err, 'src=', src);
-    showToast('音频播放失败: ' + (err?.message || '加载错误'));
+    toast('音频播放失败: ' + ((err && err.message) || '加载错误'));
   });
 }
 
@@ -771,7 +788,7 @@ function playSegmentTTS(seg) {
 
   // ─── 回退 WebView speechSynthesis (用估算时长定时器) ───
   if (typeof SpeechSynthesisUtterance === 'undefined' || !('speechSynthesis' in window)) {
-    showToast('当前环境不支持语音, 请使用 MP3 模式');
+    toast('当前环境不支持语音, 请使用 MP3 模式');
     return;
   }
   trySS(() => speechSynthesis.cancel());
@@ -965,9 +982,19 @@ document.getElementById('btnGap').textContent = gapsLabel[state.pauseGap] || '�
 init();
 
 // 注册 Service Worker (PWA 支持, 可添加到主屏幕)
+// 旧版本 SW 可能缓存了旧页面导致播放异常, 这里强制检查更新并在接管后自动刷新一次
 if ('serviceWorker' in navigator) {
+  const hadController = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!hadController) return;                       // 首次安装不刷新
+    if (sessionStorage.getItem('sw_reloaded')) return; // 每次会话只刷新一次
+    sessionStorage.setItem('sw_reloaded', '1');
+    location.reload();
+  });
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').catch(() => {});
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
+      .then(reg => { reg.update().catch(() => {}); })
+      .catch(() => {});
   });
 }
 </script>

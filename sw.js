@@ -1,9 +1,8 @@
-// 极简 Service Worker: 缓存核心文件
-const CACHE = 'kaoyan-v1';
+// 极简 Service Worker: 只缓存页面壳，音频一律直连，避免缓存卡顿
+const CACHE = 'kaoyan-v3';
 const FILES = [
   './',
   './index.html',
-  './data.json',
   './manifest.json',
   './icon.svg'
 ];
@@ -14,17 +13,25 @@ self.addEventListener('install', e => {
 });
 
 self.addEventListener('activate', e => {
-  e.waitUntil(self.clients.claim());
+  e.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)));
+    await self.clients.claim();
+  })());
 });
 
 self.addEventListener('fetch', e => {
-  // 网络优先 + 离线回退缓存
+  const url = new URL(e.request.url);
+  // 音频、数据、跨域请求不经过缓存，直接走网络
+  if (e.request.destination === 'audio' || url.pathname.includes('/audios/') ||
+      url.pathname.endsWith('data.json') || url.origin !== location.origin) {
+    return;
+  }
   e.respondWith(
     fetch(e.request).then(r => {
-      // 动态缓存
-      if (r && r.status === 200) {
+      if (r && r.status === 200 && e.request.method === 'GET') {
         const copy = r.clone();
-        caches.open(CACHE).then(c => c.put(e.request, copy));
+        caches.open(CACHE).then(c => c.put(e.request, copy)).catch(() => {});
       }
       return r;
     }).catch(() => caches.match(e.request))
