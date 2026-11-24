@@ -253,6 +253,11 @@ body { min-height: 100vh; padding-bottom: 140px; }
 
 <script>
 /* ─────────────────────────────────────
+ *  安全包装: speechSynthesis 在部分 WebView 不存在
+ * ───────────────────────────────────── */
+function trySS(fn) { try { if ('speechSynthesis' in window) return fn(); } catch(e) {} return null; }
+
+/* ─────────────────────────────────────
  *  状态
  * ───────────────────────────────────── */
 const state = {
@@ -277,44 +282,59 @@ const LS_KEY = 'kaoyan_player_v2';
  *  初始化
  * ───────────────────────────────────── */
 async function init() {
-  // 加载数据 (Android WebView file:// 协议直接读 window.__APP_DATA__)
-  state.data = window.__APP_DATA__;
-  if (!state.data || !state.data.books) {
-    alert('数据加载失败');
-    document.getElementById('loading').remove();
-    return;
+  try {
+    // 加载数据
+    if (window.__APP_DATA__) {
+      // Android APK 内联模式
+      state.data = window.__APP_DATA__;
+    } else {
+      // 本地服务器模式 (开发用)
+      const r = await fetch('data.json', { cache: 'no-store' });
+      state.data = await r.json();
+    }
+
+    if (!state.data || !state.data.books) {
+      throw new Error('数据为空');
+    }
+
+    // 加载语音列表 (WebView 里 speechSynthesis 可能不存在)
+    try { loadVoices(); } catch(e) { console.warn('loadVoices 失败:', e); }
+    try {
+      if (speechSynthesis && speechSynthesis.onvoiceschanged !== undefined) {
+        speechSynthesis.onvoiceschanged = loadVoices;
+      }
+    } catch(e) {}
+
+    // 恢复状态
+    try { loadState(); } catch(e) { console.warn('loadState 失败:', e); }
+
+    // 渲染UI
+    renderBookPills();
+    renderSubPills();
+    rebuildQueue();
+    renderList();
+
+  } catch(e) {
+    console.error('❌ init 失败:', e);
+    alert('初始化失败: ' + e.message);
   }
 
-  // 加载语音列表
-  loadVoices();
-  if (speechSynthesis.onvoiceschanged !== undefined) {
-    speechSynthesis.onvoiceschanged = loadVoices;
-  }
-
-  // 恢复状态
-  loadState();
-
-  // 渲染UI
-  renderBookPills();
-  renderSubPills();
-  rebuildQueue();
-  renderList();
-
+  // 无论如何都要隐藏 loading
   hideLoading();
 
   // 页面可见性变化 → 暂停/恢复
   document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-      // 不做暂停，让它继续在后台播
-    }
+    if (document.hidden) { /* 后台继续播 */ }
   });
 }
 
 function loadVoices() {
-  state.voices = speechSynthesis.getVoices().filter(v =>
-    v.lang.toLowerCase().startsWith('zh') || v.name.includes('Chinese') || v.name.includes('普通话') || v.name.includes('中文')
-  );
-  console.log('可用中文语音:', state.voices.length);
+  try {
+    if (!('speechSynthesis' in window)) { state.voices = []; return; }
+    state.voices = speechSynthesis.getVoices().filter(v =>
+      v.lang && (v.lang.toLowerCase().startsWith('zh') || v.name && (v.name.includes('Chinese') || v.name.includes('普通话') || v.name.includes('中文')))
+    );
+  } catch(e) { state.voices = []; }
 }
 
 function loadState() {
@@ -487,9 +507,11 @@ function getCurrentText() {
 }
 
 function pickVoice() {
-  // 优先选中文
-  const v = state.voices[0] || speechSynthesis.getVoices()[0];
-  return v || null;
+  try {
+    if (!('speechSynthesis' in window)) return null;
+    const v = state.voices[0] || speechSynthesis.getVoices()[0];
+    return v || null;
+  } catch(e) { return null; }
 }
 
 /* ─────────────────────────────────────
@@ -606,6 +628,11 @@ function playSegmentAudio(seg) {
 }
 
 function playSegmentTTS(seg) {
+  if (typeof SpeechSynthesisUtterance === 'undefined' || !('speechSynthesis' in window)) {
+    // WebView 不支持 TTS, 回退到提示
+    showToast('当前环境不支持系统语音, 请使用 MP3 模式');
+    return;
+  }
   state.currentMode = 'tts';
   state.audioEl.pause();
   state.audioEl.removeAttribute('src');
@@ -632,14 +659,15 @@ function playSegmentTTS(seg) {
     setPlayIcon();
   };
 
-  speechSynthesis.cancel();
-  speechSynthesis.speak(utter);
+  trySS(() => speechSynthesis.cancel());
+  trySS(() => speechSynthesis.speak(utter));
   // 同步标记, 即使浏览器的 onstart 不触发
   state.isPlaying = true;
   setPlayIcon();
   // 兜底: speak 实际没发声时回退
   setTimeout(() => {
-    if (state.isPlaying && !speechSynthesis.speaking && !speechSynthesis.pending) {
+    const ss = 'speechSynthesis' in window ? speechSynthesis : null;
+    if (state.isPlaying && ss && !ss.speaking && !ss.pending) {
       state.isPlaying = false;
       setPlayIcon();
     }
@@ -649,7 +677,7 @@ function playSegmentTTS(seg) {
 // 只停声音 (audio.pause + tts.cancel), 不改队列/进度
 function stopOutputOnly() {
   clearAutoNext();
-  speechSynthesis.cancel();
+  trySS(() => speechSynthesis.cancel());
   try { state.audioEl.pause(); } catch(e) {}
   state.isPlaying = false;
   setPlayIcon();
@@ -671,7 +699,7 @@ function togglePlay() {
       state.audioEl.pause();
       // pause 事件会设 state.wasPaused=true, state.isPlaying=false
     } else if (state.currentMode === 'tts') {
-      speechSynthesis.pause();
+      trySS(() => speechSynthesis.pause());
       state.isPlaying = false;
       state.wasPaused = true;
       setPlayIcon();
@@ -686,7 +714,7 @@ function togglePlay() {
       state.audioEl.play().catch(() => { /* src 失效就从头 play */ });
       // play 事件会设 state.isPlaying=true
     } else if (state.currentMode === 'tts') {
-      speechSynthesis.resume();
+      trySS(() => speechSynthesis.resume());
       state.isPlaying = true;
       state.wasPaused = false;
       setPlayIcon();
