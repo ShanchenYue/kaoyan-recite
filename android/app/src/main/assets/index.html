@@ -258,32 +258,54 @@ body { min-height: 100vh; padding-bottom: 140px; }
 let nativeTTSReady = false;
 let ttsUtteranceSeq = 0;  // 唯一 ID, 用于匹配 Java 回调
 let currentTTSId = null;
+let debugMode = true;  // 显示调试面板
 
 // Java 侧通知 TTS 就绪
 function onNativeTTSReady() {
   nativeTTSReady = true;
+  if (debugMode) setDebugStatus('✅ 原生 AndroidTTS Bridge 就绪');
   console.log('✅ 原生 AndroidTTS Bridge 就绪');
 }
 // Java 侧通知 TTS 播完 → 自动下一条
 function onNativeTTSDone(utteranceId) {
-  if (utteranceId !== currentTTSId) return;  // 不是我们发的, 忽略
+  if (utteranceId !== currentTTSId) return;
   state.isPlaying = false;
   setPlayIcon();
   document.getElementById('progressFill').style.width = '100%';
   renderList();
   currentTTSId = null;
-  if (state.wasPaused) return;  // 暂停过就不自动下一条
+  if (debugMode) setDebugStatus(`✅ onNativeTTSDone(${utteranceId})`);
+  if (state.wasPaused) return;
   autoNextSeg();
 }
-// Java 侧通知 TTS 出错
 function onNativeTTSError(utteranceId) {
   if (utteranceId !== currentTTSId) return;
+  if (debugMode) setDebugStatus(`❌ onNativeTTSError(${utteranceId})`);
   console.warn('[NativeTTS] error:', utteranceId);
   state.isPlaying = false;
   setPlayIcon();
   currentTTSId = null;
 }
 
+function setDebugStatus(msg) {
+  var el = document.getElementById('debugStatus');
+  if (el) el.textContent = msg;
+  console.log('[DEBUG]', msg);
+}
+
+function testNativeTTS() {
+  if (window.AndroidTTS) {
+    var ok = AndroidTTS.isAvailable();
+    setDebugStatus(`AndroidTTS.isAvailable() = ${ok}`);
+    if (ok) {
+      AndroidTTS.stop();
+      AndroidTTS.speak('测试一下原生语音能不能播', 1.0, 'test_' + Date.now());
+      setDebugStatus('已发送测试语音, 应该听到声音...');
+    }
+  } else {
+    setDebugStatus('❌ window.AndroidTTS 不存在! 走的是 WebView speechSynthesis');
+  }
+}
 // 安全包装 speechSynthesis (WebView 回退用)
 function trySS(fn) { try { if ('speechSynthesis' in window) return fn(); } catch(e) {} return null; }
 
@@ -904,5 +926,14 @@ if ('serviceWorker' in navigator) {
   });
 }
 </script>
+
+<!-- 调试面板 (v8, 帮定位 Bridge 是否生效) -->
+<div id="debugPanel" style="position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,0.85);color:#0f0;font-size:11px;padding:6px 10px;z-index:9999;font-family:monospace;">
+  <div id="debugStatus">等待原生 Bridge 注册...</div>
+  <div style="margin-top:4px;display:flex;gap:6px;">
+    <button onclick="testNativeTTS()" style="background:#222;color:#fff;border:1px solid #555;padding:2px 8px;font-size:10px;">测试原生TTS</button>
+    <button onclick="var a=document.getElementById('debugPanel');a.style.display='none'" style="background:#440;color:#fff;border:1px solid #555;padding:2px 8px;font-size:10px;">隐藏</button>
+  </div>
+</div>
 </body>
 </html>
