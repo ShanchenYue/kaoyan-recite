@@ -190,13 +190,57 @@ body{min-height:100vh;overflow-x:hidden;padding-bottom:96px}
 .advice{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--accent);
   border-radius:12px;padding:12px 14px;font-size:13.5px;line-height:1.8;color:#d7dbea;margin-top:10px}
 .advice b{color:var(--accent)}
+
+/* ── 专注模式 ── */
+.focus-entry{margin-left:auto;padding:6px 12px;border-radius:12px;border:1px solid rgba(79,209,197,.35);
+  background:rgba(79,209,197,.1);color:var(--accent2);font-size:12px;font-family:inherit;cursor:pointer}
+.focusbar{display:none;position:fixed;top:0;left:0;right:0;z-index:150;
+  padding:calc(var(--safe-top) + 10px) 14px 10px;
+  background:linear-gradient(180deg,rgba(21,24,38,.98),rgba(11,12,18,.94));
+  border-bottom:1px solid rgba(79,209,197,.3);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  align-items:center;gap:12px}
+body.focus-on .focusbar{display:flex}
+body.focus-on .appbar{display:none}
+body.focus-on{padding-top:calc(var(--safe-top) + 66px)}
+.ftimer{font-size:24px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:1px;color:var(--accent2)}
+.fmeta{flex:1;font-size:11px;color:var(--muted);line-height:1.5}
+.fmeta b{color:var(--text);font-weight:600}
+.fend{position:relative;overflow:hidden;padding:9px 13px;border-radius:11px;border:1px solid var(--line);
+  background:var(--card2);color:var(--text);font-size:12px;font-family:inherit;cursor:pointer;user-select:none}
+.fend::after{content:'';position:absolute;left:0;top:0;bottom:0;width:0;
+  background:rgba(248,113,113,.35);transition:width 1.4s linear}
+.fend.holding::after{width:100%}
+.fend span{position:relative;z-index:1}
+.focusmask{position:fixed;inset:0;z-index:400;background:rgba(6,7,12,.82);display:none;
+  align-items:center;justify-content:center;padding:22px;
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.focusmask.show{display:flex}
+.focuscard{width:100%;max-width:400px;background:linear-gradient(180deg,#161a2b,#12141f);
+  border:1px solid var(--line);border-radius:20px;padding:22px 20px;box-shadow:0 24px 60px rgba(0,0,0,.55)}
+.focuscard h3{margin:0;font-size:18px;text-align:center}
+.focuscard .sub{font-size:12px;color:var(--muted);text-align:center;line-height:1.7;margin-top:8px}
+.focuscard .dur{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.focuscard .dur .pill{flex:1;text-align:center;padding:10px 0;font-size:13.5px}
+.focuscard .note{font-size:11px;color:#6f7590;line-height:1.7;margin-top:14px;
+  background:rgba(79,209,197,.06);border:1px solid rgba(79,209,197,.18);border-radius:10px;padding:10px}
+.focuscard .btns{display:flex;gap:10px;margin-top:16px}
+.focuscard .btns .btn{flex:1}
+.focus-toast{position:fixed;left:50%;bottom:calc(var(--safe-bottom) + 110px);
+  transform:translateX(-50%) translateY(10px);background:rgba(10,11,18,.94);
+  border:1px solid var(--line);color:var(--text);padding:10px 16px;border-radius:12px;
+  font-size:13px;z-index:500;opacity:0;pointer-events:none;transition:.25s;
+  max-width:82vw;text-align:center;line-height:1.5}
+.focus-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
 </head>
 <body>
 <script src="auth.js"></script>
 
 <header class="appbar">
-  <div class="title"><b>考研训练营</b><span>背诵 · 刷题 · 评估</span></div>
+  <div class="title"><b>考研训练营</b><span>背诵 · 刷题 · 评估</span>
+    <button class="focus-entry" id="focusBtn">🎯 专注</button>
+  </div>
   <nav class="tabs" id="tabs">
     <button data-tab="cloze" class="active">✏️ 挖空</button>
     <button data-tab="choice">📝 选择</button>
@@ -208,6 +252,12 @@ body{min-height:100vh;overflow-x:hidden;padding-bottom:96px}
     <a href="index.html" style="text-decoration:none"><button>🎧 背诵</button></a>
   </nav>
 </header>
+
+<div class="focusbar" id="focusBar">
+  <div class="ftimer" id="focusTimer">25:00</div>
+  <div class="fmeta"><b>专注中</b> · 离开 App 自动暂停</div>
+  <button class="fend" id="focusEnd"><span>长按结束</span></button>
+</div>
 
 <!-- ═════════ 挖空 ═════════ -->
 <section class="page active" id="page-cloze">
@@ -302,6 +352,25 @@ body{min-height:100vh;overflow-x:hidden;padding-bottom:96px}
   <div class="section-title">薄弱点与建议</div>
   <div id="statsAdvice"></div>
 </section>
+
+<div class="focusmask" id="focusMask">
+  <div class="focuscard">
+    <h3>🎯 专注模式</h3>
+    <div class="sub">专注期间隐藏其他标签<br>切出 App 计时自动暂停，回来继续</div>
+    <div class="dur" id="focusDur">
+      <div class="pill" data-min="15">15 分钟</div>
+      <div class="pill active" data-min="25">25 分钟</div>
+      <div class="pill" data-min="45">45 分钟</div>
+      <div class="pill" data-min="60">60 分钟</div>
+    </div>
+    <div class="note">开始时会请求系统「屏幕固定」：请在弹出的提示中点“确定/固定”。若没有提示，请在系统设置中开启「屏幕固定」。</div>
+    <div class="btns">
+      <button class="btn ghost" id="focusCancel">取消</button>
+      <button class="btn" id="focusStart">开始专注</button>
+    </div>
+  </div>
+</div>
+<div class="focus-toast" id="focusToast"></div>
 
 <script src="quiz_data.js"></script>
 <script>
@@ -1141,6 +1210,120 @@ function renderStats(){
   advice += `<div class="advice" style="border-left-color:var(--accent2)">📈 总体正确率 <b>${allC+allW?overall+'%':'—'}</b>（累计作答 ${allC+allW} 次）· 已掌握 ${masteredCount('cloze')+masteredCount('choice')+masteredCount('word')+masteredCount('fill')+masteredCount('math')} 题 · 错题 ${wrongCount('cloze')+wrongCount('choice')+wrongCount('word')+wrongCount('fill')+wrongCount('math')} 道</div>`;
   document.getElementById('statsAdvice').innerHTML = advice;
 }
+
+/* ══════════════════ 专注模式 ══════════════════ */
+const focusState = { on:false, total:0, remain:0, timer:null, hiddenAt:0 };
+function fmtClock(s){
+  s = Math.max(0, s|0);
+  const m = Math.floor(s/60), r = s%60;
+  return (m<10?'0':'')+m+':'+(r<10?'0':'')+r;
+}
+function focusToast(msg, ms){
+  const el = document.getElementById('focusToast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(focusToast._t);
+  focusToast._t = setTimeout(()=>el.classList.remove('show'), ms||2400);
+}
+function renderFocus(){
+  document.getElementById('focusTimer').textContent = fmtClock(focusState.remain);
+  const done = focusState.total - focusState.remain;
+  document.querySelector('#focusBar .fmeta').innerHTML = focusState.remain>0
+    ? `<b>专注中</b> · 已坚持 ${fmtClock(done)}`
+    : '<b>专注完成</b>';
+}
+function openFocus(){
+  if(focusState.on){ focusToast('已在专注中'); return; }
+  document.getElementById('focusMask').classList.add('show');
+}
+function closeFocusMask(){ document.getElementById('focusMask').classList.remove('show'); }
+function startFocus(min){
+  min = parseInt(min,10)||25;
+  focusState.on = true;
+  focusState.total = min*60;
+  focusState.remain = min*60;
+  focusState.hiddenAt = 0;
+  closeFocusMask();
+  document.body.classList.add('focus-on');
+  renderFocus();
+  if(window.AndroidFocus && window.AndroidFocus.startFocus){
+    try{ window.AndroidFocus.startFocus(); }catch(e){}
+  }
+  clearInterval(focusState.timer);
+  focusState.timer = setInterval(focusTick, 1000);
+  focusToast('专注开始，离开 App 会自动暂停');
+}
+function focusTick(){
+  if(!focusState.on || document.hidden) return;
+  if(focusState.remain<=0) return;
+  focusState.remain--;
+  renderFocus();
+  if(focusState.remain<=0) setTimeout(()=>endFocus(true), 300);
+}
+function endFocus(done){
+  if(!focusState.on) return;
+  const used = Math.max(0, focusState.total - focusState.remain);
+  focusState.on = false;
+  clearInterval(focusState.timer); focusState.timer = null;
+  document.body.classList.remove('focus-on');
+  if(window.AndroidFocus && window.AndroidFocus.stopFocus){
+    try{ window.AndroidFocus.stopFocus(); }catch(e){}
+  }
+  focusToast(done ? `🎉 专注完成 ${Math.round(used/60)} 分钟` : `已结束专注，本次 ${Math.round(used/60)} 分钟`, 3200);
+}
+document.getElementById('focusBtn').onclick = openFocus;
+document.getElementById('focusCancel').onclick = closeFocusMask;
+document.getElementById('focusMask').onclick = e=>{ if(e.target.id==='focusMask') closeFocusMask(); };
+document.querySelectorAll('#focusDur .pill').forEach(p=>{
+  p.onclick = ()=>{
+    document.querySelectorAll('#focusDur .pill').forEach(x=>x.classList.remove('active'));
+    p.classList.add('active');
+  };
+});
+document.getElementById('focusStart').onclick = ()=>{
+  const p = document.querySelector('#focusDur .pill.active');
+  startFocus(p ? p.dataset.min : 25);
+};
+(function(){
+  const btn = document.getElementById('focusEnd');
+  const label = btn.querySelector('span');
+  let holdTimer = null;
+  function begin(e){
+    if(!focusState.on) return;
+    e.preventDefault();
+    btn.classList.add('holding');
+    label.textContent = '继续按住…';
+    holdTimer = setTimeout(()=>{
+      holdTimer = null;
+      btn.classList.remove('holding');
+      label.textContent = '长按结束';
+      endFocus(false);
+    }, 1500);
+  }
+  function cancel(){
+    if(holdTimer){ clearTimeout(holdTimer); holdTimer = null; }
+    btn.classList.remove('holding');
+    label.textContent = '长按结束';
+  }
+  btn.addEventListener('pointerdown', begin);
+  btn.addEventListener('pointerup', cancel);
+  btn.addEventListener('pointercancel', cancel);
+  btn.addEventListener('pointerleave', cancel);
+})();
+document.addEventListener('visibilitychange', ()=>{
+  if(!focusState.on) return;
+  if(document.hidden){
+    focusState.hiddenAt = Date.now();
+  } else if(focusState.hiddenAt){
+    const s = Math.round((Date.now()-focusState.hiddenAt)/1000);
+    focusState.hiddenAt = 0;
+    focusToast('专注已暂停 '+fmtClock(s)+'，继续计时');
+  }
+});
+window.addEventListener('pagehide', ()=>{
+  if(focusState.on && window.AndroidFocus && window.AndroidFocus.stopFocus){
+    try{ window.AndroidFocus.stopFocus(); }catch(e){}
+  }
+});
 
 /* ══════════════════ 启动 ══════════════════ */
 let booted=false;

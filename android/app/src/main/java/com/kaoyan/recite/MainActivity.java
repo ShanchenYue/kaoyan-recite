@@ -5,11 +5,13 @@ import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.util.Log;
+import android.view.View;
 import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -19,6 +21,7 @@ public class MainActivity extends Activity {
     private WebView webView;
     private TextToSpeech tts;
     private boolean ttsReady = false;
+    private boolean focusActive = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,8 +104,20 @@ public class MainActivity extends Activity {
 
         // ─── 注册原生 TTS Bridge ───
         webView.addJavascriptInterface(new TTSBridge(), "AndroidTTS");
+        webView.addJavascriptInterface(new FocusBridge(), "AndroidFocus");
 
-        webView.setWebViewClient(new WebViewClient());
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                // 页面刷新/跳转时解除专注，避免停留在固定屏幕却没有退出按钮
+                if (focusActive) {
+                    focusActive = false;
+                    try { stopLockTask(); } catch (Exception e) { Log.w(TAG, "stopLockTask 失败: " + e.getMessage()); }
+                    setImmersive(false);
+                }
+            }
+        });
         webView.loadUrl("file:///android_asset/index.html");
     }
 
@@ -143,8 +158,59 @@ public class MainActivity extends Activity {
         }
     }
 
+    /**
+     * JS 可调用的专注模式接口：沉浸全屏 + 屏幕固定
+     */
+    public class FocusBridge {
+        @JavascriptInterface
+        public void startFocus() {
+            runOnUiThread(() -> {
+                focusActive = true;
+                setImmersive(true);
+                try {
+                    startLockTask();
+                } catch (Exception e) {
+                    Log.w(TAG, "startLockTask 失败: " + e.getMessage());
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public void stopFocus() {
+            runOnUiThread(() -> {
+                focusActive = false;
+                try {
+                    stopLockTask();
+                } catch (Exception e) {
+                    Log.w(TAG, "stopLockTask 失败: " + e.getMessage());
+                }
+                setImmersive(false);
+            });
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    private void setImmersive(boolean on) {
+        View decor = getWindow().getDecorView();
+        if (on) {
+            decor.setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+        } else {
+            decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+        }
+    }
+
     @Override
     public void onBackPressed() {
+        if (focusActive) {
+            Toast.makeText(this, "专注中，请长按顶部「结束」按钮", Toast.LENGTH_SHORT).show();
+            return;
+        }
         if (webView != null && webView.canGoBack()) {
             webView.goBack();
         } else {
@@ -166,6 +232,10 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+        if (focusActive) {
+            try { stopLockTask(); } catch (Exception e) { Log.w(TAG, "stopLockTask 失败: " + e.getMessage()); }
+            focusActive = false;
+        }
         if (tts != null) {
             tts.stop();
             tts.shutdown();
