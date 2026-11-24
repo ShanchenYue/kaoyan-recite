@@ -12,6 +12,7 @@
   "type": "commonjs",
   "dependencies": {
     "edge-tts": "^1.0.1",
+    "katex": "^0.19.1",
     "node-edge-tts": "^1.2.12"
   }
 }

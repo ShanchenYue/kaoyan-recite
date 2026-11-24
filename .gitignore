@@ -6,3 +6,4 @@ __pycache__/
 *.pyc
 tts.log
 tts.err
+android/app/src/main/assets/

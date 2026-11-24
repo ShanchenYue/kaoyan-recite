@@ -1,0 +1,1769 @@
+{
+ "version": 1,
+ "items": [
+  {
+   "id": "f001",
+   "sub": "信号与系统·拉普拉斯变换对",
+   "q": "单位阶跃 $u(t)$ 的傅里叶变换与拉普拉斯变换？",
+   "a": "$F(\\omega)=\\frac{1}{j\\omega}+\\pi\\delta(\\omega)$；$L(s)=\\frac{1}{s}$，$Re(s)>0$",
+   "tag": ""
+  },
+  {
+   "id": "f002",
+   "sub": "信号与系统·拉普拉斯变换对",
+   "q": "单位冲激 $\\delta(t)$ 的傅里叶变换与拉普拉斯变换？",
+   "a": "$F(\\omega)=1$；$L(s)=1$，全 $s$ 平面",
+   "tag": ""
+  },
+  {
+   "id": "f003",
+   "sub": "信号与系统·拉普拉斯变换对",
+   "q": "常数 $1$ 的傅里叶变换与拉普拉斯变换？",
+   "a": "$F(\\omega)=2\\pi\\delta(\\omega)$；$L(s)=\\frac{1}{s}$，$Re(s)>0$",
+   "tag": ""
+  },
+  {
+   "id": "f004",
+   "sub": "信号与系统·拉普拉斯变换对",
+   "q": "冲激偶 $\\delta^{\\prime}(t)$ 的傅里叶变换与拉普拉斯变换？",
+   "a": "$F(\\omega)=j\\omega$；$L(s)=s$，全 $s$ 平面",
+   "tag": ""
+  },
+  {
+   "id": "f005",
+   "sub": "信号与系统·拉普拉斯变换对",
+   "q": "单边指数信号 $e^{-at}u(t)$ 的傅里叶变换与拉普拉斯变换？",
+   "a": "$F(\\omega)=\\frac{1}{a+j\\omega}$；$L(s)=\\frac{1}{s+a}$，$Re(s)>-a$",
+   "tag": ""
+  },
+  {
+   "id": "f006",
+   "sub": "信号与系统·拉普拉斯变换对",
+   "q": "双边指数信号 $e^{-a|t|}$ 的傅里叶变换与双边拉普拉斯变换？",
+   "a": "$F(\\omega)=\\frac{2a}{a^2+\\omega^2}$；$L(s)=\\frac{2a}{a^2-s^2}$，$-a<Re(s)<a$",
+   "tag": ""
+  },
+  {
+   "id": "f007",
+   "sub": "信号与系统·拉普拉斯变换对",
+   "q": "符号函数 $sgn(t)$ 的傅里叶变换与（单边）拉普拉斯变换？",
+   "a": "$F(\\omega)=\\frac{2}{j\\omega}$；单边 $L(s)=\\frac{1}{s}$（$t>0$ 时 $sgn(t)=1$）",
+   "tag": ""
+  },
+  {
+   "id": "f008",
+   "sub": "信号与系统·拉普拉斯变换对",
+   "q": "矩形窗 $E\\left[u\\left(t+\\frac{\\tau}{2}\\right)-u\\left(t-\\frac{\\tau}{2}\\right)\\right]$ 的变换？",
+   "a": "$F(\\omega)=E\\tau\\,Sa\\left(\\frac{\\omega\\tau}{2}\\right)$；$L(s)=\\frac{E}{s}\\left(e^{\\frac{s\\tau}{2}}-e^{-\\frac{s\\tau}{2}}\\right)=\\frac{2E}{s}sh\\left(\\frac{s\\tau}{2}\\right)$",
+   "tag": ""
+  },
+  {
+   "id": "f009",
+   "sub": "信号与系统·拉普拉斯变换对",
+   "q": "$t\\,u(t)$ 的傅里叶变换与拉普拉斯变换？",
+   "a": "$F(\\omega)=j\\pi\\delta^{\\prime}(\\omega)-\\frac{1}{\\omega^2}$；$L(s)=\\frac{1}{s^2}$",
+   "tag": ""
+  },
+  {
+   "id": "f010",
+   "sub": "信号与系统·拉普拉斯变换对",
+   "q": "$t^2u(t)$ 的傅里叶变换与拉普拉斯变换？",
+   "a": "$F(\\omega)=-\\pi\\delta^{\\prime\\prime}(\\omega)+\\frac{2j}{\\omega^3}$；$L(s)=\\frac{2}{s^3}$",
+   "tag": ""
+  },
+  {
+   "id": "f011",
+   "sub": "信号与系统·拉普拉斯变换对",
+   "q": "$t^3u(t)$ 的傅里叶变换与拉普拉斯变换？",
+   "a": "$F(\\omega)=-j\\pi\\delta^{\\prime\\prime\\prime}(\\omega)+\\frac{6}{\\omega^4}$；$L(s)=\\frac{6}{s^4}$",
+   "tag": ""
+  },
+  {
+   "id": "f012",
+   "sub": "信号与系统·拉普拉斯变换对",
+   "q": "余弦信号 $\\cos(\\omega_1t)$ 的傅里叶变换？",
+   "a": "$F(\\omega)=\\pi\\left[\\delta(\\omega-\\omega_1)+\\delta(\\omega+\\omega_1)\\right]$；双边拉普拉斯变换不存在（无公共收敛域）",
+   "tag": ""
+  },
+  {
+   "id": "f013",
+   "sub": "信号与系统·拉普拉斯变换对",
+   "q": "单边余弦 $\\cos(\\omega_1t)u(t)$ 的变换？",
+   "a": "$F(\\omega)=\\frac{j\\omega}{\\omega_1^2-\\omega^2}+\\frac{\\pi}{2}\\left[\\delta(\\omega-\\omega_1)+\\delta(\\omega+\\omega_1)\\right]$；$L(s)=\\frac{s}{s^2+\\omega_1^2}$",
+   "tag": ""
+  },
+  {
+   "id": "f014",
+   "sub": "信号与系统·拉普拉斯变换对",
+   "q": "正弦信号 $\\sin(\\omega_1t)$ 的傅里叶变换？",
+   "a": "$F(\\omega)=\\frac{\\pi}{j}\\left[\\delta(\\omega-\\omega_1)-\\delta(\\omega+\\omega_1)\\right]$；双边拉普拉斯变换不存在",
+   "tag": ""
+  },
+  {
+   "id": "f015",
+   "sub": "信号与系统·拉普拉斯变换对",
+   "q": "单边正弦 $\\sin(\\omega_1t)u(t)$ 的变换？",
+   "a": "$F(\\omega)=\\frac{\\omega_1}{\\omega_1^2-\\omega^2}+\\frac{\\pi}{2j}\\left[\\delta(\\omega-\\omega_1)-\\delta(\\omega+\\omega_1)\\right]$；$L(s)=\\frac{\\omega_1}{s^2+\\omega_1^2}$",
+   "tag": ""
+  },
+  {
+   "id": "f016",
+   "sub": "信号与系统·拉普拉斯变换对",
+   "q": "周期冲激串 $\\sum_{n=-\\infty}^{\\infty}\\delta(t-nT_1)$ 的变换？",
+   "a": "$F(\\omega)=\\frac{2\\pi}{T_1}\\sum_{n=-\\infty}^{\\infty}\\delta\\left(\\omega-\\frac{2n\\pi}{T_1}\\right)$；单边 $L(s)=\\frac{1}{1-e^{-sT_1}}$，$Re(s)>0$",
+   "tag": ""
+  },
+  {
+   "id": "f017",
+   "sub": "信号与系统·拉普拉斯变换对",
+   "q": "双曲正弦 $sh(at)u(t)=\\frac{e^{at}-e^{-at}}{2}u(t)$ 的变换？",
+   "a": "$F(\\omega)=-\\frac{a}{a^2+\\omega^2}$；$L(s)=\\frac{a}{s^2-a^2}$，$Re(s)>|a|$",
+   "tag": ""
+  },
+  {
+   "id": "f018",
+   "sub": "信号与系统·拉普拉斯变换对",
+   "q": "双曲余弦 $ch(at)u(t)=\\frac{e^{at}+e^{-at}}{2}u(t)$ 的变换？",
+   "a": "$F(\\omega)=-\\frac{j\\omega}{a^2+\\omega^2}$；$L(s)=\\frac{s}{s^2-a^2}$，$Re(s)>|a|$",
+   "tag": ""
+  },
+  {
+   "id": "f019",
+   "sub": "信号与系统·拉普拉斯变换性质",
+   "q": "拉普拉斯变换的线性性质？",
+   "a": "$ax_1(t)+bx_2(t)\\leftrightarrow aX_1(s)+bX_2(s)$，收敛域至少为两收敛域的交集；傅里叶变换同样成立",
+   "tag": ""
+  },
+  {
+   "id": "f020",
+   "sub": "信号与系统·拉普拉斯变换性质",
+   "q": "拉普拉斯变换的尺度变换性质？",
+   "a": "$x(at)\\leftrightarrow\\frac{1}{|a|}X\\left(\\frac{s}{a}\\right)$，收敛域按 $|a|$ 缩放；傅里叶变换为 $\\frac{1}{|a|}X\\left(\\frac{\\omega}{a}\\right)$",
+   "tag": ""
+  },
+  {
+   "id": "f021",
+   "sub": "信号与系统·拉普拉斯变换性质",
+   "q": "拉普拉斯变换的时移性质？",
+   "a": "$x(t-t_0)\\leftrightarrow e^{-st_0}X(s)$；傅里叶变换为 $e^{-j\\omega t_0}X(\\omega)$",
+   "tag": ""
+  },
+  {
+   "id": "f022",
+   "sub": "信号与系统·拉普拉斯变换性质",
+   "q": "拉普拉斯变换的频移性质？",
+   "a": "$e^{s_0t}x(t)\\leftrightarrow X(s-s_0)$；傅里叶变换为 $e^{j\\omega_0t}x(t)\\leftrightarrow X(\\omega-\\omega_0)$",
+   "tag": ""
+  },
+  {
+   "id": "f023",
+   "sub": "信号与系统·拉普拉斯变换性质",
+   "q": "拉普拉斯变换的时域微分性质？",
+   "a": "$x^{\\prime}(t)\\leftrightarrow sX(s)-x(0^-)$；傅里叶变换为 $x^{\\prime}(t)\\leftrightarrow j\\omega X(\\omega)$",
+   "tag": ""
+  },
+  {
+   "id": "f024",
+   "sub": "信号与系统·拉普拉斯变换性质",
+   "q": "拉普拉斯变换的频域微分性质？",
+   "a": "$-t\\,x(t)\\leftrightarrow\\frac{dX(s)}{ds}$；傅里叶变换为 $-jt\\,x(t)\\leftrightarrow\\frac{dX(\\omega)}{d\\omega}$",
+   "tag": ""
+  },
+  {
+   "id": "f025",
+   "sub": "信号与系统·拉普拉斯变换性质",
+   "q": "拉普拉斯变换的时域积分性质？",
+   "a": "$\\int_{0}^{t}x(\\tau)d\\tau\\leftrightarrow\\frac{X(s)}{s}$（单边）；傅里叶为 $\\int_{-\\infty}^{t}x(\\tau)d\\tau\\leftrightarrow\\frac{X(\\omega)}{j\\omega}+\\pi X(0)\\delta(\\omega)$",
+   "tag": ""
+  },
+  {
+   "id": "f026",
+   "sub": "信号与系统·拉普拉斯变换性质",
+   "q": "拉普拉斯变换的频域积分性质？",
+   "a": "$\\frac{x(t)}{-jt}\\leftrightarrow\\int_{-\\infty}^{\\omega}X(\\Omega)d\\Omega$；对应拉氏形式为 $\\frac{x(t)}{t}\\leftrightarrow\\int_{s}^{\\infty}X(\\sigma)d\\sigma$",
+   "tag": ""
+  },
+  {
+   "id": "f027",
+   "sub": "信号与系统·拉普拉斯变换性质",
+   "q": "拉普拉斯变换的终值定理及其使用条件？",
+   "a": "$\\lim_{t\\to\\infty}x(t)=\\lim_{s\\to0}sX(s)$；条件：$sX(s)$ 的极点全部位于左半平面（原点处至多一阶极点）",
+   "tag": ""
+  },
+  {
+   "id": "f028",
+   "sub": "信号与系统·拉普拉斯变换性质",
+   "q": "拉普拉斯变换的初值定理及其使用条件？",
+   "a": "$x(0^+)=\\lim_{s\\to\\infty}sX(s)$；条件：$X(s)$ 为真分式（分子次数小于分母次数）",
+   "tag": ""
+  },
+  {
+   "id": "f029",
+   "sub": "信号与系统·拉普拉斯变换性质",
+   "q": "拉普拉斯变换的时域卷积定理？",
+   "a": "$x_1(t)*x_2(t)\\leftrightarrow X_1(s)X_2(s)$，收敛域至少为两收敛域的交集",
+   "tag": ""
+  },
+  {
+   "id": "f030",
+   "sub": "信号与系统·拉普拉斯变换性质",
+   "q": "拉普拉斯变换的时域相乘（复卷积）定理？",
+   "a": "$x_1(t)x_2(t)\\leftrightarrow\\frac{1}{2\\pi j}\\int_{\\sigma-j\\infty}^{\\sigma+j\\infty}X_1(\\lambda)X_2(s-\\lambda)d\\lambda$；傅里叶形式为 $\\frac{1}{2\\pi}X_1(\\omega)*X_2(\\omega)$",
+   "tag": ""
+  },
+  {
+   "id": "f031",
+   "sub": "信号与系统·电路S域模型",
+   "q": "电阻 $R$ 的 S 域（复频域）模型？",
+   "a": "$V(s)=R\\,I(s)$，S 域阻抗 $Z_R=R$；时域为 $v(t)=R\\,i(t)$",
+   "tag": ""
+  },
+  {
+   "id": "f032",
+   "sub": "信号与系统·电路S域模型",
+   "q": "电容 $C$ 的 S 域（复频域）模型？",
+   "a": "$I(s)=sC\\,V(s)-C\\,v(0^-)$，即 $V(s)=\\frac{1}{sC}I(s)+\\frac{v(0^-)}{s}$；$Z_C=\\frac{1}{sC}$，并带串联电压源 $\\frac{v(0^-)}{s}$",
+   "tag": ""
+  },
+  {
+   "id": "f033",
+   "sub": "信号与系统·电路S域模型",
+   "q": "电感 $L$ 的 S 域（复频域）模型？",
+   "a": "$V(s)=sL\\,I(s)-L\\,i(0^-)$；$Z_L=sL$，并带串联电压源 $L\\,i(0^-)$",
+   "tag": ""
+  },
+  {
+   "id": "f034",
+   "sub": "信号与系统·傅里叶级数表示",
+   "q": "周期信号的三角函数形式傅里叶级数展开式？",
+   "a": "$x(t)=\\frac{a_0}{2}+\\sum_{n=1}^{\\infty}\\left[a_n\\cos(n\\omega_1t)+b_n\\sin(n\\omega_1t)\\right]$，$\\omega_1=\\frac{2\\pi}{T}$",
+   "tag": ""
+  },
+  {
+   "id": "f035",
+   "sub": "信号与系统·傅里叶级数表示",
+   "q": "周期信号的指数函数形式傅里叶级数展开式？",
+   "a": "$x(t)=\\sum_{k=-\\infty}^{\\infty}X_k e^{jk\\omega_1t}$，$\\omega_1=\\frac{2\\pi}{T}$",
+   "tag": ""
+  },
+  {
+   "id": "f036",
+   "sub": "信号与系统·傅里叶级数表示",
+   "q": "周期信号的纯余弦形式傅里叶级数展开式？",
+   "a": "$x(t)=A_0+\\sum_{n=1}^{\\infty}A_n\\cos(n\\omega_1t+\\varphi_n)$",
+   "tag": ""
+  },
+  {
+   "id": "f037",
+   "sub": "信号与系统·傅里叶级数性质",
+   "q": "傅里叶级数的线性性质？",
+   "a": "$ax(t)+by(t)\\leftrightarrow a\\,a_k+b\\,b_k$",
+   "tag": ""
+  },
+  {
+   "id": "f038",
+   "sub": "信号与系统·傅里叶级数性质",
+   "q": "傅里叶级数的时域共轭性质？",
+   "a": "$x^*(t)\\leftrightarrow a_{-k}^*$",
+   "tag": ""
+  },
+  {
+   "id": "f039",
+   "sub": "信号与系统·傅里叶级数性质",
+   "q": "傅里叶级数的调制（频移）特性？",
+   "a": "$x(t)e^{jM\\omega_1t}\\leftrightarrow a_{k-M}$",
+   "tag": ""
+  },
+  {
+   "id": "f040",
+   "sub": "信号与系统·傅里叶级数性质",
+   "q": "傅里叶级数的反折特性？",
+   "a": "$x(-t)\\leftrightarrow a_{-k}$",
+   "tag": ""
+  },
+  {
+   "id": "f041",
+   "sub": "信号与系统·傅里叶级数性质",
+   "q": "傅里叶级数的时移特性？",
+   "a": "$x(t-t_0)\\leftrightarrow a_k e^{-jk\\omega_1t_0}$",
+   "tag": ""
+  },
+  {
+   "id": "f042",
+   "sub": "信号与系统·傅里叶级数性质",
+   "q": "傅里叶级数的时域微分特性？",
+   "a": "$\\frac{dx(t)}{dt}\\leftrightarrow jk\\omega_1a_k$",
+   "tag": ""
+  },
+  {
+   "id": "f043",
+   "sub": "信号与系统·傅里叶级数性质",
+   "q": "傅里叶级数的相乘特性？",
+   "a": "$x(t)y(t)\\leftrightarrow\\sum_{l=-\\infty}^{\\infty}a_l b_{k-l}$（周期卷积）",
+   "tag": ""
+  },
+  {
+   "id": "f044",
+   "sub": "信号与系统·傅里叶级数性质",
+   "q": "傅里叶级数的周期卷积特性？",
+   "a": "$x(t)\\circledast y(t)\\leftrightarrow T\\,a_kb_k$",
+   "tag": ""
+  },
+  {
+   "id": "f045",
+   "sub": "信号与系统·傅里叶级数性质",
+   "q": "周期信号的功率与傅里叶系数的关系（帕塞瓦尔）？",
+   "a": "$P=\\frac{1}{T}\\int_T|x(t)|^2dt=\\sum_{k=-\\infty}^{\\infty}|a_k|^2$",
+   "tag": ""
+  },
+  {
+   "id": "f046",
+   "sub": "信号与系统·傅里叶级数性质",
+   "q": "傅里叶级数的时域尺度变换特性？",
+   "a": "$x(at)$ 的基频变为 $a\\omega_1$，傅里叶系数 $a_k$ 保持不变（仅重新排列）",
+   "tag": ""
+  },
+  {
+   "id": "f047",
+   "sub": "信号与系统·傅里叶级数性质",
+   "q": "实信号傅里叶系数的共轭对称性？",
+   "a": "$a_{-k}=a_k^*$",
+   "tag": ""
+  },
+  {
+   "id": "f048",
+   "sub": "信号与系统·傅里叶级数性质",
+   "q": "实偶信号的傅里叶系数特点？",
+   "a": "$a_k$ 为实且偶，即 $a_k=a_{-k}$",
+   "tag": ""
+  },
+  {
+   "id": "f049",
+   "sub": "信号与系统·傅里叶级数性质",
+   "q": "实奇信号的傅里叶系数特点？",
+   "a": "$a_k$ 为纯虚且奇，即 $a_k=-a_{-k}$",
+   "tag": ""
+  },
+  {
+   "id": "f050",
+   "sub": "信号与系统·傅里叶级数性质",
+   "q": "实信号奇偶分解对应的傅里叶系数？",
+   "a": "$Ev\\{x(t)\\}\\leftrightarrow Re\\{a_k\\}$，$Od\\{x(t)\\}\\leftrightarrow j\\,Im\\{a_k\\}$",
+   "tag": ""
+  },
+  {
+   "id": "f051",
+   "sub": "信号与系统·常见傅里叶级数",
+   "q": "$x(t)=\\sum_{k=-\\infty}^{\\infty}a_k e^{jk\\omega_0t}$ 的傅里叶级数系数？",
+   "a": "即为 $a_k$（该展开式的系数本身就是 $a_k$）",
+   "tag": ""
+  },
+  {
+   "id": "f052",
+   "sub": "信号与系统·常见傅里叶级数",
+   "q": "$e^{jk\\omega_0t}$ 的傅里叶级数系数？",
+   "a": "$a_k=1$（仅该次谐波），其余系数为 $0$",
+   "tag": ""
+  },
+  {
+   "id": "f053",
+   "sub": "信号与系统·常见傅里叶级数",
+   "q": "$\\cos(\\omega_0t)$ 的傅里叶级数系数？",
+   "a": "$a_1=a_{-1}=\\frac{1}{2}$，其余为 $0$",
+   "tag": ""
+  },
+  {
+   "id": "f054",
+   "sub": "信号与系统·常见傅里叶级数",
+   "q": "$\\sin(\\omega_0t)$ 的傅里叶级数系数？",
+   "a": "$a_1=\\frac{1}{2j}$，$a_{-1}=-\\frac{1}{2j}$，其余为 $0$",
+   "tag": ""
+  },
+  {
+   "id": "f055",
+   "sub": "信号与系统·常见傅里叶级数",
+   "q": "$x(t)=1$ 的傅里叶级数系数？",
+   "a": "$a_0=1$，其余 $a_k=0$（$k\\neq0$）",
+   "tag": ""
+  },
+  {
+   "id": "f056",
+   "sub": "信号与系统·常见傅里叶级数",
+   "q": "周期矩形脉冲（幅度 1、脉宽 $2T_1$、周期 $T$）的傅里叶级数系数？",
+   "a": "$a_k=\\frac{2T_1}{T}Sa\\left(k\\omega_0T_1\\right)$",
+   "tag": ""
+  },
+  {
+   "id": "f057",
+   "sub": "信号与系统·常见傅里叶级数",
+   "q": "周期冲激串 $\\sum_{n=-\\infty}^{\\infty}\\delta(t-nT)$ 的傅里叶级数系数？",
+   "a": "$a_k=\\frac{1}{T}$",
+   "tag": ""
+  },
+  {
+   "id": "f058",
+   "sub": "信号与系统·傅里叶变换性质",
+   "q": "傅里叶变换的唯一性？",
+   "a": "$f(t)$ 与 $F(\\omega)$ 一一对应，变换对唯一",
+   "tag": ""
+  },
+  {
+   "id": "f059",
+   "sub": "信号与系统·傅里叶变换性质",
+   "q": "傅里叶变换的线性性质？",
+   "a": "$\\sum_{i=1}^{n}A_if_i(t)\\leftrightarrow\\sum_{i=1}^{n}A_iF_i(\\omega)$",
+   "tag": ""
+  },
+  {
+   "id": "f060",
+   "sub": "信号与系统·傅里叶变换性质",
+   "q": "傅里叶变换的对偶性？",
+   "a": "$F(t)\\leftrightarrow 2\\pi f(-\\omega)$",
+   "tag": ""
+  },
+  {
+   "id": "f061",
+   "sub": "信号与系统·傅里叶变换性质",
+   "q": "傅里叶变换的尺度变换特性？",
+   "a": "$f(at)\\leftrightarrow\\frac{1}{|a|}F\\left(\\frac{\\omega}{a}\\right)$；$f(-t)\\leftrightarrow F(-\\omega)$",
+   "tag": ""
+  },
+  {
+   "id": "f062",
+   "sub": "信号与系统·傅里叶变换性质",
+   "q": "傅里叶变换的时移特性？",
+   "a": "$f(t-t_0)\\leftrightarrow F(\\omega)e^{-j\\omega t_0}$；$f(at-t_0)\\leftrightarrow\\frac{1}{|a|}F\\left(\\frac{\\omega}{a}\\right)e^{-j\\frac{\\omega t_0}{a}}$",
+   "tag": ""
+  },
+  {
+   "id": "f063",
+   "sub": "信号与系统·傅里叶变换性质",
+   "q": "傅里叶变换的频移特性？",
+   "a": "$f(t)e^{\\pm j\\omega_0t}\\leftrightarrow F(\\omega\\mp\\omega_0)$",
+   "tag": ""
+  },
+  {
+   "id": "f064",
+   "sub": "信号与系统·傅里叶变换性质",
+   "q": "余弦调制定理（$f(t)\\cos\\omega_0t$ 的频谱）？",
+   "a": "$f(t)\\cos(\\omega_0t)\\leftrightarrow\\frac{1}{2}\\left[F(\\omega-\\omega_0)+F(\\omega+\\omega_0)\\right]$",
+   "tag": ""
+  },
+  {
+   "id": "f065",
+   "sub": "信号与系统·傅里叶变换性质",
+   "q": "正弦调制定理（$f(t)\\sin\\omega_0t$ 的频谱）？",
+   "a": "$f(t)\\sin(\\omega_0t)\\leftrightarrow\\frac{1}{2j}\\left[F(\\omega-\\omega_0)-F(\\omega+\\omega_0)\\right]$",
+   "tag": ""
+  },
+  {
+   "id": "f066",
+   "sub": "信号与系统·傅里叶变换性质",
+   "q": "傅里叶变换的时域微分特性？",
+   "a": "$\\frac{df(t)}{dt}\\leftrightarrow j\\omega F(\\omega)$，$\\frac{d^kf(t)}{dt^k}\\leftrightarrow(j\\omega)^kF(\\omega)$",
+   "tag": ""
+  },
+  {
+   "id": "f067",
+   "sub": "信号与系统·傅里叶变换性质",
+   "q": "傅里叶变换的时域积分特性？",
+   "a": "$\\int_{-\\infty}^{t}f(\\tau)d\\tau\\leftrightarrow\\frac{F(\\omega)}{j\\omega}+\\pi F(0)\\delta(\\omega)$",
+   "tag": ""
+  },
+  {
+   "id": "f068",
+   "sub": "信号与系统·傅里叶变换性质",
+   "q": "傅里叶变换的频域微分特性（时域乘 $t$）？",
+   "a": "$(-jt)f(t)\\leftrightarrow\\frac{dF(\\omega)}{d\\omega}$，$(-jt)^kf(t)\\leftrightarrow\\frac{d^kF(\\omega)}{d\\omega^k}$",
+   "tag": ""
+  },
+  {
+   "id": "f069",
+   "sub": "信号与系统·傅里叶变换性质",
+   "q": "傅里叶变换的频域积分特性？",
+   "a": "$\\pi f(0)\\delta(t)-\\frac{1}{jt}f(t)\\leftrightarrow\\int_{-\\infty}^{\\omega}F(\\Omega)d\\Omega$",
+   "tag": ""
+  },
+  {
+   "id": "f070",
+   "sub": "信号与系统·傅里叶变换性质",
+   "q": "傅里叶变换的共轭特性？",
+   "a": "$f^*(t)\\leftrightarrow F^*(-\\omega)$",
+   "tag": ""
+  },
+  {
+   "id": "f071",
+   "sub": "信号与系统·傅里叶变换性质",
+   "q": "时域卷积定理？",
+   "a": "$f_1(t)*f_2(t)\\leftrightarrow F_1(\\omega)F_2(\\omega)$",
+   "tag": ""
+  },
+  {
+   "id": "f072",
+   "sub": "信号与系统·傅里叶变换性质",
+   "q": "频域卷积定理？",
+   "a": "$f_1(t)\\,f_2(t)\\leftrightarrow\\frac{1}{2\\pi}F_1(\\omega)*F_2(\\omega)$",
+   "tag": ""
+  },
+  {
+   "id": "f073",
+   "sub": "信号与系统·傅里叶变换性质",
+   "q": "时域抽样（冲激抽样）的频谱？",
+   "a": "$f(t)\\sum_{n=-\\infty}^{\\infty}\\delta(t-nT_s)\\leftrightarrow\\frac{1}{T_s}\\sum_{n=-\\infty}^{\\infty}F(\\omega-n\\omega_s)$，$\\omega_s=\\frac{2\\pi}{T_s}$",
+   "tag": ""
+  },
+  {
+   "id": "f074",
+   "sub": "信号与系统·傅里叶变换性质",
+   "q": "交替周期冲激抽样的频谱？",
+   "a": "$f(t)\\sum_{n=-\\infty}^{\\infty}(-1)^n\\delta(t-nT_s)\\leftrightarrow\\frac{1}{T_s}\\sum_{n=-\\infty}^{\\infty}F\\left(\\omega-n\\omega_s-\\frac{\\omega_s}{2}\\right)$",
+   "tag": ""
+  },
+  {
+   "id": "f075",
+   "sub": "信号与系统·傅里叶变换性质",
+   "q": "频域抽样的时域表达式？",
+   "a": "$\\frac{1}{\\omega_s}\\sum_{n=-\\infty}^{\\infty}f\\left(t-\\frac{2n\\pi}{\\omega_s}\\right)\\leftrightarrow\\sum_{n=-\\infty}^{\\infty}F(n\\omega_s)\\delta(\\omega-n\\omega_s)$",
+   "tag": ""
+  },
+  {
+   "id": "f076",
+   "sub": "信号与系统·傅里叶变换性质",
+   "q": "自相关函数的傅里叶变换？",
+   "a": "$R(\\tau)=f(\\tau)*f^*(-\\tau)\\leftrightarrow|F(\\omega)|^2$（能量谱）",
+   "tag": ""
+  },
+  {
+   "id": "f077",
+   "sub": "信号与系统·傅里叶变换性质",
+   "q": "互相关函数的傅里叶变换？",
+   "a": "$R_{21}(\\tau)\\leftrightarrow F_2(\\omega)F_1^*(\\omega)$，$R_{12}(\\tau)\\leftrightarrow F_1(\\omega)F_2^*(\\omega)$",
+   "tag": ""
+  },
+  {
+   "id": "f078",
+   "sub": "信号与系统·傅里叶变换性质",
+   "q": "帕塞瓦尔定理（能量等式）？",
+   "a": "$\\int_{-\\infty}^{\\infty}|f(t)|^2dt=\\frac{1}{2\\pi}\\int_{-\\infty}^{\\infty}|F(\\omega)|^2d\\omega$",
+   "tag": ""
+  },
+  {
+   "id": "f079",
+   "sub": "信号与系统·常见傅里叶变换对",
+   "q": "单位冲激 $\\delta(t)$ 的傅里叶变换？",
+   "a": "$F(\\omega)=1$",
+   "tag": ""
+  },
+  {
+   "id": "f080",
+   "sub": "信号与系统·常见傅里叶变换对",
+   "q": "常数信号 $1$ 的傅里叶变换？",
+   "a": "$F(\\omega)=2\\pi\\delta(\\omega)$",
+   "tag": ""
+  },
+  {
+   "id": "f081",
+   "sub": "信号与系统·常见傅里叶变换对",
+   "q": "单位阶跃 $u(t)$ 的傅里叶变换？",
+   "a": "$F(\\omega)=\\frac{1}{j\\omega}+\\pi\\delta(\\omega)$",
+   "tag": ""
+  },
+  {
+   "id": "f082",
+   "sub": "信号与系统·常见傅里叶变换对",
+   "q": "符号函数 $sgn(t)$ 的傅里叶变换？",
+   "a": "$F(\\omega)=\\frac{2}{j\\omega}$",
+   "tag": ""
+  },
+  {
+   "id": "f083",
+   "sub": "信号与系统·常见傅里叶变换对",
+   "q": "$\\frac{1}{\\pi t}$ 的傅里叶变换？",
+   "a": "$F(\\omega)=-j\\,sgn(\\omega)$",
+   "tag": ""
+  },
+  {
+   "id": "f084",
+   "sub": "信号与系统·常见傅里叶变换对",
+   "q": "单边指数 $e^{-at}u(t)\\,(a>0)$ 的傅里叶变换？",
+   "a": "$F(\\omega)=\\frac{1}{a+j\\omega}$",
+   "tag": ""
+  },
+  {
+   "id": "f085",
+   "sub": "信号与系统·常见傅里叶变换对",
+   "q": "门函数 $E\\,G_\\tau(t)$（幅度 $E$、宽度 $\\tau$）的傅里叶变换？",
+   "a": "$F(\\omega)=E\\tau\\,Sa\\left(\\frac{\\omega\\tau}{2}\\right)$",
+   "tag": ""
+  },
+  {
+   "id": "f086",
+   "sub": "信号与系统·常见傅里叶变换对",
+   "q": "三角信号 $E\\,tri_\\tau(t)$ 的傅里叶变换？",
+   "a": "$F(\\omega)=E\\tau\\,Sa^2\\left(\\frac{\\omega\\tau}{4}\\right)$",
+   "tag": ""
+  },
+  {
+   "id": "f087",
+   "sub": "信号与系统·常见傅里叶变换对",
+   "q": "抽样函数 $Sa(\\omega_0t)$ 的傅里叶变换？",
+   "a": "$F(\\omega)=\\frac{\\pi}{\\omega_0}G_{2\\omega_0}(\\omega)$（门函数，宽 $2\\omega_0$）",
+   "tag": ""
+  },
+  {
+   "id": "f088",
+   "sub": "信号与系统·常见傅里叶变换对",
+   "q": "$e^{j\\omega_0t}$ 的傅里叶变换？",
+   "a": "$F(\\omega)=2\\pi\\delta(\\omega-\\omega_0)$",
+   "tag": ""
+  },
+  {
+   "id": "f089",
+   "sub": "信号与系统·常见傅里叶变换对",
+   "q": "周期冲激串 $\\sum_{n=-\\infty}^{\\infty}\\delta(t-nT)$ 的傅里叶变换？",
+   "a": "$F(\\omega)=\\frac{2\\pi}{T}\\sum_{n=-\\infty}^{\\infty}\\delta\\left(\\omega-\\frac{2n\\pi}{T}\\right)$",
+   "tag": ""
+  },
+  {
+   "id": "f090",
+   "sub": "信号与系统·常见傅里叶变换对",
+   "q": "$\\cos(\\omega_0t)$ 的傅里叶变换？",
+   "a": "$F(\\omega)=\\pi\\left[\\delta(\\omega-\\omega_0)+\\delta(\\omega+\\omega_0)\\right]$",
+   "tag": ""
+  },
+  {
+   "id": "f091",
+   "sub": "信号与系统·常见傅里叶变换对",
+   "q": "$\\sin(\\omega_0t)$ 的傅里叶变换？",
+   "a": "$F(\\omega)=\\frac{\\pi}{j}\\left[\\delta(\\omega-\\omega_0)-\\delta(\\omega+\\omega_0)\\right]$",
+   "tag": ""
+  },
+  {
+   "id": "f092",
+   "sub": "信号与系统·常见傅里叶变换对",
+   "q": "$t\\,u(t)$ 的傅里叶变换？",
+   "a": "$F(\\omega)=j\\pi\\delta^{\\prime}(\\omega)-\\frac{1}{\\omega^2}$",
+   "tag": ""
+  },
+  {
+   "id": "f093",
+   "sub": "信号与系统·常见傅里叶变换对",
+   "q": "$\\sin(\\omega_0t)u(t)$ 的傅里叶变换？",
+   "a": "$F(\\omega)=\\frac{\\omega_0}{\\omega_0^2-\\omega^2}+\\frac{\\pi}{2j}\\left[\\delta(\\omega-\\omega_0)-\\delta(\\omega+\\omega_0)\\right]$",
+   "tag": ""
+  },
+  {
+   "id": "f094",
+   "sub": "信号与系统·常见傅里叶变换对",
+   "q": "$\\cos(\\omega_0t)u(t)$ 的傅里叶变换？",
+   "a": "$F(\\omega)=\\frac{j\\omega}{\\omega_0^2-\\omega^2}+\\frac{\\pi}{2}\\left[\\delta(\\omega-\\omega_0)+\\delta(\\omega+\\omega_0)\\right]$",
+   "tag": ""
+  },
+  {
+   "id": "f095",
+   "sub": "信号与系统·常见傅里叶变换对",
+   "q": "周期延拓 $\\sum_{n=-\\infty}^{\\infty}x(t-nT)$ 的傅里叶变换？",
+   "a": "$F(\\omega)=\\frac{2\\pi}{T}\\sum_{k=-\\infty}^{\\infty}X(k\\omega_0)\\delta(\\omega-k\\omega_0)$，$\\omega_0=\\frac{2\\pi}{T}$",
+   "tag": ""
+  },
+  {
+   "id": "f096",
+   "sub": "信号与系统·常见傅里叶变换对",
+   "q": "高斯信号 $e^{-(t/\\tau)^2}$ 的傅里叶变换？",
+   "a": "$F(\\omega)=\\tau\\sqrt{\\pi}\\,e^{-\\left(\\frac{\\omega\\tau}{2}\\right)^2}$",
+   "tag": ""
+  },
+  {
+   "id": "f097",
+   "sub": "信号与系统·常见傅里叶变换对",
+   "q": "$\\frac{1}{2}\\left[\\delta(t-1)+\\delta(t+1)\\right]$ 的傅里叶变换？",
+   "a": "$F(\\omega)=\\cos\\omega$",
+   "tag": ""
+  },
+  {
+   "id": "f098",
+   "sub": "信号与系统·常见傅里叶变换对",
+   "q": "$t$ 的傅里叶变换？",
+   "a": "$F(\\omega)=j2\\pi\\delta^{\\prime}(\\omega)$",
+   "tag": ""
+  },
+  {
+   "id": "f099",
+   "sub": "信号与系统·常见傅里叶变换对",
+   "q": "$|t|$ 的傅里叶变换？",
+   "a": "$F(\\omega)=-\\frac{2}{\\omega^2}$",
+   "tag": ""
+  },
+  {
+   "id": "f100",
+   "sub": "信号与系统·Z变换对",
+   "q": "$\\delta[n]$ 的 Z 变换与收敛域？",
+   "a": "$X(z)=1$，全 $z$ 平面",
+   "tag": ""
+  },
+  {
+   "id": "f101",
+   "sub": "信号与系统·Z变换对",
+   "q": "$u[n]$ 的 Z 变换与收敛域？",
+   "a": "$X(z)=\\frac{1}{1-z^{-1}}=\\frac{z}{z-1}$，$|z|>1$",
+   "tag": ""
+  },
+  {
+   "id": "f102",
+   "sub": "信号与系统·Z变换对",
+   "q": "$u[n-1]$ 的 Z 变换与收敛域？",
+   "a": "$X(z)=\\frac{z^{-1}}{1-z^{-1}}=\\frac{1}{z-1}$，$|z|>1$",
+   "tag": ""
+  },
+  {
+   "id": "f103",
+   "sub": "信号与系统·Z变换对",
+   "q": "$a^n u[n]$ 的 Z 变换与收敛域？",
+   "a": "$X(z)=\\frac{1}{1-az^{-1}}=\\frac{z}{z-a}$，$|z|>|a|$",
+   "tag": ""
+  },
+  {
+   "id": "f104",
+   "sub": "信号与系统·Z变换对",
+   "q": "$a^{n-1}u[n-1]$ 的 Z 变换与收敛域？",
+   "a": "$X(z)=\\frac{z^{-1}}{1-az^{-1}}=\\frac{1}{z-a}$，$|z|>|a|$",
+   "tag": ""
+  },
+  {
+   "id": "f105",
+   "sub": "信号与系统·Z变换对",
+   "q": "$n\\,u[n]$ 的 Z 变换与收敛域？",
+   "a": "$X(z)=\\frac{z^{-1}}{(1-z^{-1})^2}=\\frac{z}{(z-1)^2}$，$|z|>1$",
+   "tag": ""
+  },
+  {
+   "id": "f106",
+   "sub": "信号与系统·Z变换对",
+   "q": "$n^2u[n]$ 的 Z 变换与收敛域？",
+   "a": "$X(z)=\\frac{z(z+1)}{(z-1)^3}$，$|z|>1$",
+   "tag": ""
+  },
+  {
+   "id": "f107",
+   "sub": "信号与系统·Z变换对",
+   "q": "$\\frac{n(n-1)}{2}u[n]$ 的 Z 变换与收敛域？",
+   "a": "$X(z)=\\frac{z^{-1}}{(1-z^{-1})^3}=\\frac{z}{(z-1)^3}$，$|z|>1$",
+   "tag": ""
+  },
+  {
+   "id": "f108",
+   "sub": "信号与系统·Z变换对",
+   "q": "$\\frac{n(n+1)}{2}u[n]$ 的 Z 变换与收敛域？",
+   "a": "$X(z)=\\frac{z(2z-1)}{(z-1)^3}$，$|z|>1$",
+   "tag": ""
+  },
+  {
+   "id": "f109",
+   "sub": "信号与系统·Z变换对",
+   "q": "$n\\,a^{n-1}u[n]$ 的 Z 变换与收敛域？",
+   "a": "$X(z)=\\frac{1}{(1-az^{-1})^2}=\\frac{z}{(z-a)^2}$，$|z|>|a|$",
+   "tag": ""
+  },
+  {
+   "id": "f110",
+   "sub": "信号与系统·Z变换对",
+   "q": "$\\frac{n(n-1)\\cdots(n-m+1)}{m!}a^{n-m}u[n]$ 的 Z 变换？",
+   "a": "$X(z)=\\frac{z}{(z-a)^{m+1}}$，$|z|>|a|$",
+   "tag": ""
+  },
+  {
+   "id": "f111",
+   "sub": "信号与系统·Z变换对",
+   "q": "$\\delta[n-m]$ 的 Z 变换？",
+   "a": "$X(z)=z^{-m}$，全 $z$ 平面（$z=0$ 或 $\\infty$ 视 $m$ 而定）",
+   "tag": ""
+  },
+  {
+   "id": "f112",
+   "sub": "信号与系统·Z变换对",
+   "q": "$-u[-n-1]$ 的双边 Z 变换与收敛域？",
+   "a": "单边 $Z$ 变换为 $0$（$n\\geq0$ 时为 $0$）；双边 $X(z)=\\frac{z}{z-1}$，$|z|<1$",
+   "tag": ""
+  },
+  {
+   "id": "f113",
+   "sub": "信号与系统·Z变换对",
+   "q": "$-a^n u[-n-1]$ 的双边 Z 变换与收敛域？",
+   "a": "单边为 $0$；双边 $X(z)=\\frac{z}{z-a}$，$|z|<|a|$",
+   "tag": ""
+  },
+  {
+   "id": "f114",
+   "sub": "信号与系统·Z变换对",
+   "q": "$-n\\,u[-n-1]$ 的双边 Z 变换与收敛域？",
+   "a": "$X(z)=\\frac{z}{(z-1)^2}$，$|z|<1$",
+   "tag": ""
+  },
+  {
+   "id": "f115",
+   "sub": "信号与系统·Z变换对",
+   "q": "$-n\\,a^{n-1}u[-n-1]$ 的双边 Z 变换与收敛域？",
+   "a": "$X(z)=\\frac{z}{(z-a)^2}$，$|z|<|a|$",
+   "tag": ""
+  },
+  {
+   "id": "f116",
+   "sub": "信号与系统·Z变换对",
+   "q": "$-\\frac{n(n-1)\\cdots(n-m+1)}{m!}a^{n-m}u[-n-1]$ 的双边 Z 变换？",
+   "a": "$X(z)=\\frac{z}{(z-a)^{m+1}}$，$|z|<|a|$",
+   "tag": ""
+  },
+  {
+   "id": "f117",
+   "sub": "信号与系统·Z变换对",
+   "q": "$\\delta[n+m]$ 的 Z 变换？",
+   "a": "$X(z)=z^{m}$，全 $z$ 平面",
+   "tag": ""
+  },
+  {
+   "id": "f118",
+   "sub": "信号与系统·Z变换对",
+   "q": "$a^n u[n]-b^n u[-n-1]$（$|b|>|a|$）的 Z 变换与收敛域？",
+   "a": "$X(z)=\\frac{z}{z-a}-\\frac{z}{z-b}$，$|a|<|z|<|b|$",
+   "tag": ""
+  },
+  {
+   "id": "f119",
+   "sub": "信号与系统·Z变换对",
+   "q": "$\\cos(\\omega_0n)u[n]$ 的 Z 变换与收敛域？",
+   "a": "$X(z)=\\frac{z(z-\\cos\\omega_0)}{z^2-2z\\cos\\omega_0+1}$，$|z|>1$",
+   "tag": ""
+  },
+  {
+   "id": "f120",
+   "sub": "信号与系统·Z变换对",
+   "q": "$\\sin(\\omega_0n)u[n]$ 的 Z 变换与收敛域？",
+   "a": "$X(z)=\\frac{z\\sin\\omega_0}{z^2-2z\\cos\\omega_0+1}$，$|z|>1$",
+   "tag": ""
+  },
+  {
+   "id": "f121",
+   "sub": "信号与系统·Z变换对",
+   "q": "$\\cos\\left(\\frac{\\pi}{2}n\\right)u[n]$ 的 Z 变换？",
+   "a": "$X(z)=\\frac{z^2}{z^2+1}$，$|z|>1$",
+   "tag": ""
+  },
+  {
+   "id": "f122",
+   "sub": "信号与系统·Z变换对",
+   "q": "$\\sin\\left(\\frac{\\pi}{2}n\\right)u[n]$ 的 Z 变换？",
+   "a": "$X(z)=\\frac{z}{z^2+1}$，$|z|>1$",
+   "tag": ""
+  },
+  {
+   "id": "f123",
+   "sub": "信号与系统·Z变换对",
+   "q": "$r^n\\cos(\\omega_0n)u[n]$ 的 Z 变换与收敛域？",
+   "a": "$X(z)=\\frac{z(z-r\\cos\\omega_0)}{z^2-2rz\\cos\\omega_0+r^2}$，$|z|>r$",
+   "tag": ""
+  },
+  {
+   "id": "f124",
+   "sub": "信号与系统·Z变换对",
+   "q": "$r^n\\sin(\\omega_0n)u[n]$ 的 Z 变换与收敛域？",
+   "a": "$X(z)=\\frac{zr\\sin\\omega_0}{z^2-2rz\\cos\\omega_0+r^2}$，$|z|>r$",
+   "tag": ""
+  },
+  {
+   "id": "f125",
+   "sub": "信号与系统·Z变换对",
+   "q": "周期冲激串 $\\sum_{m=0}^{\\infty}\\delta[n-mN]$ 的 Z 变换？",
+   "a": "$X(z)=\\frac{1}{1-z^{-N}}$，$|z|>1$",
+   "tag": ""
+  },
+  {
+   "id": "f126",
+   "sub": "信号与系统·Z变换性质",
+   "q": "Z 变换的线性性质？",
+   "a": "$ax_1[n]+bx_2[n]\\leftrightarrow aX_1(z)+bX_2(z)$，收敛域至少为两收敛域的交集",
+   "tag": ""
+  },
+  {
+   "id": "f127",
+   "sub": "信号与系统·Z变换性质",
+   "q": "Z 变换的时移性质？",
+   "a": "$x[n-n_0]\\leftrightarrow z^{-n_0}X(z)$，收敛域不变（$z=0$ 或 $\\infty$ 可能例外）",
+   "tag": ""
+  },
+  {
+   "id": "f128",
+   "sub": "信号与系统·Z变换性质",
+   "q": "Z 变换的频域（z 域）尺度变换性质？",
+   "a": "$z_0^n x[n]\\leftrightarrow X\\left(\\frac{z}{z_0}\\right)$，收敛域变为 $|z_0|R$",
+   "tag": ""
+  },
+  {
+   "id": "f129",
+   "sub": "信号与系统·Z变换性质",
+   "q": "Z 变换的时间反转性质？",
+   "a": "$x[-n]\\leftrightarrow X\\left(\\frac{1}{z}\\right)$，收敛域变为 $\\frac{1}{R}$",
+   "tag": ""
+  },
+  {
+   "id": "f130",
+   "sub": "信号与系统·Z变换性质",
+   "q": "Z 变换的时域拓展性质？",
+   "a": "$x_{(k)}[n]\\leftrightarrow X(z^k)$，收敛域为 $R^{1/k}$",
+   "tag": ""
+  },
+  {
+   "id": "f131",
+   "sub": "信号与系统·Z变换性质",
+   "q": "Z 变换的共轭性质？",
+   "a": "$x^*[n]\\leftrightarrow X^*(z^*)$，收敛域不变",
+   "tag": ""
+  },
+  {
+   "id": "f132",
+   "sub": "信号与系统·Z变换性质",
+   "q": "Z 变换的卷积定理？",
+   "a": "$x_1[n]*x_2[n]\\leftrightarrow X_1(z)X_2(z)$，收敛域至少为两收敛域的交集",
+   "tag": ""
+  },
+  {
+   "id": "f133",
+   "sub": "信号与系统·Z变换性质",
+   "q": "Z 变换的频域微分性质？",
+   "a": "$n\\,x[n]\\leftrightarrow -z\\frac{dX(z)}{dz}$",
+   "tag": ""
+  },
+  {
+   "id": "f134",
+   "sub": "信号与系统·Z变换性质",
+   "q": "Z 变换的初值定理？",
+   "a": "若 $x[n]$ 为因果信号，则 $x[0]=\\lim_{z\\to\\infty}X(z)$",
+   "tag": ""
+  },
+  {
+   "id": "f135",
+   "sub": "信号与系统·Z变换性质",
+   "q": "Z 变换的终值定理？",
+   "a": "若 $x[n]$ 为因果信号且极点在单位圆内，则 $\\lim_{n\\to\\infty}x[n]=\\lim_{z\\to1}(z-1)X(z)$",
+   "tag": ""
+  },
+  {
+   "id": "f136",
+   "sub": "信号与系统·DFT性质",
+   "q": "DFT 的线性性质？",
+   "a": "$a\\,x[n]+b\\,y[n]\\leftrightarrow aX[k]+bY[k]$",
+   "tag": ""
+  },
+  {
+   "id": "f137",
+   "sub": "信号与系统·DFT性质",
+   "q": "DFT 的时移性质（循环移位）？",
+   "a": "$x[(n-n_0)_N]\\leftrightarrow W_N^{kn_0}X[k]$，$W_N=e^{-j\\frac{2\\pi}{N}}$",
+   "tag": ""
+  },
+  {
+   "id": "f138",
+   "sub": "信号与系统·DFT性质",
+   "q": "DFT 的频移性质？",
+   "a": "$e^{j\\frac{2\\pi k_0n}{N}}x[n]\\leftrightarrow X[(k-k_0)_N]$",
+   "tag": ""
+  },
+  {
+   "id": "f139",
+   "sub": "信号与系统·DFT性质",
+   "q": "DFT 的共轭性质？",
+   "a": "$x^*[n]\\leftrightarrow X^*[(-k)_N]$",
+   "tag": ""
+  },
+  {
+   "id": "f140",
+   "sub": "信号与系统·DFT性质",
+   "q": "DFT 的时间反转性质？",
+   "a": "$x[(-n)_N]\\leftrightarrow X[(-k)_N]$",
+   "tag": ""
+  },
+  {
+   "id": "f141",
+   "sub": "信号与系统·DFT性质",
+   "q": "DFT 的循环卷积定理？",
+   "a": "$x[n]\\circledast y[n]\\leftrightarrow X[k]Y[k]$",
+   "tag": ""
+  },
+  {
+   "id": "f142",
+   "sub": "信号与系统·DFT性质",
+   "q": "DFT 的相乘（时域相乘）性质？",
+   "a": "$x[n]y[n]\\leftrightarrow\\frac{1}{N}X[k]\\circledast Y[k]$",
+   "tag": ""
+  },
+  {
+   "id": "f143",
+   "sub": "信号与系统·DFT性质",
+   "q": "DFT 的时域差分性质？",
+   "a": "$x[n]-x[n-1]\\leftrightarrow(1-W_N^k)X[k]$",
+   "tag": ""
+  },
+  {
+   "id": "f144",
+   "sub": "信号与系统·DFT性质",
+   "q": "DFT 的累加性质？",
+   "a": "$\\sum_{m=-\\infty}^{n}x[m]\\leftrightarrow\\frac{X[k]}{1-W_N^k}$",
+   "tag": ""
+  },
+  {
+   "id": "f145",
+   "sub": "信号与系统·DFT性质",
+   "q": "实信号 DFT 的共轭对称性？",
+   "a": "$X[k]=X^*[(-k)_N]$",
+   "tag": ""
+  },
+  {
+   "id": "f146",
+   "sub": "信号与系统·DFT性质",
+   "q": "实偶信号 DFT 的对称性？",
+   "a": "$X[k]$ 为实偶序列",
+   "tag": ""
+  },
+  {
+   "id": "f147",
+   "sub": "信号与系统·DFT性质",
+   "q": "实奇信号 DFT 的对称性？",
+   "a": "$X[k]$ 为纯虚奇序列",
+   "tag": ""
+  },
+  {
+   "id": "f148",
+   "sub": "信号与系统·DFT性质",
+   "q": "DFT 的帕塞瓦尔定理？",
+   "a": "$\\sum_{n=0}^{N-1}|x[n]|^2=\\frac{1}{N}\\sum_{k=0}^{N-1}|X[k]|^2$",
+   "tag": ""
+  },
+  {
+   "id": "f149",
+   "sub": "数学·基本积分公式",
+   "q": "$\\int ax\\,dx=?$",
+   "a": "$\\frac{a}{2}x^2+C$",
+   "tag": ""
+  },
+  {
+   "id": "f150",
+   "sub": "数学·基本积分公式",
+   "q": "$\\int x^a\\,dx=?$",
+   "a": "$\\frac{x^{a+1}}{a+1}+C$（$a\\neq-1$）",
+   "tag": ""
+  },
+  {
+   "id": "f151",
+   "sub": "数学·基本积分公式",
+   "q": "$\\int\\frac{1}{x}dx=?$",
+   "a": "$\\ln|x|+C$",
+   "tag": ""
+  },
+  {
+   "id": "f152",
+   "sub": "数学·基本积分公式",
+   "q": "$\\int e^x dx=?$",
+   "a": "$e^x+C$",
+   "tag": ""
+  },
+  {
+   "id": "f153",
+   "sub": "数学·基本积分公式",
+   "q": "$\\int\\sin x\\,dx=?$",
+   "a": "$-\\cos x+C$",
+   "tag": ""
+  },
+  {
+   "id": "f154",
+   "sub": "数学·基本积分公式",
+   "q": "$\\int\\cos x\\,dx=?$",
+   "a": "$\\sin x+C$",
+   "tag": ""
+  },
+  {
+   "id": "f155",
+   "sub": "数学·基本积分公式",
+   "q": "$\\int a^x dx=?$",
+   "a": "$\\frac{a^x}{\\ln a}+C$（$a>0,\\ a\\neq1$）",
+   "tag": ""
+  },
+  {
+   "id": "f156",
+   "sub": "数学·基本积分公式",
+   "q": "$\\int\\frac{1}{\\cos^2x}dx=?$",
+   "a": "$\\tan x+C$",
+   "tag": ""
+  },
+  {
+   "id": "f157",
+   "sub": "数学·基本积分公式",
+   "q": "$\\int\\frac{1}{\\sin^2x}dx=?$",
+   "a": "$-\\cot x+C$",
+   "tag": ""
+  },
+  {
+   "id": "f158",
+   "sub": "数学·基本积分公式",
+   "q": "$\\int\\frac{1}{\\sqrt{1-x^2}}dx=?$",
+   "a": "$\\arcsin x+C$",
+   "tag": ""
+  },
+  {
+   "id": "f159",
+   "sub": "数学·基本积分公式",
+   "q": "$\\int\\frac{1}{1+x^2}dx=?$",
+   "a": "$\\arctan x+C$",
+   "tag": ""
+  },
+  {
+   "id": "f160",
+   "sub": "数学·基本积分公式",
+   "q": "$\\int\\frac{1}{\\sqrt{a^2-x^2}}dx=?$",
+   "a": "$\\arcsin\\frac{x}{a}+C$",
+   "tag": ""
+  },
+  {
+   "id": "f161",
+   "sub": "数学·基本积分公式",
+   "q": "$\\int\\frac{1}{a^2+x^2}dx=?$",
+   "a": "$\\frac{1}{a}\\arctan\\frac{x}{a}+C$",
+   "tag": ""
+  },
+  {
+   "id": "f162",
+   "sub": "数学·基本积分公式",
+   "q": "$\\int\\frac{1}{1-x^2}dx=?$",
+   "a": "$\\frac{1}{2}\\ln\\left|\\frac{1+x}{1-x}\\right|+C$",
+   "tag": ""
+  },
+  {
+   "id": "f163",
+   "sub": "数学·基本积分公式",
+   "q": "$\\int\\frac{1}{a^2-x^2}dx=?$",
+   "a": "$\\frac{1}{2a}\\ln\\left|\\frac{a+x}{a-x}\\right|+C$",
+   "tag": ""
+  },
+  {
+   "id": "f164",
+   "sub": "数学·基本积分公式",
+   "q": "$\\int\\frac{1}{\\cos x}dx=?$",
+   "a": "$\\ln\\left|\\sec x+\\tan x\\right|+C$",
+   "tag": ""
+  },
+  {
+   "id": "f165",
+   "sub": "数学·基本积分公式",
+   "q": "$\\int\\frac{1}{\\sin x}dx=?$",
+   "a": "$\\ln\\left|\\tan\\frac{x}{2}\\right|+C=\\ln\\left|\\csc x-\\cot x\\right|+C$",
+   "tag": ""
+  },
+  {
+   "id": "f166",
+   "sub": "数学·基本积分公式",
+   "q": "$\\int\\sqrt{a^2-x^2}\\,dx=?$",
+   "a": "$\\frac{x}{2}\\sqrt{a^2-x^2}+\\frac{a^2}{2}\\arcsin\\frac{x}{a}+C$",
+   "tag": ""
+  },
+  {
+   "id": "f167",
+   "sub": "数学·基本积分公式",
+   "q": "$\\int\\frac{1}{\\sqrt{x^2\\pm a^2}}dx=?$",
+   "a": "$\\ln\\left|x+\\sqrt{x^2\\pm a^2}\\right|+C$",
+   "tag": ""
+  },
+  {
+   "id": "f168",
+   "sub": "数学·三角换元",
+   "q": "被积函数含 $\\sqrt{a^2-x^2}$ 时如何换元？",
+   "a": "令 $x=a\\sin t$（$t\\in[-\\frac{\\pi}{2},\\frac{\\pi}{2}]$），则 $\\sqrt{a^2-x^2}=a\\cos t$，$dx=a\\cos t\\,dt$",
+   "tag": ""
+  },
+  {
+   "id": "f169",
+   "sub": "数学·三角换元",
+   "q": "被积函数含 $\\sqrt{a^2+x^2}$ 时如何换元？",
+   "a": "令 $x=a\\tan t$（$t\\in(-\\frac{\\pi}{2},\\frac{\\pi}{2})$），则 $\\sqrt{a^2+x^2}=a\\sec t$，$dx=a\\sec^2t\\,dt$",
+   "tag": ""
+  },
+  {
+   "id": "f170",
+   "sub": "数学·三角换元",
+   "q": "被积函数含 $\\sqrt{x^2-a^2}$ 时如何换元？",
+   "a": "令 $x=a\\sec t$，则 $\\sqrt{x^2-a^2}=a\\tan t$，$dx=a\\sec t\\tan t\\,dt$",
+   "tag": ""
+  },
+  {
+   "id": "f171",
+   "sub": "数学·含根式积分",
+   "q": "$\\int\\sqrt{a^2-x^2}\\,dx$ 用什么方法？",
+   "a": "三角换元，令 $x=a\\sin t$，化为 $\\int a^2\\cos^2t\\,dt=\\frac{a^2}{2}\\left(t+\\sin t\\cos t\\right)+C$",
+   "tag": ""
+  },
+  {
+   "id": "f172",
+   "sub": "数学·含根式积分",
+   "q": "$\\int x\\sqrt{a^2-x^2}\\,dx$ 用什么方法？",
+   "a": "凑微分，令 $u=a^2-x^2$，$du=-2x\\,dx$，得 $-\\frac{1}{3}\\left(a^2-x^2\\right)^{\\frac{3}{2}}+C$",
+   "tag": ""
+  },
+  {
+   "id": "f173",
+   "sub": "数学·含根式积分",
+   "q": "$\\int x^2\\sqrt{a^2-x^2}\\,dx$ 用什么方法？",
+   "a": "三角换元，令 $x=a\\sin t$，化为 $\\int a^4\\sin^2t\\cos^2t\\,dt$，再用倍角公式降次",
+   "tag": ""
+  },
+  {
+   "id": "f174",
+   "sub": "数学·含根式积分",
+   "q": "$\\int x^3\\sqrt{a^2-x^2}\\,dx$ 用什么方法？",
+   "a": "凑微分，令 $u=a^2-x^2$，把 $x^3dx=x^2\\cdot x\\,dx$ 写成 $\\left(a^2-u\\right)\\cdot\\left(-\\frac{1}{2}\\right)du$",
+   "tag": ""
+  },
+  {
+   "id": "f175",
+   "sub": "数学·含根式积分",
+   "q": "$\\int\\sqrt{2ax-x^2}\\,dx$ 用什么方法？",
+   "a": "先配方：$\\sqrt{2ax-x^2}=\\sqrt{a^2-(x-a)^2}$，再令 $x-a=a\\sin t$ 做三角换元",
+   "tag": ""
+  },
+  {
+   "id": "f176",
+   "sub": "数学·三角函数公式",
+   "q": "二倍角公式：$\\sin2\\varphi=?$",
+   "a": "$2\\sin\\varphi\\cos\\varphi$",
+   "tag": ""
+  },
+  {
+   "id": "f177",
+   "sub": "数学·三角函数公式",
+   "q": "二倍角公式：$\\cos2\\varphi=?$",
+   "a": "$\\cos^2\\varphi-\\sin^2\\varphi=2\\cos^2\\varphi-1=1-2\\sin^2\\varphi$",
+   "tag": ""
+  },
+  {
+   "id": "f178",
+   "sub": "数学·三角函数公式",
+   "q": "二倍角公式：$\\tan2\\varphi=?$",
+   "a": "$\\frac{2\\tan\\varphi}{1-\\tan^2\\varphi}$",
+   "tag": ""
+  },
+  {
+   "id": "f179",
+   "sub": "数学·三角函数公式",
+   "q": "万能公式：用 $t=\\tan\\varphi$ 表示 $\\sin2\\varphi$",
+   "a": "$\\frac{2t}{1+t^2}$",
+   "tag": ""
+  },
+  {
+   "id": "f180",
+   "sub": "数学·三角函数公式",
+   "q": "万能公式：用 $t=\\tan\\varphi$ 表示 $\\cos2\\varphi$",
+   "a": "$\\frac{1-t^2}{1+t^2}$",
+   "tag": ""
+  },
+  {
+   "id": "f181",
+   "sub": "数学·三角函数公式",
+   "q": "万能公式：$\\tan2\\varphi=?$（用 $\\tan\\varphi$ 表示）",
+   "a": "$\\frac{2\\tan\\varphi}{1-\\tan^2\\varphi}$",
+   "tag": ""
+  },
+  {
+   "id": "f182",
+   "sub": "数学·三角函数公式",
+   "q": "万能公式：$\\cot2\\varphi=?$（用 $\\cot\\varphi$ 表示）",
+   "a": "$\\frac{\\cot^2\\varphi-1}{2\\cot\\varphi}$",
+   "tag": ""
+  },
+  {
+   "id": "f183",
+   "sub": "数学·三角函数公式",
+   "q": "和角公式：$\\sin(\\varphi+t)=?$",
+   "a": "$\\sin\\varphi\\cos t+\\cos\\varphi\\sin t$",
+   "tag": ""
+  },
+  {
+   "id": "f184",
+   "sub": "数学·三角函数公式",
+   "q": "差角公式：$\\sin(\\varphi-t)=?$",
+   "a": "$\\sin\\varphi\\cos t-\\cos\\varphi\\sin t$",
+   "tag": ""
+  },
+  {
+   "id": "f185",
+   "sub": "数学·三角函数公式",
+   "q": "和角公式：$\\cos(\\varphi+t)=?$",
+   "a": "$\\cos\\varphi\\cos t-\\sin\\varphi\\sin t$",
+   "tag": ""
+  },
+  {
+   "id": "f186",
+   "sub": "数学·三角函数公式",
+   "q": "差角公式：$\\cos(\\varphi-t)=?$",
+   "a": "$\\cos\\varphi\\cos t+\\sin\\varphi\\sin t$",
+   "tag": ""
+  },
+  {
+   "id": "f187",
+   "sub": "数学·三角函数公式",
+   "q": "和角公式：$\\tan(\\varphi+t)=?$",
+   "a": "$\\frac{\\tan\\varphi+\\tan t}{1-\\tan\\varphi\\tan t}$",
+   "tag": ""
+  },
+  {
+   "id": "f188",
+   "sub": "数学·三角函数公式",
+   "q": "差角公式：$\\tan(\\varphi-t)=?$",
+   "a": "$\\frac{\\tan\\varphi-\\tan t}{1+\\tan\\varphi\\tan t}$",
+   "tag": ""
+  },
+  {
+   "id": "f189",
+   "sub": "数学·三角函数公式",
+   "q": "积化和差：$\\sin\\varphi\\cos t=?$",
+   "a": "$\\frac{1}{2}\\left[\\sin(\\varphi+t)+\\sin(\\varphi-t)\\right]$",
+   "tag": ""
+  },
+  {
+   "id": "f190",
+   "sub": "数学·三角函数公式",
+   "q": "积化和差：$\\cos\\varphi\\cos t=?$",
+   "a": "$\\frac{1}{2}\\left[\\cos(\\varphi+t)+\\cos(\\varphi-t)\\right]$",
+   "tag": ""
+  },
+  {
+   "id": "f191",
+   "sub": "数学·三角函数公式",
+   "q": "积化和差：$\\cos\\varphi\\sin t=?$",
+   "a": "$\\frac{1}{2}\\left[\\sin(\\varphi+t)-\\sin(\\varphi-t)\\right]$",
+   "tag": ""
+  },
+  {
+   "id": "f192",
+   "sub": "数学·三角函数公式",
+   "q": "积化和差：$\\sin\\varphi\\sin t=?$",
+   "a": "$\\frac{1}{2}\\left[\\cos(\\varphi-t)-\\cos(\\varphi+t)\\right]$",
+   "tag": ""
+  },
+  {
+   "id": "f193",
+   "sub": "数学·三角函数公式",
+   "q": "和差化积：$\\sin\\varphi+\\sin t=?$",
+   "a": "$2\\sin\\frac{\\varphi+t}{2}\\cos\\frac{\\varphi-t}{2}$",
+   "tag": ""
+  },
+  {
+   "id": "f194",
+   "sub": "数学·三角函数公式",
+   "q": "和差化积：$\\sin\\varphi-\\sin t=?$",
+   "a": "$2\\cos\\frac{\\varphi+t}{2}\\sin\\frac{\\varphi-t}{2}$",
+   "tag": ""
+  },
+  {
+   "id": "f195",
+   "sub": "数学·三角函数公式",
+   "q": "和差化积：$\\cos\\varphi+\\cos t=?$",
+   "a": "$2\\cos\\frac{\\varphi+t}{2}\\cos\\frac{\\varphi-t}{2}$",
+   "tag": ""
+  },
+  {
+   "id": "f196",
+   "sub": "数学·三角函数公式",
+   "q": "和差化积：$\\cos\\varphi-\\cos t=?$",
+   "a": "$-2\\sin\\frac{\\varphi+t}{2}\\sin\\frac{\\varphi-t}{2}$",
+   "tag": ""
+  },
+  {
+   "id": "f197",
+   "sub": "数学·三角函数公式",
+   "q": "辅助角公式：$a\\sin x+b\\cos x=?$",
+   "a": "$\\sqrt{a^2+b^2}\\,\\sin(x+t)$，其中 $t$ 由 $\\cos t=\\frac{a}{\\sqrt{a^2+b^2}}$ 确定",
+   "tag": ""
+  },
+  {
+   "id": "f198",
+   "sub": "数学·三角函数公式",
+   "q": "辅助角公式中的 $\\sin t=?$",
+   "a": "$\\frac{b}{\\sqrt{a^2+b^2}}$",
+   "tag": ""
+  },
+  {
+   "id": "f199",
+   "sub": "数学·三角函数公式",
+   "q": "辅助角公式中的 $\\cos t=?$",
+   "a": "$\\frac{a}{\\sqrt{a^2+b^2}}$",
+   "tag": ""
+  },
+  {
+   "id": "f200",
+   "sub": "数学·三角函数公式",
+   "q": "辅助角公式中的 $\\tan t=?$",
+   "a": "$\\frac{b}{a}$",
+   "tag": ""
+  },
+  {
+   "id": "f201",
+   "sub": "数学·三角函数公式",
+   "q": "辅助角公式中的 $\\cot t=?$",
+   "a": "$\\frac{a}{b}$",
+   "tag": ""
+  },
+  {
+   "id": "f202",
+   "sub": "数学·等价无穷小（x→0）",
+   "q": "$x\\to0$ 时，$\\sin x=?$（等价无穷小）",
+   "a": "$\\sin x\\sim x$；同理 $\\tan x\\sim x$，$\\arcsin x\\sim x$，$\\arctan x\\sim x$",
+   "tag": ""
+  },
+  {
+   "id": "f203",
+   "sub": "数学·等价无穷小（x→0）",
+   "q": "$x\\to0$ 时，$\\ln(1+x)\\sim?$",
+   "a": "$\\ln(1+x)\\sim x$",
+   "tag": ""
+  },
+  {
+   "id": "f204",
+   "sub": "数学·等价无穷小（x→0）",
+   "q": "$x\\to0$ 时，$e^x-1\\sim?$",
+   "a": "$e^x-1\\sim x$",
+   "tag": ""
+  },
+  {
+   "id": "f205",
+   "sub": "数学·等价无穷小（x→0）",
+   "q": "$x\\to0$ 时，$a^x-1\\sim?$",
+   "a": "$a^x-1\\sim x\\ln a$",
+   "tag": ""
+  },
+  {
+   "id": "f206",
+   "sub": "数学·等价无穷小（x→0）",
+   "q": "$x\\to0$ 时，$1-\\cos x\\sim?$",
+   "a": "$1-\\cos x\\sim\\frac{1}{2}x^2$",
+   "tag": ""
+  },
+  {
+   "id": "f207",
+   "sub": "数学·等价无穷小（x→0）",
+   "q": "$x\\to0$ 时，$x-\\sin x\\sim?$",
+   "a": "$x-\\sin x\\sim\\frac{1}{6}x^3$",
+   "tag": ""
+  },
+  {
+   "id": "f208",
+   "sub": "数学·等价无穷小（x→0）",
+   "q": "$x\\to0$ 时，$\\tan x-x\\sim?$",
+   "a": "$\\tan x-x\\sim\\frac{1}{3}x^3$",
+   "tag": ""
+  },
+  {
+   "id": "f209",
+   "sub": "数学·等价无穷小（x→0）",
+   "q": "$x\\to0$ 时，$\\arcsin x-x\\sim?$",
+   "a": "$\\arcsin x-x\\sim\\frac{1}{6}x^3$",
+   "tag": ""
+  },
+  {
+   "id": "f210",
+   "sub": "数学·等价无穷小（x→0）",
+   "q": "$x\\to0$ 时，$x-\\arctan x\\sim?$",
+   "a": "$x-\\arctan x\\sim\\frac{1}{3}x^3$",
+   "tag": ""
+  },
+  {
+   "id": "f211",
+   "sub": "数学·等价无穷小（x→0）",
+   "q": "$x\\to0$ 时，$(1+x)^a-1\\sim?$",
+   "a": "$(1+x)^a-1\\sim ax$",
+   "tag": ""
+  },
+  {
+   "id": "f212",
+   "sub": "数学·重要极限",
+   "q": "$\\lim_{x\\to0}\\frac{\\sin x}{x}=?$",
+   "a": "$1$",
+   "tag": ""
+  },
+  {
+   "id": "f213",
+   "sub": "数学·重要极限",
+   "q": "$\\lim_{n\\to\\infty}\\left(1+\\frac{1}{n}\\right)^n=?$",
+   "a": "$e$",
+   "tag": ""
+  },
+  {
+   "id": "f214",
+   "sub": "数学·重要极限",
+   "q": "$\\lim_{x\\to\\infty}\\left(1+\\frac{1}{x}\\right)^x=?$",
+   "a": "$e$",
+   "tag": ""
+  },
+  {
+   "id": "f215",
+   "sub": "数学·重要极限",
+   "q": "$\\lim_{x\\to0}\\left(1+x\\right)^{\\frac{1}{x}}=?$",
+   "a": "$e$",
+   "tag": ""
+  },
+  {
+   "id": "f216",
+   "sub": "数学·泰勒展开",
+   "q": "$e^x$ 的泰勒展开式？",
+   "a": "$1+x+\\frac{x^2}{2!}+\\frac{x^3}{3!}+\\cdots+\\frac{x^n}{n!}+o(x^n)$",
+   "tag": ""
+  },
+  {
+   "id": "f217",
+   "sub": "数学·泰勒展开",
+   "q": "$\\sin x$ 的泰勒展开式？",
+   "a": "$x-\\frac{x^3}{3!}+\\frac{x^5}{5!}-\\cdots+(-1)^n\\frac{x^{2n+1}}{(2n+1)!}+o(x^{2n+2})$",
+   "tag": ""
+  },
+  {
+   "id": "f218",
+   "sub": "数学·泰勒展开",
+   "q": "$\\cos x$ 的泰勒展开式？",
+   "a": "$1-\\frac{x^2}{2!}+\\frac{x^4}{4!}-\\cdots+(-1)^n\\frac{x^{2n}}{(2n)!}+o(x^{2n+1})$",
+   "tag": ""
+  },
+  {
+   "id": "f219",
+   "sub": "数学·泰勒展开",
+   "q": "$\\tan x$ 的泰勒展开式？",
+   "a": "$x+\\frac{x^3}{3}+\\frac{2x^5}{15}+o(x^5)$",
+   "tag": ""
+  },
+  {
+   "id": "f220",
+   "sub": "数学·泰勒展开",
+   "q": "$\\ln(1+x)$ 的泰勒展开式？",
+   "a": "$x-\\frac{x^2}{2}+\\frac{x^3}{3}-\\cdots+(-1)^{n-1}\\frac{x^n}{n}+o(x^n)$",
+   "tag": ""
+  },
+  {
+   "id": "f221",
+   "sub": "数学·泰勒展开",
+   "q": "$\\arctan x$ 的泰勒展开式？",
+   "a": "$x-\\frac{x^3}{3}+\\frac{x^5}{5}-\\cdots+(-1)^n\\frac{x^{2n+1}}{2n+1}+o(x^{2n+2})$",
+   "tag": ""
+  },
+  {
+   "id": "f222",
+   "sub": "数学·泰勒展开",
+   "q": "$\\arcsin x$ 的泰勒展开式？",
+   "a": "$x+\\frac{x^3}{6}+\\frac{3x^5}{40}+o(x^5)$",
+   "tag": ""
+  },
+  {
+   "id": "f223",
+   "sub": "数学·泰勒展开",
+   "q": "$\\frac{1}{1-x}$ 的展开式？",
+   "a": "$1+x+x^2+x^3+\\cdots+x^n+o(x^n)$，$|x|<1$",
+   "tag": ""
+  },
+  {
+   "id": "f224",
+   "sub": "数学·泰勒展开",
+   "q": "$\\frac{1}{1+x}$ 的展开式？",
+   "a": "$1-x+x^2-x^3+\\cdots+(-1)^nx^n+o(x^n)$，$|x|<1$",
+   "tag": ""
+  },
+  {
+   "id": "f225",
+   "sub": "数学·泰勒展开",
+   "q": "$(1+x)^a$ 的泰勒展开式？",
+   "a": "$1+ax+\\frac{a(a-1)}{2!}x^2+\\cdots+\\frac{a(a-1)\\cdots(a-n+1)}{n!}x^n+o(x^n)$",
+   "tag": ""
+  },
+  {
+   "id": "f226",
+   "sub": "数学·导数与切线",
+   "q": "导数在 $x_0$ 处的定义式？",
+   "a": "$f^{\\prime}(x_0)=\\lim_{\\Delta x\\to0}\\frac{f(x_0+\\Delta x)-f(x_0)}{\\Delta x}=\\lim_{x\\to x_0}\\frac{f(x)-f(x_0)}{x-x_0}$",
+   "tag": ""
+  },
+  {
+   "id": "f227",
+   "sub": "数学·导数与切线",
+   "q": "曲线 $y=f(x)$ 在点 $(x_0,f(x_0))$ 处的切线方程？",
+   "a": "$y-f(x_0)=f^{\\prime}(x_0)(x-x_0)$",
+   "tag": ""
+  },
+  {
+   "id": "f228",
+   "sub": "数学·导数与切线",
+   "q": "曲线 $y=f(x)$ 在点 $(x_0,f(x_0))$ 处的法线方程？",
+   "a": "$y-f(x_0)=-\\frac{1}{f^{\\prime}(x_0)}(x-x_0)$（$f^{\\prime}(x_0)\\neq0$）",
+   "tag": ""
+  },
+  {
+   "id": "f229",
+   "sub": "数学·常用导数公式",
+   "q": "$(c)^{\\prime}=?$（$c$ 为常数）",
+   "a": "$0$",
+   "tag": ""
+  },
+  {
+   "id": "f230",
+   "sub": "数学·常用导数公式",
+   "q": "$(x^a)^{\\prime}=?$",
+   "a": "$a\\,x^{a-1}$",
+   "tag": ""
+  },
+  {
+   "id": "f231",
+   "sub": "数学·常用导数公式",
+   "q": "$(\\sin x)^{\\prime}=?$",
+   "a": "$\\cos x$",
+   "tag": ""
+  },
+  {
+   "id": "f232",
+   "sub": "数学·常用导数公式",
+   "q": "$(\\cos x)^{\\prime}=?$",
+   "a": "$-\\sin x$",
+   "tag": ""
+  },
+  {
+   "id": "f233",
+   "sub": "数学·常用导数公式",
+   "q": "$(\\tan x)^{\\prime}=?$",
+   "a": "$\\sec^2x=\\frac{1}{\\cos^2x}$",
+   "tag": ""
+  },
+  {
+   "id": "f234",
+   "sub": "数学·常用导数公式",
+   "q": "$(\\cot x)^{\\prime}=?$",
+   "a": "$-\\csc^2x=-\\frac{1}{\\sin^2x}$",
+   "tag": ""
+  },
+  {
+   "id": "f235",
+   "sub": "数学·常用导数公式",
+   "q": "$(\\sec x)^{\\prime}=?$",
+   "a": "$\\sec x\\tan x$",
+   "tag": ""
+  },
+  {
+   "id": "f236",
+   "sub": "数学·常用导数公式",
+   "q": "$(\\csc x)^{\\prime}=?$",
+   "a": "$-\\csc x\\cot x$",
+   "tag": ""
+  },
+  {
+   "id": "f237",
+   "sub": "数学·常用导数公式",
+   "q": "$(\\log_a x)^{\\prime}=?$",
+   "a": "$\\frac{1}{x\\ln a}$",
+   "tag": ""
+  },
+  {
+   "id": "f238",
+   "sub": "数学·常用导数公式",
+   "q": "$(\\ln x)^{\\prime}=?$",
+   "a": "$\\frac{1}{x}$",
+   "tag": ""
+  },
+  {
+   "id": "f239",
+   "sub": "数学·常用导数公式",
+   "q": "$(a^x)^{\\prime}=?$",
+   "a": "$a^x\\ln a$",
+   "tag": ""
+  },
+  {
+   "id": "f240",
+   "sub": "数学·常用导数公式",
+   "q": "$(e^x)^{\\prime}=?$",
+   "a": "$e^x$",
+   "tag": ""
+  },
+  {
+   "id": "f241",
+   "sub": "数学·常用导数公式",
+   "q": "$(\\arcsin x)^{\\prime}=?$",
+   "a": "$\\frac{1}{\\sqrt{1-x^2}}$",
+   "tag": ""
+  },
+  {
+   "id": "f242",
+   "sub": "数学·常用导数公式",
+   "q": "$(\\arccos x)^{\\prime}=?$",
+   "a": "$-\\frac{1}{\\sqrt{1-x^2}}$",
+   "tag": ""
+  },
+  {
+   "id": "f243",
+   "sub": "数学·常用导数公式",
+   "q": "$(\\arctan x)^{\\prime}=?$",
+   "a": "$\\frac{1}{1+x^2}$",
+   "tag": ""
+  },
+  {
+   "id": "f244",
+   "sub": "数学·常用导数公式",
+   "q": "$(\\text{arccot}\\,x)^{\\prime}=?$",
+   "a": "$-\\frac{1}{1+x^2}$",
+   "tag": ""
+  },
+  {
+   "id": "f245",
+   "sub": "数学·常用导数公式",
+   "q": "$\\left[\\ln\\left(x+\\sqrt{x^2\\pm a^2}\\right)\\right]^{\\prime}=?$",
+   "a": "$\\frac{1}{\\sqrt{x^2\\pm a^2}}$",
+   "tag": ""
+  },
+  {
+   "id": "f246",
+   "sub": "数学·高阶导数",
+   "q": "$\\left(x^\\mu\\right)^{(n)}=?$",
+   "a": "$\\mu(\\mu-1)\\cdots(\\mu-n+1)x^{\\mu-n}$",
+   "tag": ""
+  },
+  {
+   "id": "f247",
+   "sub": "数学·高阶导数",
+   "q": "$\\left(a^x\\right)^{(n)}=?$",
+   "a": "$a^x(\\ln a)^n$",
+   "tag": ""
+  },
+  {
+   "id": "f248",
+   "sub": "数学·高阶导数",
+   "q": "$\\left[\\sin(kx+b)\\right]^{(n)}=?$",
+   "a": "$k^n\\sin\\left(kx+b+\\frac{n\\pi}{2}\\right)$",
+   "tag": ""
+  },
+  {
+   "id": "f249",
+   "sub": "数学·高阶导数",
+   "q": "$\\left[\\cos(kx+b)\\right]^{(n)}=?$",
+   "a": "$k^n\\cos\\left(kx+b+\\frac{n\\pi}{2}\\right)$",
+   "tag": ""
+  },
+  {
+   "id": "f250",
+   "sub": "数学·高阶导数",
+   "q": "$\\left[\\ln(ax+b)\\right]^{(n)}=?$",
+   "a": "$(-1)^{n-1}(n-1)!\\,\\frac{a^n}{(ax+b)^n}$",
+   "tag": ""
+  },
+  {
+   "id": "f251",
+   "sub": "数学·高阶导数",
+   "q": "$\\left(\\frac{1}{ax+b}\\right)^{(n)}=?$",
+   "a": "$(-1)^n n!\\,\\frac{a^n}{(ax+b)^{n+1}}$",
+   "tag": ""
+  },
+  {
+   "id": "f252",
+   "sub": "数学·高阶导数",
+   "q": "莱布尼兹公式：$(uv)^{(n)}=?$",
+   "a": "$\\sum_{k=0}^{n}C_n^k\\,u^{(n-k)}v^{(k)}$",
+   "tag": ""
+  }
+ ]
+}

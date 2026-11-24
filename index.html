@@ -185,6 +185,12 @@ body { min-height: 100vh; padding-bottom: 140px; }
 <div class="header">
   <h1>📚 考研政治背诵播放器</h1>
   <div class="sub">闭眼听 · 随时记 · 安心背</div>
+  <a href="quiz.html" style="display:block;text-align:center;margin-top:8px;text-decoration:none">
+    <span style="display:inline-block;padding:7px 18px;border-radius:20px;font-size:13px;
+      background:linear-gradient(135deg,#4ecdc4,#44a08d);color:#fff;font-weight:600">
+      📝 进入刷题训练营（挖空 / 选择 / 单词 / 填空）
+    </span>
+  </a>
 </div>
 
 <!-- 书籍选择 -->
@@ -494,6 +500,19 @@ function rebuildQueue() {
 
   // 检查这本书是否有音频
   state.audioAvailable = state.flatList.some(s => s.audio);
+
+  // 移除「挖空已掌握」对应的音频 (可在训练页恢复)
+  try {
+    const mastered = JSON.parse(localStorage.getItem('kaoyan_mastered_audio') || '[]');
+    if (mastered.length) {
+      const set = new Set(mastered);
+      const before = state.flatList.length;
+      state.flatList = state.flatList.filter(s => !s.audio || !set.has(s.audio));
+      if (state.flatList.length !== before) {
+        console.log(`[掌握过滤] ${before - state.flatList.length} 条已掌握音频被移除`);
+      }
+    }
+  } catch (e) {}
 
   // queue: 索引列表
   state.queue = state.flatList.map((_, i) => i);

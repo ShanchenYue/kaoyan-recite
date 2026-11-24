@@ -75,11 +75,20 @@ else:
     print("  ⚠️  没有 audios 目录, 跳过")
 
 # 7. 复制其他静态文件
-for fname in ['sw.js', 'manifest.json', 'icon.svg']:
+for fname in ['sw.js', 'manifest.json', 'icon.svg', 'quiz.html', 'quiz_data.js']:
     src = os.path.join(APP_DIR, fname)
     if os.path.isfile(src):
         shutil.copy2(src, os.path.join(ASSETS, fname))
         print(f"  ✅ {fname}")
+
+# 7.1 复制 KaTeX (公式离线渲染)
+src_katex = os.path.join(APP_DIR, 'vendor', 'katex')
+dst_katex = os.path.join(ASSETS, 'vendor', 'katex')
+if os.path.isdir(src_katex):
+    if os.path.exists(dst_katex):
+        shutil.rmtree(dst_katex)
+    shutil.copytree(src_katex, dst_katex)
+    print("  ✅ vendor/katex 同步")
 
 # 8. 同步 data.json 到 assets (备份, 以防万一)
 shutil.copy2(os.path.join(APP_DIR, 'data.json'), os.path.join(ASSETS, 'data.json'))
