@@ -2,154 +2,281 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="theme-color" content="#1a1a2e">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0b0c12">
 <title>考研训练营</title>
 <link rel="stylesheet" href="vendor/katex/katex.min.css">
 <style>
 :root{
-  --bg:#0f0f1a; --card:#1a1a2e; --card2:#232340; --accent:#ff6b6b;
-  --accent2:#4ecdc4; --green:#2ecc71; --red:#e74c3c; --text:#e8e8f0;
-  --muted:#8888a0; --border:#333355;
+  --bg:#0b0c12; --card:#151826; --card2:#1d2135; --line:#2a2f47;
+  --accent:#ff7a59; --accent2:#4fd1c5; --green:#34d399; --red:#f87171;
+  --text:#eceef6; --muted:#8b90a8; --gold:#fbbf24;
+  --safe-top:env(safe-area-inset-top,0px); --safe-bottom:env(safe-area-inset-bottom,0px);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
   font-family:-apple-system,"PingFang SC","MiSans","Microsoft YaHei",sans-serif}
-body{min-height:100vh;padding-bottom:80px;overflow-x:hidden}
+body{min-height:100vh;overflow-x:hidden;padding-bottom:96px}
 
-.topnav{position:sticky;top:0;z-index:100;display:flex;gap:6px;padding:10px 12px;
-  background:linear-gradient(180deg,var(--card),var(--bg));overflow-x:auto}
-.topnav a{flex:0 0 auto;padding:8px 14px;border-radius:20px;font-size:14px;
-  color:var(--muted);text-decoration:none;border:1px solid var(--border);background:var(--card)}
-.topnav a.active{background:linear-gradient(135deg,var(--accent),#ff8e53);color:#fff;border-color:transparent;font-weight:600}
+/* ── 顶部栏 ── */
+.appbar{position:sticky;top:0;z-index:100;background:rgba(11,12,18,.94);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);padding-top:calc(var(--safe-top) + 10px)}
+.appbar .title{display:flex;align-items:center;gap:8px;padding:0 16px 8px}
+.appbar .title b{font-size:17px;letter-spacing:.3px}
+.appbar .title span{font-size:11px;color:var(--muted)}
+.tabs{display:flex;gap:6px;padding:0 12px 10px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{flex:0 0 auto;display:flex;align-items:center;gap:5px;padding:8px 14px;border-radius:20px;
+  font-size:13px;color:var(--muted);background:var(--card);border:1px solid var(--line);
+  font-family:inherit;cursor:pointer;transition:.15s}
+.tabs button.active{background:linear-gradient(135deg,var(--accent),#ff9d6b);color:#fff;
+  border-color:transparent;font-weight:600;box-shadow:0 4px 14px rgba(255,122,89,.25)}
 
-.page{display:none;padding:4px 12px 20px}
+.page{display:none;padding:12px 14px 24px;max-width:720px;margin:0 auto}
 .page.active{display:block}
 
-.bar{display:flex;flex-wrap:wrap;gap:8px;padding:8px 0;align-items:center}
-.pill{padding:7px 13px;border-radius:18px;background:var(--card);border:1px solid var(--border);
-  color:var(--text);font-size:13px;cursor:pointer;user-select:none;transition:.15s}
-.pill.active{background:linear-gradient(135deg,var(--accent),#ff8e53);border-color:transparent;color:#fff;font-weight:600}
-.pill.small{font-size:12px;padding:5px 10px}
-.stat{font-size:12px;color:var(--muted);margin-left:auto}
+/* ── 筛选面板 ── */
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px}
+.panel-head{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--muted)}
+.panel-head .fake{font-size:11px;color:var(--accent2);border:1px solid rgba(79,209,197,.35);
+  background:rgba(79,209,197,.08);padding:2px 8px;border-radius:10px}
+.frow{display:flex;gap:8px;align-items:flex-start;margin-top:10px}
+.frow .flabel{flex:0 0 34px;font-size:11px;color:var(--muted);padding-top:7px;letter-spacing:.5px}
+.pills{display:flex;flex-wrap:wrap;gap:6px;flex:1}
+.pills.scroll{flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px;scrollbar-width:none;min-width:0}
+.pills.scroll::-webkit-scrollbar{display:none}
+.pills.scroll .pill{flex:0 0 auto}
+.pill{padding:6px 12px;border-radius:14px;background:var(--card2);border:1px solid var(--line);
+  color:var(--text);font-size:12.5px;cursor:pointer;user-select:none;transition:.15s;line-height:1.2}
+.pill:active{transform:scale(.96)}
+.pill.active{background:linear-gradient(135deg,var(--accent),#ff9d6b);border-color:transparent;
+  color:#fff;font-weight:600}
+.pill.soft.active{background:rgba(79,209,197,.18);border-color:var(--accent2);color:var(--accent2);font-weight:600}
+.pill .n{opacity:.65;font-size:11px;margin-left:3px}
 
-.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-top:12px}
-.card .meta{font-size:12px;color:var(--accent2);margin-bottom:8px}
-.qtext{font-size:16px;line-height:1.75;white-space:pre-wrap;word-break:break-word}
-.blank{color:var(--accent);font-weight:600;border-bottom:2px solid var(--accent);padding:0 2px}
+/* ── 进度条 ── */
+.statline{display:flex;align-items:center;gap:10px;margin:14px 2px 0;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.statline b{color:var(--text);font-weight:600}
+.progress{height:4px;border-radius:3px;background:var(--card2);flex:1;min-width:60px;overflow:hidden}
+.progress i{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent2),var(--green))}
 
-.inp{width:120px;min-width:80px;padding:4px 8px;font-size:15px;border-radius:8px;
-  border:1px solid var(--border);background:var(--card2);color:var(--text);margin:0 2px}
+/* ── 题目卡 ── */
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 16px;margin-top:12px}
+.card .meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:11px;color:var(--muted);margin-bottom:12px}
+.chip{padding:2px 8px;border-radius:9px;background:var(--card2);border:1px solid var(--line)}
+.chip.a2{color:var(--accent2);border-color:rgba(79,209,197,.3)}
+.chip.gold{color:var(--gold);border-color:rgba(251,191,36,.3)}
+.qtext{font-size:16.5px;line-height:1.85;white-space:pre-wrap;word-break:break-word}
+.blank{color:var(--accent);font-weight:600;border-bottom:2px solid var(--accent);padding:0 3px}
+.wordbig{font-size:30px;font-weight:700;letter-spacing:.6px;line-height:1.35}
+
+.inp{width:116px;min-width:86px;padding:5px 9px;font-size:15px;border-radius:9px;
+  border:1px solid var(--line);background:var(--card2);color:var(--text);margin:0 2px;
+  font-family:inherit}
 .inp:focus{outline:none;border-color:var(--accent2)}
-.inp.ok{border-color:var(--green);background:rgba(46,204,113,.12)}
-.inp.bad{border-color:var(--red);background:rgba(231,76,60,.12)}
+.inp.ok{border-color:var(--green);background:rgba(52,211,153,.12)}
+.inp.bad{border-color:var(--red);background:rgba(248,113,113,.12)}
 
-.opts{display:flex;flex-direction:column;gap:8px;margin-top:12px}
-.opt{padding:11px 14px;border-radius:10px;background:var(--card2);border:1px solid var(--border);
-  font-size:15px;cursor:pointer;transition:.15s;text-align:left}
-.opt:active{transform:scale(.99)}
-.opt.sel{border-color:var(--accent2);background:rgba(78,205,196,.15)}
-.opt.ok{border-color:var(--green);background:rgba(46,204,113,.18)}
-.opt.bad{border-color:var(--red);background:rgba(231,76,60,.18)}
-.opt .tag{font-weight:700;margin-right:8px;color:var(--accent2)}
+.opts{display:flex;flex-direction:column;gap:9px;margin-top:16px}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:12px;
+  background:var(--card2);border:1px solid var(--line);font-size:15px;line-height:1.6;
+  cursor:pointer;transition:.15s;text-align:left}
+.opt:active{transform:scale(.995)}
+.opt .key{flex:0 0 24px;height:24px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:var(--accent2);background:rgba(79,209,197,.12);margin-top:1px}
+.opt.sel{border-color:var(--accent2);background:rgba(79,209,197,.12)}
+.opt.sel .key{background:var(--accent2);color:#08202a}
+.opt.ok{border-color:var(--green);background:rgba(52,211,153,.14)}
+.opt.ok .key{background:var(--green);color:#062018}
+.opt.bad{border-color:var(--red);background:rgba(248,113,113,.13)}
+.opt.bad .key{background:var(--red);color:#2a0b0b}
 
-.btn{padding:10px 18px;border-radius:10px;border:none;font-size:15px;font-weight:600;
-  background:linear-gradient(135deg,var(--accent),#ff8e53);color:#fff;cursor:pointer}
-.btn.ghost{background:var(--card2);color:var(--text);border:1px solid var(--border)}
-.btn.green{background:linear-gradient(135deg,#27ae60,#2ecc71)}
-.btn.red{background:linear-gradient(135deg,#c0392b,#e74c3c)}
+.btn{padding:11px 18px;border-radius:12px;border:none;font-size:15px;font-weight:600;
+  background:linear-gradient(135deg,var(--accent),#ff9d6b);color:#fff;cursor:pointer;font-family:inherit}
+.btn.ghost{background:var(--card2);color:var(--text);border:1px solid var(--line)}
+.btn.green{background:linear-gradient(135deg,#10b981,#34d399)}
+.btn.red{background:linear-gradient(135deg,#ef4444,#f87171)}
 .btn:active{transform:scale(.98)}
-.btnrow{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.btn:disabled{opacity:.45}
+.btnrow{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.btnrow .btn{flex:1;min-width:110px}
 
-.feedback{margin-top:12px;padding:10px 12px;border-radius:10px;font-size:14px;line-height:1.6;display:none}
+.feedback{margin-top:14px;padding:12px 14px;border-radius:12px;font-size:14px;line-height:1.7;display:none}
 .feedback.show{display:block}
-.feedback.good{background:rgba(46,204,113,.12);border:1px solid var(--green)}
-.feedback.bad{background:rgba(231,76,60,.1);border:1px solid var(--red)}
-.feedback.info{background:rgba(78,205,196,.1);border:1px solid var(--accent2)}
+.feedback.good{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.5)}
+.feedback.bad{background:rgba(248,113,113,.09);border:1px solid rgba(248,113,113,.45)}
+.feedback.info{background:rgba(79,209,197,.08);border:1px solid rgba(79,209,197,.4)}
 
-.answer{margin-top:12px;padding:12px;border-radius:10px;background:var(--card2);
-  border:1px dashed var(--accent2);display:none}
+.answer{margin-top:14px;padding:14px;border-radius:12px;background:var(--card2);
+  border:1px solid var(--line);display:none}
 .answer.show{display:block}
-.answer .lbl{font-size:12px;color:var(--accent2);margin-bottom:6px}
+.answer .lbl{font-size:11px;color:var(--accent2);letter-spacing:1px;margin-bottom:8px}
+.answer .body{font-size:14px;line-height:1.85;color:#cfd4e6;word-break:break-word}
 
+/* ── 底部操作条 ── */
 .bottom{position:fixed;left:0;right:0;bottom:0;z-index:90;display:flex;gap:10px;
-  padding:10px 14px;background:linear-gradient(0deg,var(--bg) 60%,transparent)}
+  padding:10px 14px calc(var(--safe-bottom) + 10px);max-width:720px;margin:0 auto;
+  background:linear-gradient(0deg,var(--bg) 62%,rgba(11,12,18,0))}
 .bottom .btn{flex:1}
-.empty{text-align:center;color:var(--muted);padding:40px 16px;font-size:14px;line-height:1.8}
-.mastered-badge{font-size:11px;color:var(--green);border:1px solid var(--green);
-  border-radius:10px;padding:1px 6px;margin-left:6px}
-.vlist{display:flex;flex-direction:column;gap:8px;margin-top:10px;max-height:none}
+.bottom .btn.mini{flex:0 0 auto;padding:11px 14px}
+
+.empty{text-align:center;color:var(--muted);padding:48px 18px;font-size:14px;line-height:1.9}
+
+/* ── 单词清单 ── */
+.seg{display:flex;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:3px;margin-top:12px}
+.seg button{flex:1;padding:8px 0;border:none;background:none;color:var(--muted);font-size:13.5px;
+  border-radius:9px;font-family:inherit;cursor:pointer}
+.seg button.active{background:var(--card);color:var(--text);font-weight:600;box-shadow:0 1px 6px rgba(0,0,0,.3)}
+.searchrow{display:flex;gap:8px;margin-top:12px}
+.searchrow input{flex:1;padding:11px 14px;border-radius:12px;background:var(--card);
+  border:1px solid var(--line);color:var(--text);font-size:14px;font-family:inherit}
+.searchrow input:focus{outline:none;border-color:var(--accent2)}
+.wlist{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+.wrow{display:flex;align-items:center;gap:10px;padding:11px 14px;background:var(--card);
+  border:1px solid var(--line);border-radius:12px;font-size:14px}
+.wrow .w{font-weight:600;flex:0 0 auto;min-width:88px}
+.wrow .m{color:#cfd4e6;font-size:13px;flex:1;line-height:1.5}
+.wrow .f{font-size:10.5px;color:var(--gold);border:1px solid rgba(251,191,36,.35);
+  border-radius:8px;padding:1px 6px}
+.wrow .done{font-size:10.5px;color:var(--green);border:1px solid rgba(52,211,153,.35);
+  border-radius:8px;padding:1px 6px}
+
+/* ── 错题本 ── */
+.wrow.wrong{flex-direction:column;align-items:stretch;gap:8px;cursor:pointer}
+.wrow.wrong .top{display:flex;align-items:center;gap:8px}
+.wrow.wrong .txt{font-size:13.5px;line-height:1.6;color:#cfd4e6}
+.kbadge{font-size:10.5px;padding:2px 7px;border-radius:7px;background:rgba(255,122,89,.14);
+  color:var(--accent);border:1px solid rgba(255,122,89,.3)}
+.kbadge.k2{background:rgba(79,209,197,.12);color:var(--accent2);border-color:rgba(79,209,197,.3)}
+.kbadge.k3{background:rgba(251,191,36,.12);color:var(--gold);border-color:rgba(251,191,36,.3)}
+.kbadge.k4{background:rgba(167,139,250,.13);color:#c4b5fd;border-color:rgba(167,139,250,.3)}
+.wcnt{margin-left:auto;font-size:11px;color:var(--red)}
+
+/* ── 评估 ── */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.kcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.kcard .t{font-size:12px;color:var(--muted);display:flex;gap:6px;align-items:center}
+.kcard .v{font-size:24px;font-weight:700;margin-top:6px}
+.kcard .s{font-size:11px;color:var(--muted);margin-top:3px}
+.bars{display:flex;flex-direction:column;gap:12px;margin-top:12px}
+.brow .bt{display:flex;justify-content:space-between;font-size:12.5px;color:#cfd4e6;gap:10px}
+.brow .bt span:last-child{color:var(--muted);flex:0 0 auto}
+.btrack{height:7px;background:var(--card2);border-radius:5px;overflow:hidden;margin-top:6px}
+.btrack i{display:block;height:100%;border-radius:5px;background:var(--green)}
+.btrack i.warn{background:var(--gold)}
+.btrack i.bad{background:var(--red)}
+.section-title{font-size:13px;color:var(--muted);margin:20px 2px 0;letter-spacing:.5px}
+.advice{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--accent);
+  border-radius:12px;padding:12px 14px;font-size:13.5px;line-height:1.8;color:#d7dbea;margin-top:10px}
+.advice b{color:var(--accent)}
 </style>
 </head>
 <body>
 
-<div class="topnav">
-  <a href="index.html">🎧 背诵</a>
-  <a href="#" class="active" data-tab="cloze">✏️ 挖空</a>
-  <a href="#" data-tab="choice">📝 选择</a>
-  <a href="#" data-tab="words">🔤 单词</a>
-  <a href="#" data-tab="fill">🧮 填空</a>
-</div>
+<header class="appbar">
+  <div class="title"><b>考研训练营</b><span>背诵 · 刷题 · 评估</span></div>
+  <nav class="tabs" id="tabs">
+    <button data-tab="cloze" class="active">✏️ 挖空</button>
+    <button data-tab="choice">📝 选择</button>
+    <button data-tab="words">🔤 单词</button>
+    <button data-tab="fill">🧮 填空</button>
+    <button data-tab="wrong">🔁 错题本</button>
+    <button data-tab="stats">📊 评估</button>
+    <a href="index.html" style="text-decoration:none"><button>🎧 背诵</button></a>
+  </nav>
+</header>
 
-<!-- ══════════ 挖空 ══════════ -->
-<div class="page active" id="page-cloze">
-  <div class="bar">
-    <div class="pill active" data-clz-book="__all">全部</div>
-    <div class="stat" id="clozeStat"></div>
+<!-- ═════════ 挖空 ═════════ -->
+<section class="page active" id="page-cloze">
+  <div class="panel">
+    <div class="panel-head"><span>筛选范围</span><span class="fake" id="clozeScope">全部</span></div>
+    <div class="frow"><span class="flabel">书目</span><div class="pills" id="clozeBookBar"></div></div>
+    <div class="frow"><span class="flabel">章节</span><div class="pills scroll" id="clozeSubBar"></div></div>
+    <div class="frow"><span class="flabel">状态</span><div class="pills" id="clozeStatusBar"></div></div>
+    <div class="frow"><span class="flabel">设置</span><div class="pills" id="clozeModeBar"></div></div>
   </div>
-  <div class="bar" id="clozeSubBar"></div>
-  <div class="bar">
-    <div class="pill small active" data-clz-mode="type">文字填入</div>
-    <div class="pill small" data-clz-mode="choice">选项选择</div>
-    <div class="pill small" data-clz-order="seq">顺序</div>
-    <div class="pill small" data-clz-order="shuffle">乱序</div>
-    <div class="pill small" data-clz-order="random">随机</div>
-    <div class="pill small" id="clozeRestore">恢复已掌握</div>
-  </div>
+  <div class="statline" id="clozeStat"></div>
   <div id="clozeCard"></div>
-</div>
+</section>
 
-<!-- ══════════ 选择 ══════════ -->
-<div class="page" id="page-choice">
-  <div class="bar" id="choiceSetBar"><div class="pill active" data-ch-set="__all">全部</div></div>
-  <div class="bar">
-    <div class="pill small active" data-ch-order="seq">顺序</div>
-    <div class="pill small" data-ch-order="random">随机</div>
-    <div class="stat" id="choiceStat"></div>
+<!-- ═════════ 选择 ═════════ -->
+<section class="page" id="page-choice">
+  <div class="panel">
+    <div class="panel-head"><span>筛选范围</span><span class="fake" id="choiceScope">全部</span></div>
+    <div class="frow"><span class="flabel">套卷</span><div class="pills scroll" id="choiceSetBar"></div></div>
+    <div class="frow"><span class="flabel">题型</span><div class="pills" id="choiceTypeBar"></div></div>
+    <div class="frow"><span class="flabel">状态</span><div class="pills" id="choiceStatusBar"></div></div>
+    <div class="frow"><span class="flabel">顺序</span><div class="pills" id="choiceOrderBar"></div></div>
   </div>
+  <div class="statline" id="choiceStat"></div>
   <div id="choiceCard"></div>
-</div>
+</section>
 
-<!-- ══════════ 单词 ══════════ -->
-<div class="page" id="page-words">
-  <div class="bar">
-    <div class="pill small active" data-wd-order="seq">顺序</div>
-    <div class="pill small" data-wd-order="random">随机</div>
-    <div class="pill small" id="wdHighFreq">🔥 高频词</div>
-    <div class="stat" id="wordsStat"></div>
+<!-- ═════════ 单词 ═════════ -->
+<section class="page" id="page-words">
+  <div class="seg" id="wordsSeg">
+    <button data-wmode="practice" class="active">练习</button>
+    <button data-wmode="list">高频词清单</button>
   </div>
-  <div id="wordsCard"></div>
-</div>
+  <div id="wordsPractice">
+    <div class="panel">
+      <div class="panel-head"><span>筛选范围</span><span class="fake" id="wordsScope">全部</span></div>
+      <div class="frow"><span class="flabel">范围</span><div class="pills" id="wordsRangeBar"></div></div>
+      <div class="frow"><span class="flabel">状态</span><div class="pills" id="wordsStatusBar"></div></div>
+      <div class="frow"><span class="flabel">顺序</span><div class="pills" id="wordsOrderBar"></div></div>
+    </div>
+    <div class="statline" id="wordsStat"></div>
+    <div id="wordsCard"></div>
+  </div>
+  <div id="wordsList" style="display:none">
+    <div class="pills" id="wordsListRange" style="margin-top:12px"></div>
+    <div class="searchrow"><input id="wordsSearch" placeholder="搜索单词或释义…"></div>
+    <div class="statline" id="wordsListStat"></div>
+    <div class="wlist" id="wordsListBox"></div>
+  </div>
+</section>
 
-<!-- ══════════ 填空 ══════════ -->
-<div class="page" id="page-fill">
-  <div class="bar" id="fillSubjectBar"></div>
-  <div class="bar" id="fillSubBar"></div>
-  <div class="bar">
-    <div class="pill small active" data-fl-order="seq">顺序</div>
-    <div class="pill small" data-fl-order="random">随机</div>
-    <div class="stat" id="fillStat"></div>
+<!-- ═════════ 填空 ═════════ -->
+<section class="page" id="page-fill">
+  <div class="panel">
+    <div class="panel-head"><span>筛选范围</span><span class="fake" id="fillScope">全部</span></div>
+    <div class="frow"><span class="flabel">科目</span><div class="pills" id="fillSubjectBar"></div></div>
+    <div class="frow" id="fillSubRow"><span class="flabel">章节</span><div class="pills scroll" id="fillSubBar"></div></div>
+    <div class="frow"><span class="flabel">状态</span><div class="pills" id="fillStatusBar"></div></div>
+    <div class="frow"><span class="flabel">顺序</span><div class="pills" id="fillOrderBar"></div></div>
   </div>
+  <div class="statline" id="fillStat"></div>
   <div id="fillCard"></div>
-</div>
+</section>
+
+<!-- ═════════ 错题本 ═════════ -->
+<section class="page" id="page-wrong">
+  <div class="panel">
+    <div class="panel-head"><span>错题汇总</span><span class="fake" id="wrongTotal">0</span></div>
+    <div class="frow"><span class="flabel">题型</span><div class="pills" id="wrongKindBar"></div></div>
+  </div>
+  <div class="statline" id="wrongStat"></div>
+  <div class="wlist" id="wrongList"></div>
+</section>
+
+<!-- ═════════ 评估 ═════════ -->
+<section class="page" id="page-stats">
+  <div class="grid2" id="statsCards"></div>
+  <div class="section-title">各科目 / 章节正确率</div>
+  <div id="statsGroups"></div>
+  <div class="section-title">薄弱点与建议</div>
+  <div id="statsAdvice"></div>
+</section>
 
 <script src="quiz_data.js"></script>
 <script>
-/* ═════════════ 通用: 进度存储 ═════════════ */
+/* ══════════════════ 基础工具 ══════════════════ */
 const PROG_KEY = 'kaoyan_quiz_prog_v1';
 function loadProg(){ try{ return JSON.parse(localStorage.getItem(PROG_KEY))||{} }catch(e){ return {} } }
 function saveProg(p){ try{ localStorage.setItem(PROG_KEY, JSON.stringify(p)) }catch(e){} }
 let PROG = loadProg();
+
 function getRec(kind,id){
   PROG[kind] = PROG[kind] || {};
   if(!PROG[kind][id]) PROG[kind][id] = {c:0,w:0,m:false};
@@ -163,395 +290,18 @@ function markResult(kind,id,ok){
   return r;
 }
 function masteredCount(kind){ const d=PROG[kind]||{}; return Object.values(d).filter(x=>x.m).length }
+function wrongCount(kind){ const d=PROG[kind]||{}; return Object.values(d).filter(x=>x.w>0).length }
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]} return a }
+function esc(s){ return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])) }
 
-/* 把「挖空已掌握」对应的音频路径同步给背诵播放器 */
 function refreshMasteredAudio(){
   const arr=[];
   Object.entries(PROG.cloze||{}).forEach(([id,r])=>{
-    if(r.m){
-      const it=CLZ.find(x=>x.id===id);
-      if(it && it.audio) arr.push(it.audio);
-    }
+    if(r.m){ const it=CLZ.find(x=>x.id===id); if(it && it.audio) arr.push(it.audio); }
   });
   try{ localStorage.setItem('kaoyan_mastered_audio', JSON.stringify(arr)); }catch(e){}
 }
 
-/* ═════════════ 通用: 洗牌/取数据 ═════════════ */
-function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]} return a }
-
-/* ═════════════ 顶部 tab 切换 ═════════════ */
-document.querySelectorAll('.topnav a[data-tab]').forEach(a=>{
-  a.addEventListener('click',e=>{
-    e.preventDefault();
-    document.querySelectorAll('.topnav a').forEach(x=>x.classList.remove('active'));
-    a.classList.add('active');
-    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-    document.getElementById('page-'+a.dataset.tab).classList.add('active');
-    window.scrollTo(0,0);
-  });
-});
-
-/* ══════════════════════════════════════════
- *  ① 挖空
- * ══════════════════════════════════════════ */
-const CLZ = (window.__QUIZ_CLOZE__ && window.__QUIZ_CLOZE__.items) || [];
-const clzState = { book:'__all', sub:'__all', mode:'type', order:'seq', idx:0, list:[], cur:null, answered:false };
-
-function clzBooks(){ const s=new Set(CLZ.map(x=>x.book)); return [...s] }
-function clzSubs(){ return [...new Set(CLZ.filter(x=>clzState.book==='__all'||x.book===clzState.book).map(x=>x.sub).filter(Boolean))] }
-
-function clzBuildList(){
-  let arr = CLZ.filter(x=> (clzState.book==='__all'||x.book===clzState.book) &&
-                          (clzState.sub==='__all'||x.sub===clzState.sub));
-  arr = arr.filter(x=> !(PROG.cloze&&PROG.cloze[x.id]&&PROG.cloze[x.id].m));
-  if(clzState.order==='shuffle') arr = shuffle(arr);
-  else if(clzState.order==='random') arr = shuffle(arr);
-  clzState.list = arr; clzState.idx = 0;
-  clzRenderStat();
-  clzShow();
-}
-
-function clzRenderStat(){
-  const total = CLZ.filter(x=> (clzState.book==='__all'||x.book===clzState.book) &&
-                               (clzState.sub==='__all'||x.sub===clzState.sub)).length;
-  const m = masteredCount('cloze');
-  document.getElementById('clozeStat').textContent = `已掌握 ${m} / ${total} · 剩余 ${clzState.list.length}`;
-}
-
-function clzRenderBooks(){
-  const bar = document.querySelector('#page-cloze .bar');
-  bar.querySelectorAll('[data-clz-book]').forEach(x=>x.remove());
-  const all = document.createElement('div');
-  all.className='pill'+(clzState.book==='__all'?' active':''); all.textContent='全部'; all.dataset.clzBook='__all';
-  bar.insertBefore(all, bar.firstChild);
-  clzBooks().forEach(b=>{
-    const d=document.createElement('div');
-    d.className='pill'+(clzState.book===b?' active':''); d.textContent=b; d.dataset.clzBook=b;
-    bar.insertBefore(d, bar.querySelector('.stat'));
-  });
-  bar.querySelectorAll('[data-clz-book]').forEach(el=>{
-    el.onclick=()=>{ clzState.book=el.dataset.clzBook; clzState.sub='__all'; clzRenderBooks(); clzRenderSubs(); clzBuildList(); };
-  });
-  bar.querySelectorAll('[data-clz-book]').forEach(el=>{ el.classList.toggle('active', el.dataset.clzBook===clzState.book); });
-}
-
-function clzRenderSubs(){
-  const bar = document.getElementById('clozeSubBar'); bar.innerHTML='';
-  const subs = clzSubs(); if(!subs.length){ return; }
-  const mk=(v,t)=>{ const d=document.createElement('div'); d.className='pill small'+(clzState.sub===v?' active':''); d.textContent=t;
-    d.onclick=()=>{ clzState.sub=v; clzRenderSubs(); clzBuildList(); }; return d; };
-  bar.appendChild(mk('__all','全部子类'));
-  subs.forEach(s=>bar.appendChild(mk(s,s)));
-}
-
-function clzShow(){
-  const box = document.getElementById('clozeCard');
-  if(!clzState.list.length){
-    box.innerHTML = `<div class="empty">🎉 当前范围已全部掌握或被筛空<br>可点右上「恢复已掌握」重来</div>`;
-    clzRenderStat(); return;
-  }
-  if(clzState.idx>=clzState.list.length) clzState.idx=0;
-  const it = clzState.list[clzState.idx];
-  clzState.cur = it; clzState.answered = false;
-  const rec = getRec('cloze', it.id);
-
-  // 题干
-  let html = `<div class="card"><div class="meta">${it.book} · ${it.sub||'综合'} · 第 ${clzState.idx+1}/${clzState.list.length} 题` +
-    (rec.c?` · 已连对 ${rec.c}/3`:'') + `</div>`;
-
-  if(clzState.mode==='type'){
-    const parts = it.template.split(/〔\d+〕/);
-    let t = '';
-    for(let i=0;i<parts.length;i++){
-      t += escapeHtml(parts[i]);
-      if(i<it.blanks.length){
-        t += `<input class="inp" data-bi="${i}" autocomplete="off" placeholder="填空${i+1}">`;
-      }
-    }
-    html += `<div class="qtext">${t}</div>`;
-    html += `<div class="btnrow"><button class="btn" id="clzSubmit">提交答案</button>
-             <button class="btn ghost" id="clzShowAns">看答案</button></div>`;
-  } else {
-    html += `<div class="qtext">${escapeHtml(it.template).replace(/〔(\d+)〕/g,'<span class="blank">〔空$1〕</span>')}</div>`;
-    it.blanks.forEach((ans,bi)=>{
-      html += `<div style="margin-top:14px;font-size:13px;color:var(--muted)">空 ${bi+1}</div><div class="opts" data-bopts="${bi}">`;
-      (it.options[bi]||[]).forEach(o=>{
-        html += `<div class="opt" data-oval="${escapeAttr(o)}"><span class="tag">•</span>${escapeHtml(o)}</div>`;
-      });
-      html += `</div>`;
-    });
-    html += `<div class="btnrow"><button class="btn" id="clzSubmit">提交答案</button></div>`;
-  }
-  html += `<div class="feedback" id="clzFb"></div></div>`;
-  html += `<div class="bottom">
-     <button class="btn ghost" id="clzPrev">◀ 上一题</button>
-     <button class="btn ghost" id="clzNext">下一题 ▶</button></div>`;
-  box.innerHTML = html;
-
-  // ── 事件: 选项模式 ──
-  if(clzState.mode==='choice'){
-    box.querySelectorAll('.opts').forEach(row=>{
-      row.querySelectorAll('.opt').forEach(op=>{
-        op.onclick=()=>{ row.querySelectorAll('.opt').forEach(o=>o.classList.remove('sel')); op.classList.add('sel'); };
-      });
-    });
-  }
-
-  document.getElementById('clzSubmit').onclick = ()=>clzCheck();
-  const sa = document.getElementById('clzShowAns');
-  if(sa) sa.onclick = ()=>{
-    const fb=document.getElementById('clzFb'); fb.className='feedback show info';
-    fb.innerHTML = '答案：' + it.blanks.map((b,i)=>`${i+1}. ${escapeHtml(b)}`).join('　');
-  };
-  document.getElementById('clzPrev').onclick = ()=>{ clzState.idx=(clzState.idx-1+clzState.list.length)%clzState.list.length; clzShow(); };
-  document.getElementById('clzNext').onclick = ()=>{ clzState.idx=(clzState.idx+1)%clzState.list.length; clzShow(); };
-  clzRenderStat();
-}
-
-function clzCheck(){
-  if(clzState.answered) return;
-  const it = clzState.cur; const fb=document.getElementById('clzFb');
-  let allOk = true; const results=[];
-  if(clzState.mode==='type'){
-    document.querySelectorAll('#clozeCard .inp').forEach(inp=>{
-      const bi=+inp.dataset.bi; const user=(inp.value||'').trim().replace(/\s+/g,'');
-      const ans=(it.blanks[bi]||'').replace(/\s+/g,'');
-      const ok = user && (user===ans || ans.includes(user) && user.length>=Math.max(2,ans.length-2));
-      inp.classList.add(ok?'ok':'bad');
-      if(!ok){ if(!inp.value.trim()) inp.value = it.blanks[bi]; }
-      allOk = allOk && ok; results.push(ok);
-    });
-  } else {
-    it.blanks.forEach((ans,bi)=>{
-      const row=document.querySelector(`[data-bopts="${bi}"]`);
-      const sel=row.querySelector('.opt.sel');
-      const val=sel?sel.dataset.oval:'';
-      const ok = val===ans;
-      row.querySelectorAll('.opt').forEach(o=>{
-        if(o.dataset.oval===ans) o.classList.add('ok');
-        else if(o.classList.contains('sel')) o.classList.add('bad');
-      });
-      allOk = allOk && ok; results.push(ok);
-    });
-  }
-  const rec = markResult('cloze', it.id, allOk);
-  fb.className='feedback show '+(allOk?'good':'bad');
-  fb.innerHTML = allOk
-    ? `✅ 全部正确！${rec.m?'🎉 已掌握，移出题库':`连对 ${rec.c}/3`}`
-    : `❌ 有误。正确答案：${it.blanks.map((b,i)=>`${i+1}. ${escapeHtml(b)}`).join('　')}`;
-  clzState.answered = true;
-  clzRenderStat();
-  if(allOk && rec.m){ setTimeout(()=>{ clzBuildList(); }, 900); }
-}
-
-document.querySelectorAll('[data-clz-mode]').forEach(el=>el.onclick=()=>{
-  document.querySelectorAll('[data-clz-mode]').forEach(x=>x.classList.remove('active'));
-  el.classList.add('active'); clzState.mode=el.dataset.clzMode; clzShow();
-});
-document.querySelectorAll('[data-clz-order]').forEach(el=>el.onclick=()=>{
-  document.querySelectorAll('[data-clz-order]').forEach(x=>x.classList.remove('active'));
-  el.classList.add('active'); clzState.order=el.dataset.clzOrder; clzBuildList();
-});
-document.getElementById('clozeRestore').onclick=()=>{
-  if(!confirm('恢复所有已掌握的挖空题？')) return;
-  Object.values(PROG.cloze||{}).forEach(r=>{ r.m=false; r.c=0; });
-  saveProg(PROG); refreshMasteredAudio(); clzBuildList();
-};
-
-function escapeHtml(s){ return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])) }
-function escapeAttr(s){ return escapeHtml(s).replace(/'/g,'&#39;') }
-
-/* ══════════════════════════════════════════
- *  ② 政治选择题 (肖八)
- * ══════════════════════════════════════════ */
-const CH = (window.__QUIZ_CHOICE__ && window.__QUIZ_CHOICE__.items) || [];
-const chState = { set:'__all', order:'seq', idx:0, list:[], answered:false };
-function chSets(){ return [...new Set(CH.map(x=>x.set))] }
-function chBuildList(){
-  let arr = CH.filter(x=>chState.set==='__all'||x.set===chState.set)
-              .filter(x=>!(PROG.choice&&PROG.choice[x.id]&&PROG.choice[x.id].m));
-  if(chState.order==='random') arr=shuffle(arr);
-  chState.list=arr; chState.idx=0; chShow();
-}
-function chShow(){
-  const box=document.getElementById('choiceCard');
-  if(!CH.length){ box.innerHTML='<div class="empty">选择题题库尚未生成（肖八 OCR 处理中）</div>'; return; }
-  if(!chState.list.length){ box.innerHTML='<div class="empty">🎉 当前范围已全部掌握</div>'; return; }
-  if(chState.idx>=chState.list.length) chState.idx=0;
-  const it=chState.list[chState.idx]; chState.answered=false;
-  const rec=getRec('choice',it.id);
-  const multi = it.answer.length>1 || it.multi;
-  let html=`<div class="card"><div class="meta">${it.set} · 第 ${it.no} 题 · ${multi?'多选':'单选'} · 已对 ${rec.c}/3</div>`;
-  html+=`<div class="qtext">${escapeHtml(it.stem)}</div><div class="opts">`;
-  ['A','B','C','D'].forEach(k=>{
-    if(it.options[k]!=null){
-      html+=`<div class="opt" data-ok="${k}"><span class="tag">${k}</span>${escapeHtml(it.options[k])}</div>`;
-    }
-  });
-  html+=`</div><div class="btnrow"><button class="btn" id="chSubmit">提交</button></div>
-    <div class="feedback" id="chFb"></div>
-    <div class="answer" id="chAns"><div class="lbl">解析</div><div id="chAnsBody"></div></div></div>
-    <div class="bottom"><button class="btn ghost" id="chPrev">◀ 上一题</button>
-    <button class="btn ghost" id="chNext">下一题 ▶</button></div>`;
-  box.innerHTML=html;
-  box.querySelectorAll('.opt').forEach(op=>op.onclick=()=>{
-    if(chState.answered) return;
-    if(multi){ op.classList.toggle('sel'); }
-    else { box.querySelectorAll('.opt').forEach(o=>o.classList.remove('sel')); op.classList.add('sel'); }
-  });
-  document.getElementById('chSubmit').onclick=chCheck;
-  document.getElementById('chPrev').onclick=()=>{chState.idx=(chState.idx-1+chState.list.length)%chState.list.length; chShow();};
-  document.getElementById('chNext').onclick=()=>{chState.idx=(chState.idx+1)%chState.list.length; chShow();};
-  document.getElementById('choiceStat').textContent=`已掌握 ${masteredCount('choice')} / ${CH.length}`;
-}
-function chCheck(){
-  if(chState.answered) return; chState.answered=true;
-  const it=chState.list[chState.idx]; const box=document.getElementById('choiceCard');
-  const sel=[...box.querySelectorAll('.opt.sel')].map(o=>o.dataset.ok).sort().join('');
-  const ans=(it.answer||'').split('').sort().join('');
-  const ok=sel===ans;
-  box.querySelectorAll('.opt').forEach(o=>{
-    const k=o.dataset.ok;
-    if(ans.includes(k)) o.classList.add('ok');
-    else if(o.classList.contains('sel')) o.classList.add('bad');
-  });
-  const rec=markResult('choice',it.id,ok);
-  const fb=document.getElementById('chFb');
-  fb.className='feedback show '+(ok?'good':'bad');
-  fb.innerHTML= ok?`✅ 正确！${rec.m?'🎉 已掌握':`连对 ${rec.c}/3`}`:`❌ 正确答案：${it.answer}`;
-  const an=document.getElementById('chAns'); an.classList.add('show');
-  document.getElementById('chAnsBody').innerHTML=escapeHtml(it.explain||'（暂无解析）');
-  document.getElementById('choiceStat').textContent=`已掌握 ${masteredCount('choice')} / ${CH.length}`;
-}
-document.querySelectorAll('[data-ch-order]').forEach(el=>el.onclick=()=>{
-  document.querySelectorAll('[data-ch-order]').forEach(x=>x.classList.remove('active'));
-  el.classList.add('active'); chState.order=el.dataset.chOrder; chBuildList();
-});
-
-/* ══════════════════════════════════════════
- *  ③ 英语单词
- * ══════════════════════════════════════════ */
-const WD=[];
-(function initWords(){
-  const src=(window.__QUIZ_WORDS__&&window.__QUIZ_WORDS__.items)||[];
-  WD.push(...src);
-})();
-const wdState={order:'seq',idx:0,list:[],answered:false,highfreq:false};
-function wdBuildList(){
-  let arr=WD.filter(x=>!(PROG.word&&PROG.word[x.id]&&PROG.word[x.id].m));
-  if(wdState.highfreq) arr=arr.slice().sort((a,b)=>(b.freq||0)-(a.freq||0));
-  else if(wdState.order==='random') arr=shuffle(arr);
-  wdState.list=arr; wdState.idx=0; wdShow();
-}
-function wdShow(){
-  const box=document.getElementById('wordsCard');
-  if(!WD.length){ box.innerHTML='<div class="empty">单词题库尚未生成（词汇书 OCR 处理中）</div>'; return; }
-  if(!wdState.list.length){ box.innerHTML='<div class="empty">🎉 单词已全部掌握</div>'; return; }
-  if(wdState.idx>=wdState.list.length) wdState.idx=0;
-  const it=wdState.list[wdState.idx]; wdState.answered=false;
-  const rec=getRec('word',it.id);
-  let html=`<div class="card"><div class="meta">第 ${wdState.idx+1}/${wdState.list.length} 词 · 已对 ${rec.c}/3${it.freq?` · 频次 ${it.freq}`:''}</div>`;
-  html+=`<div class="qtext" style="font-size:26px;font-weight:700;letter-spacing:.5px">${escapeHtml(it.word)}</div>`;
-  html+=`<div class="opts">`;
-  it.options.forEach((o,i)=>{ html+=`<div class="opt" data-oval="${escapeAttr(o)}"><span class="tag">${'ABCD'[i]}</span>${escapeHtml(o)}</div>`; });
-  html+=`</div><div class="feedback" id="wdFb"></div></div>
-   <div class="bottom"><button class="btn ghost" id="wdPrev">◀</button>
-   <button class="btn ghost" id="wdNext">下一词 ▶</button></div>`;
-  box.innerHTML=html;
-  box.querySelectorAll('.opt').forEach(op=>op.onclick=()=>{
-    if(wdState.answered) return; wdState.answered=true;
-    const val=op.dataset.oval; const ok=val===it.meaning;
-    box.querySelectorAll('.opt').forEach(o=>{
-      if(o.dataset.oval===it.meaning) o.classList.add('ok');
-      else if(o===op) o.classList.add('bad');
-    });
-    const rec2=markResult('word',it.id,ok);
-    const fb=document.getElementById('wdFb'); fb.className='feedback show '+(ok?'good':'bad');
-    fb.innerHTML= ok?`✅ 正确！${rec2.m?'🎉 已掌握':`连对 ${rec2.c}/3`}`:`❌ 词义：${escapeHtml(it.meaning)}`;
-    document.getElementById('wordsStat').textContent=`已掌握 ${masteredCount('word')} / ${WD.length}`;
-  });
-  document.getElementById('wdPrev').onclick=()=>{wdState.idx=(wdState.idx-1+wdState.list.length)%wdState.list.length; wdShow();};
-  document.getElementById('wdNext').onclick=()=>{wdState.idx=(wdState.idx+1)%wdState.list.length; wdShow();};
-  document.getElementById('wordsStat').textContent=`已掌握 ${masteredCount('word')} / ${WD.length}`;
-}
-document.querySelectorAll('[data-wd-order]').forEach(el=>el.onclick=()=>{
-  document.querySelectorAll('[data-wd-order]').forEach(x=>x.classList.remove('active'));
-  el.classList.add('active'); wdState.order=el.dataset.wdOrder; wdState.highfreq=false; wdBuildList();
-});
-document.getElementById('wdHighFreq').onclick=()=>{ wdState.highfreq=true; wdBuildList(); };
-
-/* ══════════════════════════════════════════
- *  ④ 数学 / 信号与系统 填空 (自评)
- * ══════════════════════════════════════════ */
-const FL=(window.__QUIZ_FILL__&&window.__QUIZ_FILL__.items)||[];
-const flState={subject:'__all',sub:'__all',order:'seq',idx:0,list:[],revealed:false};
-function flSubjects(){ return [...new Set(FL.map(x=>x.subject||'其他'))] }
-function flSubs(){ return [...new Set(FL.filter(x=>flState.subject==='__all'||(x.subject||'其他')===flState.subject).map(x=>x.sub))] }
-function flBuildList(){
-  let arr=FL.filter(x=>flState.subject==='__all'||(x.subject||'其他')===flState.subject)
-            .filter(x=>flState.sub==='__all'||x.sub===flState.sub)
-            .filter(x=>!(PROG.fill&&PROG.fill[x.id]&&PROG.fill[x.id].m));
-  if(flState.order==='random') arr=shuffle(arr);
-  flState.list=arr; flState.idx=0; flShow();
-}
-function flShow(){
-  const box=document.getElementById('fillCard');
-  if(!FL.length){ box.innerHTML='<div class="empty">填空题库尚未生成</div>'; return; }
-  if(!flState.list.length){ box.innerHTML='<div class="empty">🎉 当前范围已全部掌握</div>'; return; }
-  if(flState.idx>=flState.list.length) flState.idx=0;
-  const it=flState.list[flState.idx]; flState.revealed=false;
-  const rec=getRec('fill',it.id);
-  let html=`<div class="card"><div class="meta">${it.subject?it.subject+' · ':''}${it.sub} · 第 ${flState.idx+1}/${flState.list.length} · 已对 ${rec.c}/3</div>`;
-  html+=`<div class="qtext">${it.q}</div>`;
-  html+=`<div class="btnrow"><button class="btn ghost" id="flReveal">👁 显示答案</button></div>`;
-  html+=`<div class="answer" id="flAns"><div class="lbl">参考答案</div><div id="flAnsBody">${it.a}</div></div>`;
-  html+=`<div class="btnrow" id="flJudge" style="display:none">
-      <button class="btn green" id="flOk">✅ 我答对了</button>
-      <button class="btn red" id="flNo">❌ 答错了</button></div>`;
-  html+=`<div class="feedback" id="flFb"></div></div>
-   <div class="bottom"><button class="btn ghost" id="flPrev">◀ 上一题</button>
-   <button class="btn ghost" id="flNext">下一题 ▶</button></div>`;
-  box.innerHTML=html;
-  renderMath(box);
-  document.getElementById('flReveal').onclick=()=>{
-    document.getElementById('flAns').classList.add('show');
-    document.getElementById('flJudge').style.display='flex';
-    renderMath(document.getElementById('flAns'));
-  };
-  document.getElementById('flOk').onclick=()=>flJudge(true);
-  document.getElementById('flNo').onclick=()=>flJudge(false);
-  document.getElementById('flPrev').onclick=()=>{flState.idx=(flState.idx-1+flState.list.length)%flState.list.length; flShow();};
-  document.getElementById('flNext').onclick=()=>{flState.idx=(flState.idx+1)%flState.list.length; flShow();};
-  document.getElementById('fillStat').textContent=`已掌握 ${masteredCount('fill')} / ${FL.length}`;
-}
-function flJudge(ok){
-  const it=flState.list[flState.idx]; const rec=markResult('fill',it.id,ok);
-  const fb=document.getElementById('flFb'); fb.className='feedback show '+(ok?'good':'bad');
-  fb.innerHTML= ok?`✅ 连对 ${rec.c}/3${rec.m?' 🎉 已掌握，移出题库':''}`:`❌ 已记录，继续加油`;
-  document.getElementById('fillStat').textContent=`已掌握 ${masteredCount('fill')} / ${FL.length}`;
-  document.getElementById('flJudge').style.display='none';
-  if(ok && rec.m) setTimeout(()=>flBuildList(), 900);
-}
-function flRenderSubjects(){
-  const bar=document.getElementById('fillSubjectBar'); bar.innerHTML='';
-  const mk=(v,t)=>{const d=document.createElement('div');d.className='pill'+(flState.subject===v?' active':'');d.textContent=t;
-    d.onclick=()=>{flState.subject=v;flState.sub='__all';flRenderSubjects();flRenderSubs();flBuildList();};return d;};
-  bar.appendChild(mk('__all','全部'));
-  flSubjects().forEach(s=>bar.appendChild(mk(s,s)));
-}
-function flRenderSubs(){
-  const bar=document.getElementById('fillSubBar'); bar.innerHTML='';
-  const mk=(v,t)=>{const d=document.createElement('div');d.className='pill small'+(flState.sub===v?' active':'');d.textContent=t;
-    d.onclick=()=>{flState.sub=v;flRenderSubs();flBuildList();};return d;};
-  bar.appendChild(mk('__all','全部'));
-  flSubs().forEach(s=>bar.appendChild(mk(s,s)));
-}
-document.querySelectorAll('[data-fl-order]').forEach(el=>el.onclick=()=>{
-  document.querySelectorAll('[data-fl-order]').forEach(x=>x.classList.remove('active'));
-  el.classList.add('active'); flState.order=el.dataset.flOrder; flBuildList();
-});
-
-/* ═════════════ KaTeX 渲染 ═════════════ */
 function renderMath(root){
   if(!window.renderMathInElement) return;
   try{
@@ -564,11 +314,670 @@ function renderMath(root){
   }catch(e){}
 }
 
-/* ═════════════ 启动 ═════════════ */
+/* 通用 pill 渲染 */
+function renderPills(box, opts, active, onPick, cls){
+  box.innerHTML='';
+  opts.forEach(o=>{
+    const d=document.createElement('div');
+    d.className='pill'+(cls?' '+cls:'')+(o.v===active?' active':'');
+    d.innerHTML = o.t + (o.n!=null?`<span class="n">${o.n}</span>`:'');
+    d.onclick=()=>onPick(o.v);
+    box.appendChild(d);
+  });
+}
+
+/* 按状态筛选 */
+function filterStatus(kind, arr, status){
+  if(status==='wrong') return arr.filter(x=>{ const r=PROG[kind]&&PROG[kind][x.id]; return r&&r.w>0 });
+  if(status==='all') return arr;
+  return arr.filter(x=>{ const r=PROG[kind]&&PROG[kind][x.id]; return !(r&&r.m) });
+}
+function sortWrong(kind, arr){
+  return arr.slice().sort((a,b)=>{
+    const ra=(PROG[kind]&&PROG[kind][a.id])||{w:0}, rb=(PROG[kind]&&PROG[kind][b.id])||{w:0};
+    return rb.w-ra.w;
+  });
+}
+
+/* ══════════════════ 顶部 tab ══════════════════ */
+function setTab(name){
+  document.querySelectorAll('#tabs [data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));
+  document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id==='page-'+name));
+  window.scrollTo(0,0);
+  if(name==='wrong') renderWrongBook();
+  if(name==='stats') renderStats();
+  if(name==='words' && wdState.view==='list') renderWordsList();
+}
+document.querySelectorAll('#tabs [data-tab]').forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
+
+/* ══════════════════ ① 挖空 ══════════════════ */
+const CLZ = (window.__QUIZ_CLOZE__ && window.__QUIZ_CLOZE__.items) || [];
+const clzState = { book:'__all', sub:'__all', status:'todo', mode:'type', order:'seq', idx:0, list:[], cur:null, answered:false };
+
+function clzBooks(){ return [...new Set(CLZ.map(x=>x.book))] }
+function clzSubs(){ return [...new Set(CLZ.filter(x=>clzState.book==='__all'||x.book===clzState.book).map(x=>x.sub).filter(Boolean))] }
+function clzScopeItems(){
+  return CLZ.filter(x=> (clzState.book==='__all'||x.book===clzState.book) &&
+                        (clzState.sub==='__all'||x.sub===clzState.sub));
+}
+function clzBuildList(startId){
+  const base = clzScopeItems();
+  let arr = filterStatus('cloze', base, clzState.status);
+  if(clzState.status==='wrong') arr = sortWrong('cloze', arr);
+  else if(clzState.order!=='seq') arr = shuffle(arr);
+  clzState.list = arr;
+  clzState.idx = Math.max(0, startId? arr.findIndex(x=>x.id===startId):0);
+  clzRenderFilters(); clzShow();
+}
+function clzRenderFilters(){
+  renderPills(document.getElementById('clozeBookBar'),
+    [{v:'__all',t:'全部'}].concat(clzBooks().map(b=>({v:b,t:b}))), clzState.book,
+    v=>{ clzState.book=v; clzState.sub='__all'; clzBuildList(); });
+  renderPills(document.getElementById('clozeSubBar'),
+    [{v:'__all',t:'全部章节'}].concat(clzSubs().map(s=>({v:s,t:s}))), clzState.sub,
+    v=>{ clzState.sub=v; clzBuildList(); }, 'soft');
+  renderPills(document.getElementById('clozeStatusBar'),
+    [{v:'todo',t:'待练'},{v:'wrong',t:'只练错题'},{v:'all',t:'全部'}], clzState.status,
+    v=>{ clzState.status=v; clzBuildList(); }, 'soft');
+  renderPills(document.getElementById('clozeModeBar'),
+    [{v:'type',t:'文字填入'},{v:'choice',t:'选项选择'},{v:'seq',t:'顺序'},{v:'shuffle',t:'乱序'}],
+    clzState.mode==='choice'?'choice':clzState.order==='shuffle'?'shuffle':'type',
+    v=>{
+      if(v==='type'||v==='choice'){ clzState.mode=v; }
+      else { clzState.order=v; clzBuildList(); return; }
+      clzRenderFilters(); clzShow();
+    }, 'soft');
+  document.getElementById('clozeScope').textContent =
+    (clzState.book==='__all'?'全部':clzState.book) + (clzState.sub==='__all'?'':' · '+clzState.sub);
+}
+function clzRenderStat(){
+  const total = clzScopeItems().length, m = masteredCount('cloze');
+  const el = document.getElementById('clozeStat');
+  const pct = total? Math.round(m/total*100):0;
+  el.innerHTML = `<span>掌握 <b>${m}</b>/${total}</span>
+    <div class="progress"><i style="width:${pct}%"></i></div>
+    <span>错题 <b>${wrongCount('cloze')}</b> · 本轮 <b>${clzState.list.length}</b></span>`;
+}
+function clzShow(){
+  clzRenderStat();
+  const box = document.getElementById('clozeCard');
+  if(!clzState.list.length){
+    box.innerHTML = `<div class="empty">🎉 当前范围没有待练题目<br>切换「状态」可查看全部或错题</div>`; return;
+  }
+  if(clzState.idx>=clzState.list.length) clzState.idx=0;
+  const it = clzState.list[clzState.idx];
+  clzState.cur=it; clzState.answered=false;
+  const rec = getRec('cloze', it.id);
+
+  let html = `<div class="card"><div class="meta">
+      <span class="chip">${esc(it.book)}</span><span class="chip">${esc(it.sub||'综合')}</span>
+      <span class="chip a2">第 ${clzState.idx+1}/${clzState.list.length} 题</span>
+      ${rec.c?`<span class="chip gold">连对 ${Math.min(rec.c,3)}/3</span>`:''}
+      ${rec.w?`<span class="chip" style="color:var(--red)">错 ${rec.w}</span>`:''}
+    </div>`;
+
+  if(clzState.mode==='type'){
+    const parts = it.template.split(/〔\d+〕/);
+    let t='';
+    for(let i=0;i<parts.length;i++){
+      t += esc(parts[i]);
+      if(i<it.blanks.length) t += `<input class="inp" data-bi="${i}" autocomplete="off" placeholder="空${i+1}">`;
+    }
+    html += `<div class="qtext">${t}</div>
+      <div class="btnrow"><button class="btn" id="clzSubmit">提交答案</button>
+      <button class="btn ghost" id="clzShowAns">看答案</button></div>`;
+  } else {
+    html += `<div class="qtext">${esc(it.template).replace(/〔(\d+)〕/g,'<span class="blank">〔空$1〕</span>')}</div>`;
+    it.blanks.forEach((ans,bi)=>{
+      html += `<div style="margin-top:16px;font-size:11px;color:var(--muted);letter-spacing:1px">空 ${bi+1}</div>
+        <div class="opts" data-bopts="${bi}">`;
+      (it.options[bi]||[]).forEach(o=>{
+        html += `<div class="opt" data-oval="${esc(o)}"><span class="key">?</span><span>${esc(o)}</span></div>`;
+      });
+      html += `</div>`;
+    });
+    html += `<div class="btnrow"><button class="btn" id="clzSubmit">提交答案</button></div>`;
+  }
+  html += `<div class="feedback" id="clzFb"></div></div>
+    <div class="bottom">
+      <button class="btn ghost mini" id="clzPrev">◀</button>
+      <button class="btn ghost" id="clzNext">下一题 ▶</button>
+    </div>`;
+  box.innerHTML = html;
+
+  if(clzState.mode==='choice'){
+    box.querySelectorAll('.opts').forEach(row=>{
+      row.querySelectorAll('.opt').forEach(op=>op.onclick=()=>{
+        row.querySelectorAll('.opt').forEach(o=>o.classList.remove('sel'));
+        op.classList.add('sel');
+      });
+    });
+  }
+  document.getElementById('clzSubmit').onclick = clzCheck;
+  const sa = document.getElementById('clzShowAns');
+  if(sa) sa.onclick = ()=>{
+    const fb=document.getElementById('clzFb'); fb.className='feedback show info';
+    fb.innerHTML = '答案：' + it.blanks.map((b,i)=>`<b>${i+1}.</b> ${esc(b)}`).join('　');
+    clzState.answered = true;
+  };
+  document.getElementById('clzPrev').onclick = ()=>{ clzState.idx=(clzState.idx-1+clzState.list.length)%clzState.list.length; clzShow(); };
+  document.getElementById('clzNext').onclick = ()=>{ clzState.idx=(clzState.idx+1)%clzState.list.length; clzShow(); };
+  clzRenderStat();
+}
+function clzCheck(){
+  if(clzState.answered) return;
+  const it = clzState.cur, fb=document.getElementById('clzFb');
+  let allOk=true;
+  if(clzState.mode==='type'){
+    document.querySelectorAll('#clozeCard .inp').forEach(inp=>{
+      const bi=+inp.dataset.bi;
+      const user=(inp.value||'').trim().replace(/\s+/g,'');
+      const ans=(it.blanks[bi]||'').replace(/\s+/g,'');
+      const ok = user && (user===ans || (ans.includes(user) && user.length>=Math.max(2,ans.length-2)));
+      inp.classList.add(ok?'ok':'bad');
+      if(!ok){ if(!inp.value.trim()) inp.value = it.blanks[bi]; }
+      allOk = allOk && ok;
+    });
+  } else {
+    it.blanks.forEach((ans,bi)=>{
+      const row=document.querySelector(`[data-bopts="${bi}"]`);
+      const sel=row.querySelector('.opt.sel');
+      const val=sel?sel.dataset.oval:'';
+      const ok = val===ans;
+      row.querySelectorAll('.opt').forEach(o=>{
+        if(o.dataset.oval===ans){ o.classList.add('ok'); o.querySelector('.key').textContent='✓'; }
+        else if(o.classList.contains('sel')) o.classList.add('bad');
+      });
+      allOk = allOk && ok;
+    });
+  }
+  const rec = markResult('cloze', it.id, allOk);
+  fb.className='feedback show '+(allOk?'good':'bad');
+  fb.innerHTML = allOk
+    ? `✅ 全部正确！${rec.m?'🎉 已掌握，移出题库':`连对 ${rec.c}/3`}`
+    : `❌ 有误。正确答案：${it.blanks.map((b,i)=>`<b>${i+1}.</b> ${esc(b)}`).join('　')}`;
+  clzState.answered = true;
+  clzRenderStat();
+  if(allOk && rec.m) setTimeout(()=>clzBuildList(), 1000);
+}
+
+/* ══════════════════ ② 选择题 ══════════════════ */
+const CH = (window.__QUIZ_CHOICE__ && window.__QUIZ_CHOICE__.items) || [];
+const chState = { set:'__all', type:'all', status:'todo', order:'seq', idx:0, list:[], answered:false, timer:null, done:{} };
+
+function chSets(){ return [...new Set(CH.map(x=>x.set))] }
+function chScopeItems(){
+  return CH.filter(x=> chState.set==='__all'||x.set===chState.set)
+           .filter(x=> chState.type==='all' || (chState.type==='multi'? x.multi||x.answer.length>1 : !(x.multi||x.answer.length>1)));
+}
+function chBuildList(startId){
+  const base = chScopeItems();
+  let arr = filterStatus('choice', base, chState.status);
+  if(chState.status==='wrong') arr = sortWrong('choice', arr);
+  else if(chState.order==='random') arr = shuffle(arr);
+  chState.list=arr;
+  chState.idx = Math.max(0, startId? arr.findIndex(x=>x.id===startId):0);
+  chRenderFilters(); chShow();
+}
+function chRenderFilters(){
+  renderPills(document.getElementById('choiceSetBar'),
+    [{v:'__all',t:'全部'}].concat(chSets().map(s=>({v:s,t:s.replace('肖八·','')}))), chState.set,
+    v=>{ chState.set=v; chBuildList(); });
+  renderPills(document.getElementById('choiceTypeBar'),
+    [{v:'all',t:'全部'},{v:'single',t:'单选'},{v:'multi',t:'多选'}], chState.type,
+    v=>{ chState.type=v; chBuildList(); }, 'soft');
+  renderPills(document.getElementById('choiceStatusBar'),
+    [{v:'todo',t:'待练'},{v:'wrong',t:'只练错题'},{v:'all',t:'全部'}], chState.status,
+    v=>{ chState.status=v; chBuildList(); }, 'soft');
+  renderPills(document.getElementById('choiceOrderBar'),
+    [{v:'seq',t:'顺序'},{v:'random',t:'随机'}], chState.order,
+    v=>{ chState.order=v; chBuildList(); }, 'soft');
+  document.getElementById('choiceScope').textContent =
+    (chState.set==='__all'?'全部套卷':chState.set.replace('肖八·','')) +
+    (chState.type==='all'?'':' · '+(chState.type==='multi'?'多选':'单选'));
+}
+function chStatText(){
+  const total = chScopeItems().length, m = masteredCount('choice');
+  const pct = total? Math.round(m/total*100):0;
+  document.getElementById('choiceStat').innerHTML =
+    `<span>掌握 <b>${m}</b>/${total}</span>
+     <div class="progress"><i style="width:${pct}%"></i></div>
+     <span>错题 <b>${wrongCount('choice')}</b> · 本轮 <b>${chState.list.length}</b></span>`;
+}
+function chShow(){
+  chStatText();
+  if(chState.timer){ clearTimeout(chState.timer); chState.timer=null; }
+  const box=document.getElementById('choiceCard');
+  if(!CH.length){ box.innerHTML='<div class="empty">选择题题库尚未生成</div>'; return; }
+  if(!chState.list.length){
+    box.innerHTML='<div class="empty">🎉 当前范围没有待练题目<br>切换「状态」可查看全部或错题</div>'; return;
+  }
+  if(chState.idx>=chState.list.length) chState.idx=0;
+  const it=chState.list[chState.idx]; chState.answered=false;
+  const rec=getRec('choice',it.id);
+  const isDone=!!chState.done[it.id];
+  const multi = it.answer.length>1 || it.multi;
+  let html=`<div class="card"><div class="meta">
+      <span class="chip">${esc(it.set.replace('肖八·',''))}</span>
+      <span class="chip">第 ${it.no} 题</span>
+      <span class="chip a2">${multi?'多选':'单选'}</span>
+      <span class="chip">${chState.idx+1}/${chState.list.length}</span>
+      ${isDone?'<span class="chip" style="color:var(--green)">已作答</span>':''}
+      ${rec.c?`<span class="chip gold">已对 ${Math.min(rec.c,3)}/3</span>`:''}
+      ${rec.w?`<span class="chip" style="color:var(--red)">错 ${rec.w}</span>`:''}
+    </div>
+    <div class="qtext">${esc(it.stem)}</div><div class="opts">`;
+  ['A','B','C','D'].forEach(k=>{
+    if(it.options[k]!=null){
+      html+=`<div class="opt${isDone&&it.answer.includes(k)?' ok':''}" data-ok="${k}"><span class="key">${isDone&&it.answer.includes(k)?'✓':k}</span><span>${esc(it.options[k])}</span></div>`;
+    }
+  });
+  html+=`</div>${isDone?'':`<div class="btnrow"><button class="btn" id="chSubmit">提交</button></div>`}
+    <div class="feedback" id="chFb"></div>
+    <div class="answer${isDone?' show':''}" id="chAns"><div class="lbl">解析 · 正确答案 ${esc(it.answer)}</div>
+      <div class="body" id="chAnsBody">${esc(it.explain||'暂无解析')}</div></div></div>
+    <div class="bottom">
+      <button class="btn ghost mini" id="chPrev">◀</button>
+      <button class="btn ghost mini" id="chExp">💡 解析</button>
+      <button class="btn ghost" id="chNext">下一题 ▶</button>
+    </div>`;
+  box.innerHTML=html;
+  if(isDone) chState.answered=true;
+  box.querySelectorAll('.opt').forEach(op=>op.onclick=()=>{
+    if(chState.answered) return;
+    if(multi) op.classList.toggle('sel');
+    else { box.querySelectorAll('.opt').forEach(o=>o.classList.remove('sel')); op.classList.add('sel'); }
+  });
+  const sub=document.getElementById('chSubmit');
+  if(sub) sub.onclick=chCheck;
+  document.getElementById('chExp').onclick=()=>{
+    document.getElementById('chAns').classList.toggle('show');
+  };
+  document.getElementById('chPrev').onclick=()=>{chState.idx=(chState.idx-1+chState.list.length)%chState.list.length; chShow();};
+  document.getElementById('chNext').onclick=()=>{chState.idx=(chState.idx+1)%chState.list.length; chShow();};
+  chStatText();
+}
+function chCheck(){
+  if(chState.answered) return;
+  if(chState.timer){ clearTimeout(chState.timer); chState.timer=null; }
+  chState.answered=true;
+  const it=chState.list[chState.idx], box=document.getElementById('choiceCard');
+  chState.done[it.id]=true;
+  const sel=[...box.querySelectorAll('.opt.sel')].map(o=>o.dataset.ok).sort().join('');
+  const ans=(it.answer||'').split('').sort().join('');
+  const ok=sel===ans;
+  box.querySelectorAll('.opt').forEach(o=>{
+    const k=o.dataset.ok;
+    if(ans.includes(k)) o.classList.add('ok');
+    else if(o.classList.contains('sel')) o.classList.add('bad');
+  });
+  const rec=markResult('choice',it.id,ok);
+  const fb=document.getElementById('chFb');
+  fb.className='feedback show '+(ok?'good':'bad');
+  fb.innerHTML = ok
+    ? `✅ 正确！${rec.m?'🎉 已掌握':`连对 ${rec.c}/3`}　<span style="color:var(--muted)">即将进入下一题…</span>`
+    : `❌ 正确答案：<b>${esc(it.answer)}</b>`;
+  document.getElementById('chAns').classList.add('show');
+  document.getElementById('chSubmit').disabled = true;
+  chStatText();
+  // 答对自动下一题
+  if(ok){
+    chState.timer = setTimeout(()=>{
+      chState.timer=null;
+      if(!chState.list.length) return;
+      chState.idx=(chState.idx+1)%chState.list.length;
+      chShow();
+    }, 750);
+  }
+}
+
+/* ══════════════════ ③ 单词 ══════════════════ */
+const WD = (window.__QUIZ_WORDS__ && window.__QUIZ_WORDS__.items) || [];
+const wdState = { view:'practice', range:'all', status:'todo', order:'seq', idx:0, list:[], answered:false };
+const WD_HI = 2;
+
+function wdScopeItems(){
+  let arr = WD.slice();
+  if(wdState.range==='high') arr = arr.filter(x=>(x.freq||0)>=WD_HI);
+  return arr;
+}
+function wdBuildList(startId){
+  let arr = filterStatus('word', wdScopeItems(), wdState.status);
+  if(wdState.status==='wrong') arr = sortWrong('word', arr);
+  else if(wdState.order==='random') arr = shuffle(arr);
+  else arr.sort((a,b)=>(b.freq||0)-(a.freq||0));
+  wdState.list=arr;
+  wdState.idx = Math.max(0, startId? arr.findIndex(x=>x.id===startId):0);
+  wdRenderFilters(); wdShow();
+}
+function wdRenderFilters(){
+  renderPills(document.getElementById('wordsRangeBar'),
+    [{v:'all',t:'全部词汇'},{v:'high',t:'🔥 高频',n:WD.filter(x=>(x.freq||0)>=WD_HI).length}], wdState.range,
+    v=>{ wdState.range=v; wdBuildList(); });
+  renderPills(document.getElementById('wordsStatusBar'),
+    [{v:'todo',t:'待练'},{v:'wrong',t:'只练错题'},{v:'all',t:'全部'}], wdState.status,
+    v=>{ wdState.status=v; wdBuildList(); }, 'soft');
+  renderPills(document.getElementById('wordsOrderBar'),
+    [{v:'seq',t:'高频优先'},{v:'random',t:'随机'}], wdState.order,
+    v=>{ wdState.order=v; wdBuildList(); }, 'soft');
+  document.getElementById('wordsScope').textContent =
+    (wdState.range==='high'?'高频词':'全部词汇');
+}
+function wdStatText(){
+  const total = wdScopeItems().length, m = masteredCount('word');
+  const pct = total? Math.round(m/total*100):0;
+  document.getElementById('wordsStat').innerHTML =
+    `<span>掌握 <b>${m}</b>/${total}</span>
+     <div class="progress"><i style="width:${pct}%"></i></div>
+     <span>错题 <b>${wrongCount('word')}</b> · 本轮 <b>${wdState.list.length}</b></span>`;
+}
+function wdShow(){
+  wdStatText();
+  const box=document.getElementById('wordsCard');
+  if(!WD.length){ box.innerHTML='<div class="empty">单词题库尚未生成</div>'; return; }
+  if(!wdState.list.length){
+    box.innerHTML='<div class="empty">🎉 当前范围没有待练单词<br>切换「状态」可查看全部或错题</div>'; return;
+  }
+  if(wdState.idx>=wdState.list.length) wdState.idx=0;
+  const it=wdState.list[wdState.idx]; wdState.answered=false;
+  const rec=getRec('word',it.id);
+  let html=`<div class="card"><div class="meta">
+      <span class="chip">第 ${wdState.idx+1}/${wdState.list.length} 词</span>
+      ${it.freq?`<span class="chip gold">频次 ${it.freq}</span>`:''}
+      ${rec.c?`<span class="chip a2">已对 ${Math.min(rec.c,3)}/3</span>`:''}
+      ${rec.w?`<span class="chip" style="color:var(--red)">错 ${rec.w}</span>`:''}
+    </div>
+    <div class="wordbig">${esc(it.word)}</div>
+    <div class="opts">`;
+  it.options.forEach((o,i)=>{ html+=`<div class="opt" data-oval="${esc(o)}"><span class="key">${'ABCD'[i]}</span><span>${esc(o)}</span></div>`; });
+  html+=`</div><div class="feedback" id="wdFb"></div></div>
+   <div class="bottom"><button class="btn ghost mini" id="wdPrev">◀</button>
+   <button class="btn ghost" id="wdNext">下一词 ▶</button></div>`;
+  box.innerHTML=html;
+  box.querySelectorAll('.opt').forEach(op=>op.onclick=()=>{
+    if(wdState.answered) return;
+    wdState.answered=true;
+    const val=op.dataset.oval, ok=val===it.meaning;
+    box.querySelectorAll('.opt').forEach(o=>{
+      if(o.dataset.oval===it.meaning){ o.classList.add('ok'); o.querySelector('.key').textContent='✓'; }
+      else if(o===op) o.classList.add('bad');
+    });
+    const rec2=markResult('word',it.id,ok);
+    const fb=document.getElementById('wdFb'); fb.className='feedback show '+(ok?'good':'bad');
+    fb.innerHTML = ok?`✅ 正确！${rec2.m?'🎉 已掌握':`连对 ${rec2.c}/3`}`:`❌ 词义：<b>${esc(it.meaning)}</b>`;
+    wdStatText();
+  });
+  document.getElementById('wdPrev').onclick=()=>{wdState.idx=(wdState.idx-1+wdState.list.length)%wdState.list.length; wdShow();};
+  document.getElementById('wdNext').onclick=()=>{wdState.idx=(wdState.idx+1)%wdState.list.length; wdShow();};
+}
+/* 单词清单 */
+const wdListState = { range:'high' };
+function renderWordsList(){
+  const box=document.getElementById('wordsListBox');
+  renderPills(document.getElementById('wordsListRange'),
+    [{v:'high',t:'🔥 高频词'},{v:'all',t:'全部词汇'}], wdListState.range,
+    v=>{ wdListState.range=v; renderWordsList(); });
+  const q=(document.getElementById('wordsSearch').value||'').trim().toLowerCase();
+  let arr = WD.slice();
+  if(wdListState.range==='high') arr = arr.filter(x=>(x.freq||0)>=WD_HI);
+  if(q) arr = arr.filter(x=> (x.word||'').toLowerCase().includes(q) || (x.meaning||'').includes(q));
+  arr.sort((a,b)=>(b.freq||0)-(a.freq||0) || (a.word||'').localeCompare(b.word||''));
+  document.getElementById('wordsListStat').innerHTML =
+    `<span>${wdListState.range==='high'?`高频词（频次 ≥ ${WD_HI}）`:'全部词汇'} <b>${arr.length}</b> 个 · 全部 ${WD.length} 个</span>`;
+  if(!arr.length){ box.innerHTML='<div class="empty">没有匹配的单词</div>'; return; }
+  box.innerHTML = arr.map(x=>{
+    const rec=PROG.word&&PROG.word[x.id];
+    return `<div class="wrow">
+      <span class="w">${esc(x.word)}</span>
+      <span class="m">${esc(x.meaning)}</span>
+      ${x.freq?`<span class="f">×${x.freq}</span>`:''}
+      ${rec&&rec.m?'<span class="done">已掌握</span>':''}
+    </div>`;
+  }).join('');
+}
+document.querySelectorAll('#wordsSeg [data-wmode]').forEach(b=>b.onclick=()=>{
+  wdState.view=b.dataset.wmode;
+  document.querySelectorAll('#wordsSeg [data-wmode]').forEach(x=>x.classList.toggle('active',x===b));
+  document.getElementById('wordsPractice').style.display = wdState.view==='practice'?'block':'none';
+  document.getElementById('wordsList').style.display = wdState.view==='list'?'block':'none';
+  if(wdState.view==='list') renderWordsList(); else wdShow();
+});
+document.getElementById('wordsSearch').addEventListener('input',renderWordsList);
+
+/* ══════════════════ ④ 填空 ══════════════════ */
+const FL = (window.__QUIZ_FILL__ && window.__QUIZ_FILL__.items) || [];
+const flState = { subject:'__all', sub:'__all', status:'todo', order:'seq', idx:0, list:[], revealed:false };
+
+function flSubjects(){ return [...new Set(FL.map(x=>x.subject||'其他'))] }
+function flSubs(){ return [...new Set(FL.filter(x=>flState.subject==='__all'||(x.subject||'其他')===flState.subject).map(x=>x.sub))] }
+function flScopeItems(){
+  return FL.filter(x=> flState.subject==='__all'||(x.subject||'其他')===flState.subject)
+           .filter(x=> flState.sub==='__all'||x.sub===flState.sub);
+}
+function flBuildList(startId){
+  let arr = filterStatus('fill', flScopeItems(), flState.status);
+  if(flState.status==='wrong') arr = sortWrong('fill', arr);
+  else if(flState.order==='random') arr = shuffle(arr);
+  flState.list=arr;
+  flState.idx = Math.max(0, startId? arr.findIndex(x=>x.id===startId):0);
+  flRenderFilters(); flShow();
+}
+function flShortSub(s){ return (s||'').replace('冲刺·',''); }
+function flRenderFilters(){
+  renderPills(document.getElementById('fillSubjectBar'),
+    [{v:'__all',t:'全部'}].concat(flSubjects().map(s=>({v:s,t:s}))), flState.subject,
+    v=>{ flState.subject=v; flState.sub='__all'; flBuildList(); });
+  const subs = flSubs();
+  document.getElementById('fillSubRow').style.display = subs.length? 'flex':'none';
+  renderPills(document.getElementById('fillSubBar'),
+    [{v:'__all',t:'全部章节'}].concat(subs.map(s=>({v:s,t:flShortSub(s)}))), flState.sub,
+    v=>{ flState.sub=v; flBuildList(); }, 'soft');
+  renderPills(document.getElementById('fillStatusBar'),
+    [{v:'todo',t:'待练'},{v:'wrong',t:'只练错题'},{v:'all',t:'全部'}], flState.status,
+    v=>{ flState.status=v; flBuildList(); }, 'soft');
+  renderPills(document.getElementById('fillOrderBar'),
+    [{v:'seq',t:'顺序'},{v:'random',t:'随机'}], flState.order,
+    v=>{ flState.order=v; flBuildList(); }, 'soft');
+  document.getElementById('fillScope').textContent =
+    (flState.subject==='__all'?'全部科目':flState.subject) + (flState.sub==='__all'?'':' · '+flShortSub(flState.sub));
+}
+function flStatText(){
+  const total = flScopeItems().length, m = masteredCount('fill');
+  const pct = total? Math.round(m/total*100):0;
+  document.getElementById('fillStat').innerHTML =
+    `<span>掌握 <b>${m}</b>/${total}</span>
+     <div class="progress"><i style="width:${pct}%"></i></div>
+     <span>错题 <b>${wrongCount('fill')}</b> · 本轮 <b>${flState.list.length}</b></span>`;
+}
+function flShow(){
+  flStatText();
+  const box=document.getElementById('fillCard');
+  if(!FL.length){ box.innerHTML='<div class="empty">填空题库尚未生成</div>'; return; }
+  if(!flState.list.length){
+    box.innerHTML='<div class="empty">🎉 当前范围没有待练题目<br>切换「状态」可查看全部或错题</div>'; return;
+  }
+  if(flState.idx>=flState.list.length) flState.idx=0;
+  const it=flState.list[flState.idx]; flState.revealed=false;
+  const rec=getRec('fill',it.id);
+  const q = esc(it.q).replace(/〔(\d+)〕/g,'<span class="blank">〔空$1〕</span>');
+  let html=`<div class="card"><div class="meta">
+      <span class="chip">${esc(it.subject||'其他')}</span>
+      <span class="chip">${esc(flShortSub(it.sub))}</span>
+      <span class="chip a2">第 ${flState.idx+1}/${flState.list.length} 题</span>
+      ${rec.c?`<span class="chip gold">已对 ${Math.min(rec.c,3)}/3</span>`:''}
+      ${rec.w?`<span class="chip" style="color:var(--red)">错 ${rec.w}</span>`:''}
+    </div>
+    <div class="qtext">${q}</div>
+    <div class="btnrow"><button class="btn ghost" id="flReveal">👁 显示答案</button></div>
+    <div class="answer" id="flAns"><div class="lbl">参考答案</div><div class="body" id="flAnsBody">${esc(it.a)}</div></div>
+    <div class="btnrow" id="flJudge" style="display:none">
+      <button class="btn green" id="flOk">✅ 我答对了</button>
+      <button class="btn red" id="flNo">❌ 答错了</button>
+    </div>
+    <div class="feedback" id="flFb"></div></div>
+    <div class="bottom"><button class="btn ghost mini" id="flPrev">◀</button>
+    <button class="btn ghost" id="flNext">下一题 ▶</button></div>`;
+  box.innerHTML=html;
+  renderMath(box);
+  document.getElementById('flReveal').onclick=()=>{
+    document.getElementById('flAns').classList.add('show');
+    document.getElementById('flJudge').style.display='flex';
+    document.getElementById('flReveal').style.display='none';
+    renderMath(document.getElementById('flAnsBody'));
+  };
+  document.getElementById('flOk').onclick=()=>flJudge(true);
+  document.getElementById('flNo').onclick=()=>flJudge(false);
+  document.getElementById('flPrev').onclick=()=>{flState.idx=(flState.idx-1+flState.list.length)%flState.list.length; flShow();};
+  document.getElementById('flNext').onclick=()=>{flState.idx=(flState.idx+1)%flState.list.length; flShow();};
+  flStatText();
+}
+function flJudge(ok){
+  const it=flState.list[flState.idx];
+  const rec=markResult('fill',it.id,ok);
+  const fb=document.getElementById('flFb'); fb.className='feedback show '+(ok?'good':'bad');
+  fb.innerHTML = ok?`✅ 连对 ${rec.c}/3${rec.m?' 🎉 已掌握，移出题库':''}`:`❌ 已记入错题本，记得回看`;
+  document.getElementById('flJudge').style.display='none';
+  flStatText();
+  if(ok && rec.m) setTimeout(()=>flBuildList(), 1000);
+}
+
+/* ══════════════════ ⑤ 错题本 ══════════════════ */
+const wrongState = { kind:'all' };
+const KIND_INFO = {
+  cloze:{name:'挖空', cls:'', items:()=>CLZ, text:x=>esc((x.template||'').replace(/〔\d+〕/g,'____')).slice(0,120)},
+  choice:{name:'选择', cls:'k2', items:()=>CH, text:x=>esc(x.stem).slice(0,120)},
+  word:{name:'单词', cls:'k3', items:()=>WD, text:x=>`${esc(x.word)} <span style="color:var(--muted)">— ${esc(x.meaning)}</span>`},
+  fill:{name:'填空', cls:'k4', items:()=>FL, text:x=>esc(x.q).slice(0,120)}
+};
+const KIND_BUILD = {cloze:clzBuildList, choice:chBuildList, word:wdBuildList, fill:flBuildList};
+const KIND_STATE = {cloze:clzState, choice:chState, word:wdState, fill:flState};
+
+function renderWrongBook(){
+  const kinds = wrongState.kind==='all'? ['cloze','choice','word','fill'] : [wrongState.kind];
+  let rows=[]; let total=0;
+  kinds.forEach(k=>{
+    const info=KIND_INFO[k];
+    (info.items()).forEach(it=>{
+      const r=PROG[k]&&PROG[k][it.id];
+      if(r && r.w>0){ total++; rows.push({k, it, r}); }
+    });
+  });
+  rows.sort((a,b)=>b.r.w-a.r.w);
+  const bar=document.getElementById('wrongKindBar');
+  renderPills(bar,[
+    {v:'all',t:'全部', n:['cloze','choice','word','fill'].reduce((s,k)=>s+wrongCount(k),0)},
+    {v:'cloze',t:'挖空',n:wrongCount('cloze')},
+    {v:'choice',t:'选择',n:wrongCount('choice')},
+    {v:'word',t:'单词',n:wrongCount('word')},
+    {v:'fill',t:'填空',n:wrongCount('fill')}
+  ], wrongState.kind, v=>{ wrongState.kind=v; renderWrongBook(); });
+
+  document.getElementById('wrongTotal').textContent = total+' 道';
+  document.getElementById('wrongStat').innerHTML =
+    `<span>错得多排前面，点任意一题即可开始「只练错题」</span>`;
+  const box=document.getElementById('wrongList');
+  if(!rows.length){
+    box.innerHTML='<div class="empty">🎉 还没有错题记录<br>做错的题会自动收进这里</div>'; return;
+  }
+  box.innerHTML = rows.map((row,i)=>{
+    const info=KIND_INFO[row.k];
+    return `<div class="wrow wrong" data-k="${row.k}" data-id="${row.it.id}">
+      <div class="top">
+        <span class="kbadge ${info.cls}">${info.name}</span>
+        <span style="font-size:11px;color:var(--muted)">${row.k==='choice'?esc(row.it.set.replace('肖八·',''))+' · 第'+row.it.no+'题':''}</span>
+        <span class="wcnt">错 ${row.r.w} 次 · 对 ${row.r.c} 次</span>
+      </div>
+      <div class="txt">${info.text(row.it)}</div>
+    </div>`;
+  }).join('');
+  box.querySelectorAll('.wrow').forEach(el=>el.onclick=()=>{
+    practiceWrong(el.dataset.k, el.dataset.id);
+  });
+}
+function practiceWrong(kind, id){
+  const st=KIND_STATE[kind];
+  st.status='wrong';
+  KIND_BUILD[kind](id);
+  setTab(kind==='word'?'words':kind);
+  if(kind==='word'){ wdState.view='practice'; document.querySelectorAll('#wordsSeg [data-wmode]').forEach(x=>x.classList.toggle('active', x.dataset.wmode==='practice')); document.getElementById('wordsPractice').style.display='block'; document.getElementById('wordsList').style.display='none'; }
+}
+
+/* ══════════════════ ⑥ 评估 ══════════════════ */
+function groupStats(kind, items, keyFn){
+  const map={};
+  items.forEach(it=>{
+    const r=PROG[kind]&&PROG[kind][it.id];
+    if(!r) return;
+    const att=r.c+r.w;
+    if(att<=0) return;
+    const k=keyFn(it)||'其他';
+    const g=map[k]||(map[k]={name:k,total:0,att:0,ok:0,m:0});
+    g.att+=att; g.ok+=r.c; g.total++; if(r.m) g.m++;
+  });
+  return Object.values(map).map(g=>Object.assign(g,{acc: g.att? g.ok/g.att:0}));
+}
+function barColor(acc){ return acc<0.5?'bad':acc<0.75?'warn':''; }
+function renderStats(){
+  const kinds=[
+    {k:'cloze', name:'政治挖空', items:CLZ, total:CLZ.length},
+    {k:'choice', name:'肖八选择', items:CH, total:CH.length},
+    {k:'word', name:'英语单词', items:WD, total:WD.length},
+    {k:'fill', name:'数学/信号/政治填空', items:FL, total:FL.length}
+  ];
+  let allC=0, allW=0;
+  const cards = kinds.map(x=>{
+    const d=PROG[x.k]||{};
+    let c=0,w=0;
+    Object.values(d).forEach(r=>{ c+=r.c; w+=r.w; });
+    allC+=c; allW+=w;
+    const acc = (c+w)? c/(c+w):0;
+    return `<div class="kcard">
+      <div class="t">${x.name}</div>
+      <div class="v" style="color:${acc>=0.75?'var(--green)':acc>=0.5?'var(--gold)':'var(--red)'}">${c+w?Math.round(acc*100)+'%':'—'}</div>
+      <div class="s">掌握 ${masteredCount(x.k)}/${x.total} · 错题 ${wrongCount(x.k)}</div>
+    </div>`;
+  }).join('');
+  cards && (document.getElementById('statsCards').innerHTML = cards);
+
+  const groups = [
+    ...groupStats('cloze', CLZ, it=>it.book+' · '+(it.sub||'综合')),
+    ...groupStats('choice', CH, it=>it.set.replace('肖八·','套卷')),
+    ...groupStats('word', WD, ()=> '英语词汇'),
+    ...groupStats('fill', FL, it=>(it.subject||'其他')+' · '+(it.sub||''))
+  ].sort((a,b)=>a.acc-b.acc || b.att-a.att);
+
+  const shown = groups.filter(g=>g.att>=2).slice(0,14);
+  document.getElementById('statsGroups').innerHTML = shown.length? `<div class="bars">${
+    shown.map(g=>`<div class="brow">
+      <div class="bt"><span>${esc(g.name)}</span><span>${Math.round(g.acc*100)}% · ${g.att}次</span></div>
+      <div class="btrack"><i class="${barColor(g.acc)}" style="width:${Math.max(3,Math.round(g.acc*100))}%"></i></div>
+    </div>`).join('')}</div>` : '<div class="empty">还没有足够的作答记录<br>先去练几题吧</div>';
+
+  // 建议
+  const weak = groups.filter(g=>g.att>=2 && g.acc<0.75).slice(0,3);
+  let advice='';
+  if(!groups.length){
+    advice = `<div class="advice">📌 还没有作答数据。建议先各科目做 10 题以上，系统会自动分析你的薄弱章节。</div>`;
+  } else if(!weak.length){
+    advice = `<div class="advice">🌟 目前各章节正确率都在 75% 以上，状态不错！建议保持每日训练，并把错题本里的题重练一遍巩固。</div>`;
+  } else {
+    advice = weak.map(g=>{
+      const rate = Math.round(g.acc*100);
+      return `<div class="advice">📌 <b>${esc(g.name)}</b> 正确率仅 ${rate}%（作答 ${g.att} 次）。建议回到该章节原文，先理解再刷题，并在「错题本」中做专项重练。</div>`;
+    }).join('');
+  }
+  const overall = (allC+allW)? Math.round(allC/(allC+allW)*100):0;
+  advice += `<div class="advice" style="border-left-color:var(--accent2)">📈 总体正确率 <b>${allC+allW?overall+'%':'—'}</b>（累计作答 ${allC+allW} 次）· 已掌握 ${masteredCount('cloze')+masteredCount('choice')+masteredCount('word')+masteredCount('fill')} 题 · 错题 ${wrongCount('cloze')+wrongCount('choice')+wrongCount('word')+wrongCount('fill')} 道</div>`;
+  document.getElementById('statsAdvice').innerHTML = advice;
+}
+
+/* ══════════════════ 启动 ══════════════════ */
+let booted=false;
 function boot(){
+  if(booted) return;
+  booted=true;
   refreshMasteredAudio();
-  clzRenderBooks(); clzRenderSubs(); clzBuildList();
-  chBuildList(); wdBuildList(); flRenderSubjects(); flRenderSubs(); flBuildList();
+  clzBuildList(); chBuildList(); wdBuildList(); flBuildList();
 }
 document.addEventListener('DOMContentLoaded',boot);
 if(document.readyState!=='loading') boot();

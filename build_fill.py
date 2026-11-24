@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """生成数学 / 信号与系统填空题库 quiz/fill.json（自评模式）"""
-import json, io, os
+import json, io, os, re
 
 ITEMS = []
 _n = [0]
@@ -388,6 +388,68 @@ I(S, r"$\left[\cos(kx+b)\right]^{(n)}=?$", r"$k^n\cos\left(kx+b+\frac{n\pi}{2}\r
 I(S, r"$\left[\ln(ax+b)\right]^{(n)}=?$", r"$(-1)^{n-1}(n-1)!\,\frac{a^n}{(ax+b)^n}$")
 I(S, r"$\left(\frac{1}{ax+b}\right)^{(n)}=?$", r"$(-1)^n n!\,\frac{a^n}{(ax+b)^{n+1}}$")
 I(S, r"莱布尼兹公式：$(uv)^{(n)}=?$", r"$\sum_{k=0}^{n}C_n^k\,u^{(n-k)}v^{(k)}$")
+
+# ════════════════════════════════════════════════════════
+#  政治 · 冲刺阶段背诵填空（来自 docx，按天分章）
+# ════════════════════════════════════════════════════════
+def add_politics():
+    try:
+        from docx import Document
+    except ImportError:
+        print("  [跳过] 未安装 python-docx")
+        return
+    path = r"d:\Desktop\背诵\2026_11_24_27 肖《背诵手册》190 题背诵版(1)\客、主观题背诵包\冲刺阶段背诵填空练习.docx"
+    if not os.path.isfile(path):
+        print("  [跳过] 找不到政治填空 docx")
+        return
+    doc = Document(path)
+    paras = [p.text.strip() for p in doc.paragraphs]
+    day, mode, qs, ans = 0, "", [], []
+    zb = [0]
+
+    def flush():
+        if not day or not qs:
+            return
+        for i, q in enumerate(qs):
+            blanks = re.findall(r"_{3,}", q)
+            if not blanks:
+                continue
+            nb = len(blanks)
+            q2 = re.sub(r"_{3,}", lambda m: "〔%d〕" % (len(re.findall(r"_{3,}", q[:m.start()])) + 1), q)
+            seg = ans[i] if i < len(ans) else ""
+            parts = [x.strip() for x in re.split(r"[；;]", seg) if x.strip()]
+            if len(parts) == nb:
+                a2 = "　".join("%d.%s" % (j + 1, p) for j, p in enumerate(parts))
+            else:
+                a2 = seg
+            zb[0] += 1
+            ITEMS.append({"id": "zf%03d" % zb[0], "subject": "政治",
+                          "sub": "冲刺·第%d天" % day, "q": q2,
+                          "a": a2, "tag": "冲刺填空"})
+
+    for t in paras:
+        if not t:
+            continue
+        m = re.match(r"^第\s*(\d+)\s*天", t)
+        if m:
+            flush()
+            day, mode, qs, ans = int(m.group(1)), "", [], []
+            continue
+        if "【填空题】" in t:
+            mode = "q"
+            continue
+        if "【答案】" in t:
+            mode = "a"
+            continue
+        if mode == "q":
+            qs.append(t)
+        elif mode == "a":
+            ans.append(t)
+    flush()
+    print("  政治冲刺填空: %d 题" % zb[0])
+
+
+add_politics()
 
 out = {"version": 1, "items": ITEMS}
 os.makedirs(os.path.join(os.path.dirname(__file__), "quiz"), exist_ok=True)

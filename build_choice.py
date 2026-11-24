@@ -184,6 +184,8 @@ def main():
     print(f"套卷段数: {len(segs)}")
 
     items = []
+    jmap = parse_jiexi(answers)
+    hit = 0
     for k, seg in enumerate(segs, 1):
         qmap = parse_set(seg)
         cnt = 0
@@ -192,6 +194,12 @@ def main():
                 continue
             x = qmap[q]
             answer = answers[str(k)]['single'][q - 1] if q <= 16 else answers[str(k)]['multi'][q - 17]
+            explain = jmap.get((k, q), '')
+            if explain:
+                hit += 1
+            else:
+                good = [x['options'].get(c, '') for c in answer if c in x['options']]
+                explain = '正确答案：%s。正确选项：%s。' % (answer, '；'.join(good))
             items.append({
                 'id': f'xb{k}{q:02d}',
                 'set': f'肖八·套卷{k}',
@@ -200,11 +208,12 @@ def main():
                 'stem': x['stem'],
                 'options': x['options'],
                 'answer': answer,
-                'explain': '',
+                'explain': explain,
             })
             cnt += 1
         missing = [q for q in range(1, 34) if q not in qmap]
         print(f"  套卷{k}: {cnt}/33  (缺 {missing})")
+    print(f"  解析命中: {hit}/{len(items)}")
 
     os.makedirs(os.path.join(APP, 'quiz'), exist_ok=True)
     with open(os.path.join(APP, 'quiz', 'choice.json'), 'w', encoding='utf-8') as f:
@@ -228,6 +237,82 @@ def extract_explain(jseg, q):
     txt = re.sub(r'【\s*简\s*析\s*】|\[\s*简\s*析\s*\]', '', txt)
     txt = re.sub(r'\s+', '', txt)
     return txt[:300]
+
+
+# ══════════════════════════════════════════════════════
+#  解析册 OCR -> 每题解析
+# ══════════════════════════════════════════════════════
+# 解析册中 8 套「单项选择题」正文起始位置(规范化后, 见 ocr/xiaoba_jiexi.txt)
+JIE_STARTS = [193, 12721, 24498, 37443, 49400, 59747, 71132, 82893]
+
+
+def jiexi_text():
+    t = open(OCR_J, encoding='utf-8', errors='ignore').read()
+    t = re.sub(r'\s+', '', t)
+    t = re.sub(r'<<<PAGEp\d{3}>>>', '', t)
+    t = re.sub(r'公众号[:：]?不止考研[，,]?免?费?分享?', '', t)
+    return t
+
+
+def _jie_clean(txt):
+    txt = re.sub(r'^[^。]{0,16}?[A-Da-d]{1,4}', '', txt)
+    for _ in range(4):
+        txt = re.sub(r'^[〔\[（(【][^〕\]）)】]{0,8}[〕\]）)】]', '', txt)
+        txt = re.sub(r'^[，、。；：|丨丨〕\]）】\|]', '', txt)
+    txt = re.sub(r'[〔\[（(【][^〕\]）)】]{0,6}[〕\]）)】]', '', txt)
+    txt = re.sub(r'(答案速[查跹]?|多项选择题|单项选择题)', '', txt)
+    m = re.match(r'^[^\u4e00-\u9fff]+', txt)
+    if m:
+        txt = txt[m.end():]
+    txt = re.sub(r'^[桐徇陌狁酮厑衢額悭峥卓丨|、，。；：\s]{1,4}', '', txt)
+    txt = txt.strip()
+    if len(re.findall(r'[\u4e00-\u9fff]', txt)) < 24:
+        return ''
+    if len(txt) > 460:
+        cut = txt[:460]
+        p = max(cut.rfind('。'), cut.rfind('；'))
+        txt = cut[:p + 1] if p > 120 else cut
+    return txt
+
+
+def parse_jiexi(answers):
+    """返回 {(套卷, 题号): 解析文本}"""
+    t = jiexi_text()
+    out = {}
+    for k in range(1, 9):
+        st = JIE_STARTS[k - 1]
+        en = JIE_STARTS[k] if k < 8 else len(t)
+        seg = t[st:en]
+        seg = re.sub(r'[0-9Oo]{0,4}[烤考]研政[治洽氵台]冲刺[0-9Ooß]?套卷[（(〈]?[一二三四五六七八直t丿l]*[)）]?[答嗒]案[及发]解[析霎霁帝麂]?', '', seg)
+        if '答案速' in seg[:320]:
+            p = seg.find('。')
+            if 0 < p < 500:
+                seg = seg[p + 1:]
+        cands = []
+        for m in re.finditer(r'(?<!\d)(\d{1,2})(?!\d)', seg):
+            n = int(m.group(1))
+            if not (1 <= n <= 33):
+                continue
+            head = seg[m.end():m.end() + 12]
+            lets = set(re.findall(r'[A-Da-d]', head.upper()))
+            if not lets:
+                continue
+            exp = set(answers[str(k)]['single'][n - 1] if n <= 16 else answers[str(k)]['multi'][n - 17])
+            if len(lets & exp) >= max(1, len(exp) - 1) and len(lets - exp) <= 1:
+                cands.append((m.start(), m.end(), n))
+        cands.sort()
+        for i, (pos, end, n) in enumerate(cands):
+            if (k, n) in out:
+                continue
+            nxt = len(seg)
+            for c in cands[i + 1:]:
+                if c[0] > end + 20:
+                    nxt = c[0]
+                    break
+            txt = _jie_clean(seg[end:min(nxt, end + 900)])
+            if txt:
+                out[(k, n)] = txt
+    return out
 
 
 if __name__ == '__main__':
