@@ -1,4 +1,4 @@
-/* 离线授权验证：一次性秘钥（HMAC-SHA256 签名），无需联网 */
+/* 离线授权验证：一次性秘钥（HMAC-SHA256 签名 + 分钟级有效期），无需联网 */
 (function () {
   'use strict';
   var SECRET = 'KY-2026-SC-7f3a9e2c41b8d605a4e7c1f9b3d82a6e5c0f7b1d';
@@ -6,7 +6,7 @@
   var LS_USED = 'kaoyan_used_keys_v1';
   var B32 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
   var VERSION = 1;
-  var PERM = 0xFFFF;
+  var PERM = 0xFFFFFFFF;
   var EPOCH = Date.UTC(2026, 0, 1);
 
   function rotr(x, n) { return ((x >>> n) | (x << (32 - n))) >>> 0; }
@@ -80,27 +80,37 @@
     return new Uint8Array(out);
   }
 
+  function b32enc(bytes) {
+    var bits = 0, val = 0, out = '', i;
+    for (i = 0; i < bytes.length; i++) {
+      val = ((val << 8) | bytes[i]) >>> 0; bits += 8;
+      while (bits >= 5) { out += B32[(val >>> (bits - 5)) & 31]; bits -= 5; }
+    }
+    if (bits > 0) out += B32[(val << (5 - bits)) & 31];
+    return out;
+  }
+
   function norm(s) { return (s || '').toUpperCase().replace(/[^A-Z2-7]/g, ''); }
 
   function db() { try { return window.localStorage; } catch (e) { return null; } }
 
-  /* 解析并校验签名，格式：16 位 Base32（版本 1 + 到期日 2 字节 + 随机序号 3 字节 + 签名 4 字节） */
+  /* 解析并校验签名，格式：20 位 Base32（版本 1 + 到期分钟 4 字节 + 随机序号 3 字节 + 签名 4 字节） */
   function parseKey(raw) {
     var s = norm(raw);
-    if (s.length !== 16) return null;
+    if (s.length !== 20) return null;
     var b = b32dec(s);
-    if (!b || b.length !== 10) return null;
-    var p = b.subarray(0, 6), sig = b.subarray(6, 10);
+    if (!b || b.length !== 12) return null;
+    var p = b.subarray(0, 8), sig = b.subarray(8, 12);
     var mac = hmacBytes(enc(SECRET), p);
     for (var i = 0; i < 4; i++) if (mac[i] !== sig[i]) return null;
     if (p[0] !== VERSION) return null;
-    return { id: s, exp: (p[1] << 8) | p[2] };
+    return { id: b32enc(b), exp: ((p[1] << 24) | (p[2] << 16) | (p[3] << 8) | p[4]) >>> 0 };
   }
 
   function expired(k) {
     if (k.exp === PERM) return false;
-    var days = Math.floor((Date.now() - EPOCH) / 86400000);
-    return days > k.exp;
+    var mins = Math.floor((Date.now() - EPOCH) / 60000);
+    return mins > k.exp;
   }
 
   function usedList() {
@@ -165,23 +175,23 @@
         '<div class="kytitle">授权验证</div>' +
         '<div class="kysub">本应用需一次性秘钥激活<br>请向作者获取属于你的秘钥</div>' +
         '<div class="kystep">输入一次性秘钥</div>' +
-        '<input class="kyinp" id="kyInp" maxlength="19" placeholder="XXXX-XXXX-XXXX-XXXX" ' +
+        '<input class="kyinp" id="kyInp" maxlength="24" placeholder="XXXX-XXXX-XXXX-XXXX-XXXX" ' +
         'autocomplete="off" autocapitalize="characters" spellcheck="false">' +
         '<button class="kybtn" id="kyOk">激活并进入</button>' +
         '<div class="kyerr" id="kyErr"></div>' +
-        '<div class="kyfoot">秘钥仅供本人使用，请勿转发<br>激活成功后本机长期可用</div>' +
+        '<div class="kyfoot">秘钥有激活时限，过期自动作废<br>激活成功后本机长期可用</div>' +
       '</div>';
     document.body.appendChild(g);
     document.body.style.overflow = 'hidden';
     var inp = g.querySelector('#kyInp'), err = g.querySelector('#kyErr');
     inp.addEventListener('input', function () {
-      var v = norm(inp.value).slice(0, 16);
+      var v = norm(inp.value).slice(0, 20);
       inp.value = v.replace(/(.{4})/g, '$1-').replace(/-$/, '');
     });
     function submit() {
       var v = inp.value, k = parseKey(v);
-      if (k && expired(k)) { err.textContent = '秘钥已过期，请向作者重新获取'; return; }
-      if (!k) { err.textContent = norm(v).length !== 16 ? '秘钥格式不正确（应为 16 位）' : '秘钥无效，请核对后重试'; return; }
+      if (k && expired(k)) { err.textContent = '秘钥已过期（超过激活时限），请向作者重新获取'; return; }
+      if (!k) { err.textContent = norm(v).length !== 20 ? '秘钥格式不正确（应为 20 位）' : '秘钥无效，请核对后重试'; return; }
       if (usedList().indexOf(k.id) >= 0) { err.textContent = '此秘钥已在本机使用过'; return; }
       try { db().setItem(LS_LIC, JSON.stringify({ id: k.id, exp: k.exp, ts: Date.now() })); } catch (e) {}
       markUsed(k.id);
