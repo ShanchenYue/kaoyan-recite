@@ -27,11 +27,8 @@ jobs:
         cd android
         gradle wrapper --gradle-version 8.5
 
-    - name: Copy web assets
-      run: |
-        mkdir -p android/app/src/main/assets/audios
-        cp index.html data.json manifest.json sw.js icon.svg android/app/src/main/assets/ 2>/dev/null || true
-        if [ -d audios ]; then cp -r audios/* android/app/src/main/assets/audios/; fi
+    - name: Sync web assets → Android (inline data.json into index.html)
+      run: python sync_android.py
 
     - name: Build Debug APK
       run: cd android && chmod +x gradlew && ./gradlew assembleDebug --no-daemon
