@@ -7,7 +7,12 @@ _n = [0]
 
 def I(sub, q, a, tag=""):
     _n[0] += 1
-    ITEMS.append({"id": "f%03d" % _n[0], "sub": sub, "q": q, "a": a, "tag": tag})
+    if "·" in sub:
+        subject, chapter = sub.split("·", 1)
+    else:
+        subject, chapter = sub, sub
+    ITEMS.append({"id": "f%03d" % _n[0], "subject": subject,
+                  "sub": chapter, "q": q, "a": a, "tag": tag})
 
 # ════════════════════════════════════════════════════════
 #  信号与系统 · 拉普拉斯变换对

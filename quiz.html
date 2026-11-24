@@ -133,9 +133,8 @@ body{min-height:100vh;padding-bottom:80px;overflow-x:hidden}
 
 <!-- ══════════ 填空 ══════════ -->
 <div class="page" id="page-fill">
-  <div class="bar" id="fillSubBar">
-    <div class="pill active" data-fl-sub="__all">全部</div>
-  </div>
+  <div class="bar" id="fillSubjectBar"></div>
+  <div class="bar" id="fillSubBar"></div>
   <div class="bar">
     <div class="pill small active" data-fl-order="seq">顺序</div>
     <div class="pill small" data-fl-order="random">随机</div>
@@ -485,10 +484,12 @@ document.getElementById('wdHighFreq').onclick=()=>{ wdState.highfreq=true; wdBui
  *  ④ 数学 / 信号与系统 填空 (自评)
  * ══════════════════════════════════════════ */
 const FL=(window.__QUIZ_FILL__&&window.__QUIZ_FILL__.items)||[];
-const flState={sub:'__all',order:'seq',idx:0,list:[],revealed:false};
-function flSubs(){ return [...new Set(FL.map(x=>x.sub))] }
+const flState={subject:'__all',sub:'__all',order:'seq',idx:0,list:[],revealed:false};
+function flSubjects(){ return [...new Set(FL.map(x=>x.subject||'其他'))] }
+function flSubs(){ return [...new Set(FL.filter(x=>flState.subject==='__all'||(x.subject||'其他')===flState.subject).map(x=>x.sub))] }
 function flBuildList(){
-  let arr=FL.filter(x=>flState.sub==='__all'||x.sub===flState.sub)
+  let arr=FL.filter(x=>flState.subject==='__all'||(x.subject||'其他')===flState.subject)
+            .filter(x=>flState.sub==='__all'||x.sub===flState.sub)
             .filter(x=>!(PROG.fill&&PROG.fill[x.id]&&PROG.fill[x.id].m));
   if(flState.order==='random') arr=shuffle(arr);
   flState.list=arr; flState.idx=0; flShow();
@@ -500,7 +501,7 @@ function flShow(){
   if(flState.idx>=flState.list.length) flState.idx=0;
   const it=flState.list[flState.idx]; flState.revealed=false;
   const rec=getRec('fill',it.id);
-  let html=`<div class="card"><div class="meta">${it.sub} · 第 ${flState.idx+1}/${flState.list.length} · 已对 ${rec.c}/3</div>`;
+  let html=`<div class="card"><div class="meta">${it.subject?it.subject+' · ':''}${it.sub} · 第 ${flState.idx+1}/${flState.list.length} · 已对 ${rec.c}/3</div>`;
   html+=`<div class="qtext">${it.q}</div>`;
   html+=`<div class="btnrow"><button class="btn ghost" id="flReveal">👁 显示答案</button></div>`;
   html+=`<div class="answer" id="flAns"><div class="lbl">参考答案</div><div id="flAnsBody">${it.a}</div></div>`;
@@ -531,6 +532,13 @@ function flJudge(ok){
   document.getElementById('flJudge').style.display='none';
   if(ok && rec.m) setTimeout(()=>flBuildList(), 900);
 }
+function flRenderSubjects(){
+  const bar=document.getElementById('fillSubjectBar'); bar.innerHTML='';
+  const mk=(v,t)=>{const d=document.createElement('div');d.className='pill'+(flState.subject===v?' active':'');d.textContent=t;
+    d.onclick=()=>{flState.subject=v;flState.sub='__all';flRenderSubjects();flRenderSubs();flBuildList();};return d;};
+  bar.appendChild(mk('__all','全部'));
+  flSubjects().forEach(s=>bar.appendChild(mk(s,s)));
+}
 function flRenderSubs(){
   const bar=document.getElementById('fillSubBar'); bar.innerHTML='';
   const mk=(v,t)=>{const d=document.createElement('div');d.className='pill small'+(flState.sub===v?' active':'');d.textContent=t;
@@ -560,7 +568,7 @@ function renderMath(root){
 function boot(){
   refreshMasteredAudio();
   clzRenderBooks(); clzRenderSubs(); clzBuildList();
-  chBuildList(); wdBuildList(); flRenderSubs(); flBuildList();
+  chBuildList(); wdBuildList(); flRenderSubjects(); flRenderSubs(); flBuildList();
 }
 document.addEventListener('DOMContentLoaded',boot);
 if(document.readyState!=='loading') boot();
