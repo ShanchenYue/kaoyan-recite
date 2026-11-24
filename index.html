@@ -610,11 +610,8 @@ function clearAutoNext() {
     state.autoNextTimer = setTimeout(autoNextSeg, state.pauseGap);
   });
   a.addEventListener('error', () => {
-    console.warn('[audio] error, fallback to TTS:', a.src);
-    const seg = getCurrentText();
-    if (seg && state.currentMode === 'audio') {
-      playSegmentTTS(seg);
-    }
+    console.warn('[audio] error:', a.src);
+    showToast('音频加载失败, 文件可能不存在');
   });
   a.addEventListener('timeupdate', () => {
     if (a.duration && !isNaN(a.duration)) {
@@ -637,10 +634,10 @@ function autoNextSeg() {
   playSegment();
 }
 
-// 核心: 播放当前选中的那条
+// 核心: 播放当前选中的那条 (v9: 强制 audio, 不回退 TTS)
 function playSegment() {
   clearAutoNext();
-  stopOutputOnly(); // 停掉 audio 和 TTS, 但不改 state.queuePos
+  stopOutputOnly();
   state.wasPaused = false;
 
   const seg = getCurrentText();
@@ -648,33 +645,37 @@ function playSegment() {
 
   // 更新 UI
   const book = state.data.books[state.bookIdx];
-  const voiceTag = book.audio_voice ? '🎧' : '🔊';
   document.getElementById('nowMeta').textContent =
-    `${voiceTag} ${book.main_category} · ${seg.sub || '未分类'} · #${state.queuePos+1}/${state.queue.length}`;
+    `🎧 ${book.main_category} · ${seg.sub || '未分类'} · #${state.queuePos+1}/${state.queue.length}`;
   document.getElementById('nowText').textContent = seg.text;
   document.getElementById('progressFill').style.width = '0%';
 
-  // 优先音频, 没有则TTS
-  if (state.useAudio && seg.audio) {
+  // 强制 audio, 无 MP3 则提示
+  if (seg.audio && seg.audio.length > 3) {
     playSegmentAudio(seg);
   } else {
-    playSegmentTTS(seg);
+    showToast('该段落无 MP3 语音, 请先生成语音包');
   }
   saveState();
 }
 
 function playSegmentAudio(seg) {
   state.currentMode = 'audio';
-  state.audioEl.removeAttribute('src'); // 清旧 src
-  state.audioEl.src = seg.audio + '?t=' + Date.now();
+  state.audioEl.pause();
+  state.audioEl.removeAttribute('src');
+  // Android WebView assets 绝对路径
+  const src = seg.audio.startsWith('file://')
+    ? seg.audio
+    : (seg.audio.startsWith('audios/') || seg.audio.startsWith('assets/')
+        ? 'file:///android_asset/' + seg.audio.replace(/^assets\//, '')
+        : seg.audio);
+  state.audioEl.src = src;
   state.audioEl.playbackRate = state.speed;
   state.audioEl.currentTime = 0;
+  state.audioEl.load();
   state.audioEl.play().catch(err => {
-    console.warn('[audio] play() rejected:', err);
-    // 只有明确是加载错误才回退, 其他浏览器可能只是因为 src 切换时机
-    if (err && (err.name === 'NotSupportedError' || err.name === 'NotReadableError')) {
-      playSegmentTTS(seg);
-    }
+    console.warn('[audio] play() rejected:', err, 'src=', src);
+    showToast('音频播放失败: ' + (err?.message || '加载错误'));
   });
 }
 
