@@ -114,7 +114,7 @@ public class MainActivity extends Activity {
                 if (focusActive) {
                     focusActive = false;
                     try { stopLockTask(); } catch (Exception e) { Log.w(TAG, "stopLockTask 失败: " + e.getMessage()); }
-                    setImmersive(false);
+                    setImmersiveMode(false);
                 }
             }
         });
@@ -166,7 +166,7 @@ public class MainActivity extends Activity {
         public void startFocus() {
             runOnUiThread(() -> {
                 focusActive = true;
-                setImmersive(true);
+                setImmersiveMode(true);
                 try {
                     startLockTask();
                 } catch (Exception e) {
@@ -184,13 +184,13 @@ public class MainActivity extends Activity {
                 } catch (Exception e) {
                     Log.w(TAG, "stopLockTask 失败: " + e.getMessage());
                 }
-                setImmersive(false);
+                setImmersiveMode(false);
             });
         }
     }
 
     @SuppressWarnings("deprecation")
-    private void setImmersive(boolean on) {
+    private void setImmersiveMode(boolean on) {
         View decor = getWindow().getDecorView();
         if (on) {
             decor.setSystemUiVisibility(
