@@ -1,10 +1,13 @@
-/* 离线授权验证：设备码 → 激活码（HMAC-SHA256），无网络校验 */
+/* 离线授权验证：一次性秘钥（HMAC-SHA256 签名），无需联网 */
 (function () {
   'use strict';
   var SECRET = 'KY-2026-SC-7f3a9e2c41b8d605a4e7c1f9b3d82a6e5c0f7b1d';
-  var LS_SEED = 'kaoyan_device_seed_v1';
   var LS_LIC = 'kaoyan_license_v1';
+  var LS_USED = 'kaoyan_used_keys_v1';
   var B32 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+  var VERSION = 1;
+  var PERM = 0xFFFF;
+  var EPOCH = Date.UTC(2026, 0, 1);
 
   function rotr(x, n) { return ((x >>> n) | (x << (32 - n))) >>> 0; }
 
@@ -66,43 +69,61 @@
 
   function enc(s) { return new TextEncoder().encode(s); }
 
-  function b32(bytes) {
-    var bits = 0, val = 0, out = '', i;
-    for (i = 0; i < bytes.length; i++) {
-      val = (val << 8) | bytes[i]; bits += 8;
-      while (bits >= 5) { out += B32[(val >>> (bits - 5)) & 31]; bits -= 5; }
+  function b32dec(s) {
+    var bits = 0, val = 0, out = [], i, idx;
+    for (i = 0; i < s.length; i++) {
+      idx = B32.indexOf(s[i]);
+      if (idx < 0) return null;
+      val = ((val << 5) | idx) >>> 0; bits += 5;
+      if (bits >= 8) { out.push((val >>> (bits - 8)) & 255); bits -= 8; }
     }
-    if (bits > 0) out += B32[(val << (5 - bits)) & 31];
-    return out;
+    return new Uint8Array(out);
   }
 
-  function randHex(n) {
-    var a = new Uint8Array(n);
-    try { (window.crypto || window.msCrypto).getRandomValues(a); }
-    catch (e) { for (var i = 0; i < n; i++) a[i] = Math.floor(Math.random() * 256); }
-    return Array.prototype.map.call(a, function (x) { return ('0' + x.toString(16)).slice(-2); }).join('');
-  }
+  function norm(s) { return (s || '').toUpperCase().replace(/[^A-Z2-7]/g, ''); }
 
   function db() { try { return window.localStorage; } catch (e) { return null; } }
 
-  function deviceCode() {
-    var s = db(), seed = s && s.getItem(LS_SEED);
-    if (!seed) { seed = randHex(16); if (s) s.setItem(LS_SEED, seed); }
-    var raw = b32(sha256bytes(enc(seed))).slice(0, 20);
-    return raw.replace(/(.{4})/g, '$1-').replace(/-$/, '');
+  /* 解析并校验签名，格式：16 位 Base32（版本 1 + 到期日 2 字节 + 随机序号 3 字节 + 签名 4 字节） */
+  function parseKey(raw) {
+    var s = norm(raw);
+    if (s.length !== 16) return null;
+    var b = b32dec(s);
+    if (!b || b.length !== 10) return null;
+    var p = b.subarray(0, 6), sig = b.subarray(6, 10);
+    var mac = hmacBytes(enc(SECRET), p);
+    for (var i = 0; i < 4; i++) if (mac[i] !== sig[i]) return null;
+    if (p[0] !== VERSION) return null;
+    return { id: s, exp: (p[1] << 8) | p[2] };
   }
-  function expected(code) {
-    var raw = b32(hmacBytes(enc(SECRET), enc(norm(code)))).slice(0, 20);
-    return raw.replace(/(.{4})/g, '$1-').replace(/-$/, '');
+
+  function expired(k) {
+    if (k.exp === PERM) return false;
+    var days = Math.floor((Date.now() - EPOCH) / 86400000);
+    return days > k.exp;
   }
-  function norm(s) { return (s || '').toUpperCase().replace(/[^A-Z2-7]/g, ''); }
+
+  function usedList() {
+    try {
+      var s = db(); if (!s) return [];
+      var a = JSON.parse(s.getItem(LS_USED) || '[]');
+      return Array.isArray(a) ? a : [];
+    } catch (e) { return []; }
+  }
+  function markUsed(id) {
+    try {
+      var s = db(); if (!s) return;
+      var a = usedList();
+      if (a.indexOf(id) < 0) { a.push(id); s.setItem(LS_USED, JSON.stringify(a)); }
+    } catch (e) {}
+  }
+
   function verified() {
     try {
       var s = db(); if (!s) return false;
       var lic = JSON.parse(s.getItem(LS_LIC) || 'null');
-      if (!lic || !lic.dc || !lic.code) return false;
-      if (lic.dc !== deviceCode()) return false;
-      return norm(lic.code) === norm(expected(lic.dc));
+      if (!lic || !lic.id) return false;
+      return !!parseKey(lic.id);
     } catch (e) { return false; }
   }
 
@@ -118,17 +139,11 @@
     'justify-content:center;background:linear-gradient(135deg,#ff7a59,#ff9d6b);box-shadow:0 8px 24px rgba(255,122,89,.35)}' +
     '.kytitle{text-align:center;font-size:19px;font-weight:700;letter-spacing:.5px}' +
     '.kysub{text-align:center;font-size:12.5px;color:#8b90a8;line-height:1.7;margin-top:8px}' +
-    '.kystep{margin-top:18px;font-size:12px;color:#8b90a8;letter-spacing:.5px}' +
-    '.kycode{margin-top:8px;display:flex;gap:8px;align-items:center}' +
-    '.kycode code{flex:1;display:block;padding:13px 12px;border-radius:12px;background:#0e1018;' +
-    'border:1px dashed #3a4160;color:#4fd1c5;font-size:15px;letter-spacing:1.5px;text-align:center;' +
-    'font-family:ui-monospace,Menlo,Consolas,monospace;word-break:break-all}' +
-    '.kycopy{flex:0 0 auto;padding:11px 14px;border-radius:12px;border:1px solid #2a2f47;background:#1d2135;' +
-    'color:#eceef6;font-size:12.5px;font-family:inherit}' +
+    '.kystep{margin-top:20px;font-size:12px;color:#8b90a8;letter-spacing:.5px}' +
     '.kyinp{width:100%;margin-top:8px;padding:14px 12px;border-radius:12px;background:#0e1018;' +
-    'border:1px solid #2a2f47;color:#eceef6;font-size:16px;letter-spacing:2px;text-align:center;' +
+    'border:1px solid #2a2f47;color:#eceef6;font-size:17px;letter-spacing:2px;text-align:center;' +
     'font-family:ui-monospace,Menlo,Consolas,monospace;outline:none}' +
-    '.kyinp:focus{border-color:#4fd1c5}' +
+    '.kyinp:focus{border-color:#4fd1c5;box-shadow:0 0 0 3px rgba(79,209,197,.12)}' +
     '.kybtn{width:100%;margin-top:14px;padding:14px;border:none;border-radius:13px;font-size:15px;' +
     'font-weight:700;color:#fff;font-family:inherit;background:linear-gradient(135deg,#ff7a59,#ff9d6b);' +
     'box-shadow:0 8px 22px rgba(255,122,89,.28)}' +
@@ -148,52 +163,38 @@
       '<div class="kybox">' +
         '<div class="kyicon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg></div>' +
         '<div class="kytitle">授权验证</div>' +
-        '<div class="kysub">本应用已绑定设备授权<br>首次使用需输入一次性验证码</div>' +
-        '<div class="kystep">① 复制设备码</div>' +
-        '<div class="kycode"><code id="kyDev"></code><button class="kycopy" id="kyCopy">复制</button></div>' +
-        '<div class="kystep">② 输入激活码</div>' +
-        '<input class="kyinp" id="kyInp" placeholder="XXXX-XXXX-XXXX-XXXX-XXXX" autocomplete="off" spellcheck="false">' +
-        '<button class="kybtn" id="kyOk">验证并进入</button>' +
+        '<div class="kysub">本应用需一次性秘钥激活<br>请向作者获取属于你的秘钥</div>' +
+        '<div class="kystep">输入一次性秘钥</div>' +
+        '<input class="kyinp" id="kyInp" maxlength="19" placeholder="XXXX-XXXX-XXXX-XXXX" ' +
+        'autocomplete="off" autocapitalize="characters" spellcheck="false">' +
+        '<button class="kybtn" id="kyOk">激活并进入</button>' +
         '<div class="kyerr" id="kyErr"></div>' +
-        '<div class="kyfoot">验证码与设备码绑定，仅本设备可用<br>验证通过后不再弹出</div>' +
+        '<div class="kyfoot">秘钥仅供本人使用，请勿转发<br>激活成功后本机长期可用</div>' +
       '</div>';
     document.body.appendChild(g);
     document.body.style.overflow = 'hidden';
-    var dc = deviceCode();
-    g.querySelector('#kyDev').textContent = dc;
-    g.querySelector('#kyCopy').onclick = function () {
-      var btn = this;
-      function done() { btn.textContent = '已复制'; setTimeout(function () { btn.textContent = '复制'; }, 1500); }
-      try {
-        if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(dc).then(done); return; }
-      } catch (e) {}
-      var ta = document.createElement('textarea'); ta.value = dc; document.body.appendChild(ta);
-      ta.select();
-      try { document.execCommand('copy'); done(); } catch (e) { alert('请长按设备码手动复制'); }
-      document.body.removeChild(ta);
-    };
     var inp = g.querySelector('#kyInp'), err = g.querySelector('#kyErr');
     inp.addEventListener('input', function () {
-      var v = inp.value.toUpperCase().replace(/[^A-Z2-7]/g, '');
+      var v = norm(inp.value).slice(0, 16);
       inp.value = v.replace(/(.{4})/g, '$1-').replace(/-$/, '');
     });
     function submit() {
-      var v = inp.value;
-      if (norm(v).length !== 20) { err.textContent = '激活码格式不正确'; return; }
-      if (norm(v) === norm(expected(dc))) {
-        try { db().setItem(LS_LIC, JSON.stringify({ dc: dc, code: v, ts: Date.now() })); } catch (e) {}
-        g.classList.add('out');
-        document.body.style.overflow = '';
-        setTimeout(function () { if (g.parentNode) g.parentNode.removeChild(g); }, 300);
-      } else {
-        err.textContent = '激活码无效，请核对后重试';
-      }
+      var v = inp.value, k = parseKey(v);
+      if (k && expired(k)) { err.textContent = '秘钥已过期，请向作者重新获取'; return; }
+      if (!k) { err.textContent = norm(v).length !== 16 ? '秘钥格式不正确（应为 16 位）' : '秘钥无效，请核对后重试'; return; }
+      if (usedList().indexOf(k.id) >= 0) { err.textContent = '此秘钥已在本机使用过'; return; }
+      try { db().setItem(LS_LIC, JSON.stringify({ id: k.id, exp: k.exp, ts: Date.now() })); } catch (e) {}
+      markUsed(k.id);
+      g.classList.add('out');
+      document.body.style.overflow = '';
+      setTimeout(function () { if (g.parentNode) g.parentNode.removeChild(g); }, 300);
     }
     g.querySelector('#kyOk').onclick = submit;
     inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') submit(); });
+    setTimeout(function () { try { inp.focus(); } catch (e) {} }, 300);
   }
 
-  window.KaoYanAuth = { verified: verified, deviceCode: deviceCode };
+  window.KaoYanAuth = { verified: verified };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', build);
   else build();
 })();
