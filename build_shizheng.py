@@ -12,7 +12,7 @@ APP = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(APP, 'data.json')
 SRC = r'd:\Desktop\背诵\资源'
 CIRCLED = '①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳'
-ITEM_RE = re.compile(r'^(\d{1,2})\s*[.．、]\s*')
+ITEM_RE = re.compile(r'^(\d{1,3})\s*[.．、]\s*')
 HEAD_RE = re.compile(r'^[一二三四五六七八九十]+\s*[、.]')
 TITLE_RE = re.compile(r'^20\d{2}\s*重点时政总结')
 
@@ -34,7 +34,7 @@ def clean(s):
     s = s.replace('\n', '').replace('\r', '')
     s = re.sub(r' {2,}', ' ', s).strip()
     # 编号统一为 "N. "
-    s = re.sub(r'^(\d{1,2})\s*[.．、]\s*', r'\1. ', s)
+    s = re.sub(r'^(\d{1,3})\s*[.．、]\s*', r'\1. ', s)
     # 去掉中文字符之间的排版空格（①-⑳ 前保留一个空格）
     out = []
     i, n = 0, len(s)
@@ -101,7 +101,9 @@ def main():
             max_cid = max(max_cid, s.get('cid', 0))
     next_cid = max_cid + 1
 
-    names = {b.get('main_category') for b in data['books']}
+    # 先移除同名旧书，保证重复执行时书籍索引不漂移
+    new_names = {m for m, *_ in BOOKS}
+    data['books'] = [b for b in data['books'] if b.get('main_category') not in new_names]
     added = []
     for main, part, voice, note in BOOKS:
         items = parse_docx(os.path.join(SRC, '重点时政总结-%s.docx' % part))
@@ -142,8 +144,6 @@ def main():
     if dry:
         print('（dry-run，未写入）')
         return
-    # 移除同名旧书，保证可重复执行
-    data['books'] = [b for b in data['books'] if b.get('main_category') not in {m for m, *_ in BOOKS}]
     data['books'].extend(added)
     with open(DATA, 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, separators=(',', ':'))

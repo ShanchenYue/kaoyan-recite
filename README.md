@@ -90,7 +90,7 @@ python start.py
 
 ## 版本
 
-当前版本：**v1.9.0**（versionCode 12）
+当前版本：**v1.9.1**（versionCode 13）
 
 ## 过关规则
 

@@ -1,5 +1,5 @@
 // 极简 Service Worker: 只缓存页面壳，音频一律直连，避免缓存卡顿
-const CACHE = 'kaoyan-v4';
+const CACHE = 'kaoyan-v5';
 const FILES = [
   './',
   './index.html',
