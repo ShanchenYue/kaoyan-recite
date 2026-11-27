@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0f1117">
+<title>30天背诵计划 · 考研训练营</title>
+<style>
+:root{
+  --bg:#0f1117; --card:#171a24; --card2:#202433; --line:#2b3142;
+  --text:#e9ecf5; --muted:#8b93a8; --accent:#3ec9b0; --accent2:#5aa9ff;
+  --green:#34d399; --red:#f87171; --gold:#f5b301;
+  --safe-top:env(safe-area-inset-top,0px); --safe-bottom:env(safe-area-inset-bottom,0px);
+}
+html[data-theme="light"]{
+  --bg:#f4f7fb; --card:#ffffff; --card2:#eef3f9; --line:#dbe3ee;
+  --text:#202638; --muted:#6b7385; --accent:#0f9d8f; --accent2:#2f7fd8;
+  --green:#0f9d72; --red:#dc4b4b; --gold:#a86b00;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
+  font-family:-apple-system,"PingFang SC","MiSans","Microsoft YaHei",sans-serif}
+body{min-height:100vh;padding-bottom:40px}
+
+/* 顶部 */
+.appbar{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:10px;
+  padding:calc(var(--safe-top) + 10px) 14px 10px;background:rgba(15,17,23,.92);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+html[data-theme="light"] .appbar{background:rgba(244,247,251,.94)}
+.appbar .back{flex:0 0 auto;width:34px;height:34px;border-radius:10px;border:1px solid var(--line);
+  background:var(--card2);color:var(--text);text-decoration:none;display:flex;align-items:center;
+  justify-content:center;font-size:17px}
+.appbar .ttl{flex:1;min-width:0}
+.appbar .ttl b{display:block;font-size:16px;letter-spacing:.3px}
+.appbar .ttl span{display:block;font-size:11px;color:var(--muted);margin-top:1px}
+.appbar .theme{flex:0 0 auto;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);
+  background:var(--card2);color:var(--text);font-size:15px;cursor:pointer}
+
+main{max-width:760px;margin:0 auto;padding:12px 14px 30px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin-top:12px}
+html[data-theme="light"] .card{box-shadow:0 2px 14px rgba(31,45,80,.05)}
+.sec-title{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin-bottom:12px}
+.sec-title::before{content:'';width:3px;height:14px;border-radius:2px;background:var(--accent)}
+.sec-title .r{margin-left:auto;font-size:11px}
+
+/* Hero */
+.hero{background:linear-gradient(135deg,#173c3a 0%,#191d2b 60%,#1b2030 100%);
+  border:1px solid rgba(62,201,176,.35);border-radius:20px;padding:18px;margin-top:12px;position:relative;overflow:hidden}
+html[data-theme="light"] .hero{background:linear-gradient(135deg,#e6fbf6 0%,#ffffff 60%,#f0f6ff 100%);
+  border-color:#cdeee6}
+.hero .row{display:flex;align-items:flex-end;gap:10px}
+.hero .big{font-size:44px;font-weight:800;line-height:1;letter-spacing:-1px;color:var(--accent)}
+.hero .big small{font-size:14px;font-weight:600;color:var(--muted);margin-left:4px;letter-spacing:0}
+.hero .date{font-size:12.5px;color:var(--muted);padding-bottom:5px}
+.hero .subj{display:inline-block;margin-top:10px;padding:3px 10px;border-radius:10px;font-size:12px;
+  color:var(--accent);border:1px solid rgba(62,201,176,.4);background:rgba(62,201,176,.1)}
+.hero .bar{height:7px;border-radius:5px;background:rgba(255,255,255,.1);margin-top:14px;overflow:hidden}
+html[data-theme="light"] .hero .bar{background:#e3eaf3}
+.hero .bar i{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.hero .stats{display:flex;gap:18px;margin-top:10px;font-size:11.5px;color:var(--muted)}
+.hero .stats b{color:var(--text);font-size:14px;margin-right:3px}
+.hero .acts{display:flex;gap:9px;margin-top:14px;flex-wrap:wrap}
+.btn{border:none;border-radius:11px;padding:10px 16px;font-size:14px;font-weight:600;
+  font-family:inherit;cursor:pointer;color:#06231f;background:linear-gradient(135deg,var(--accent),#5fe0c8)}
+.btn.ghost{background:var(--card2);color:var(--text);border:1px solid var(--line)}
+.btn.done{background:rgba(52,211,153,.16);color:var(--green);border:1px solid rgba(52,211,153,.45)}
+.btn:active{transform:scale(.98)}
+
+/* 内容 */
+.content{font-size:14.5px;line-height:1.8;white-space:pre-wrap;word-break:break-word}
+.checkline{font-size:12.5px;line-height:1.7;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);white-space:pre-wrap}
+.group{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+.group:first-of-type{border-top:none;padding-top:0}
+.gh{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600}
+.gh .n{margin-left:auto;font-size:11px;color:var(--muted);font-weight:400}
+.items{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.item{display:flex;gap:9px;align-items:flex-start;padding:9px 10px;border-radius:11px;
+  background:var(--card2);border:1px solid transparent}
+.item .no{flex:0 0 auto;min-width:22px;height:22px;padding:0 4px;border-radius:7px;font-size:11px;
+  display:flex;align-items:center;justify-content:center;color:var(--accent);
+  background:rgba(62,201,176,.12);margin-top:1px}
+.item .txt{flex:1;min-width:0;font-size:13px;line-height:1.6;color:var(--text);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer}
+.item .txt.open{-webkit-line-clamp:unset;display:block}
+.item .acts{flex:0 0 auto;display:flex;gap:5px;margin-top:1px}
+.a{font-size:11px;padding:3px 8px;border-radius:8px;border:1px solid var(--line);
+  background:var(--card);color:var(--text);text-decoration:none;white-space:nowrap}
+.a.fill{color:var(--accent2);border-color:rgba(90,169,255,.35)}
+.a.play{color:var(--accent);border-color:rgba(62,201,176,.35)}
+
+/* 复习 */
+.revrow{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px dashed var(--line)}
+.revrow:first-of-type{border-top:none}
+.revrow .d{flex:0 0 54px;font-weight:700;font-size:13px;color:var(--accent)}
+.revrow .m{flex:1;min-width:0;font-size:12.5px;color:var(--muted);line-height:1.5;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.revrow .tag{flex:0 0 auto;font-size:10.5px;padding:2px 7px;border-radius:8px;border:1px solid var(--line);color:var(--muted)}
+.revrow .tag.ok{color:var(--green);border-color:rgba(52,211,153,.4);background:rgba(52,211,153,.08)}
+.revrow .go{flex:0 0 auto;font-size:11.5px;color:var(--accent2);text-decoration:none;
+  padding:4px 9px;border-radius:8px;border:1px solid rgba(90,169,255,.35)}
+.note{font-size:11.5px;color:var(--muted);line-height:1.7;margin-top:10px}
+
+/* 30天总览 */
+.grid{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;margin-top:4px}
+.day{position:relative;border-radius:11px;border:1px solid var(--line);background:var(--card2);
+  padding:9px 0 7px;text-align:center;cursor:pointer;transition:.15s}
+.day b{display:block;font-size:14px;line-height:1}
+.day span{display:block;font-size:9px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden}
+.day.done{background:rgba(52,211,153,.13);border-color:rgba(52,211,153,.45)}
+.day.done b{color:var(--green)}
+.day.today{border-color:var(--accent);box-shadow:0 0 0 2px rgba(62,201,176,.18) inset}
+.day.today b{color:var(--accent)}
+.day.sel{outline:2px solid var(--accent2);outline-offset:1px}
+.day.future{opacity:.62}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:10.5px;color:var(--muted);margin-top:10px}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+.legend .l1{background:rgba(52,211,153,.5)} .legend .l2{background:var(--accent)} .legend .l3{background:#555c6e}
+
+/* 开始日期 */
+.startbox{margin-top:12px;font-size:12px;color:var(--muted)}
+.startbox summary{cursor:pointer;color:var(--accent2)}
+.startbox .row{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
+.startbox input[type=date]{padding:7px 9px;border-radius:9px;border:1px solid var(--line);
+  background:var(--card2);color:var(--text);font-family:inherit;font-size:13px}
+.startbox button{padding:7px 12px;border-radius:9px;border:1px solid var(--line);
+  background:var(--card2);color:var(--text);font-family:inherit;font-size:12px}
+
+.banner{margin-top:12px;padding:11px 13px;border-radius:11px;font-size:12.5px;line-height:1.6;
+  background:rgba(245,179,1,.1);border:1px solid rgba(245,179,1,.4);color:var(--gold)}
+.toast{position:fixed;left:50%;bottom:34px;transform:translateX(-50%) translateY(20px);
+  background:rgba(0,0,0,.86);color:#fff;padding:9px 18px;border-radius:20px;font-size:13px;
+  opacity:0;pointer-events:none;transition:.25s;z-index:300}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(max-width:360px){.grid{grid-template-columns:repeat(5,1fr)}}
+</style>
+</head>
+<body>
+<script>(function(){try{document.documentElement.dataset.theme=localStorage.getItem('kaoyan_theme')||'dark';}catch(e){}})();</script>
+<script src="auth.js"></script>
+<script src="plan_data.js"></script>
+
+<header class="appbar">
+  <a class="back" href="index.html" title="返回背诵">←</a>
+  <div class="ttl"><b>30天背诵计划</b><span>每日打卡 · 1/2/4/7/15 天科学复习</span></div>
+  <button class="theme" id="btnTheme" title="切换日间/夜间">🌙</button>
+</header>
+
+<main>
+  <section class="hero" id="hero"></section>
+  <div id="banner"></div>
+  <section class="card" id="todayCard"></section>
+  <section class="card" id="reviewCard"></section>
+  <section class="card" id="overviewCard"></section>
+  <section class="card" id="detailCard"></section>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+const P = window.__PLAN__;
+const KEY = 'kaoyan_plan_v1';
+let state = { start: P.start, done: {}, selected: null };
+
+function load(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    if(raw){
+      const o = JSON.parse(raw);
+      if(o && typeof o === 'object'){
+        if(o.start) state.start = o.start;
+        if(o.done && typeof o.done === 'object') state.done = o.done;
+      }
+    }
+  }catch(e){}
+}
+function save(){
+  const s = JSON.stringify({start:state.start, done:state.done});
+  if(window.KYStore) KYStore.save(KEY, s);
+  else try{ localStorage.setItem(KEY, s); }catch(e){}
+}
+function applyTheme(t){
+  document.documentElement.dataset.theme = t;
+  const b = document.getElementById('btnTheme');
+  if(b) b.textContent = t === 'light' ? '☀️' : '🌙';
+  const m = document.querySelector('meta[name="theme-color"]');
+  if(m) m.setAttribute('content', t === 'light' ? '#f4f7fb' : '#0f1117');
+  try{ localStorage.setItem('kaoyan_theme', t); }catch(e){}
+}
+function toggleTheme(){ applyTheme(document.documentElement.dataset.theme === 'light' ? 'dark' : 'light'); }
+
+function ymd(d){
+  const p = n => String(n).padStart(2, '0');
+  return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+}
+function parseYmd(s){
+  const a = String(s).split('-').map(Number);
+  return new Date(a[0], a[1] - 1, a[2]);
+}
+function todayMidnight(){
+  const n = new Date();
+  return new Date(n.getFullYear(), n.getMonth(), n.getDate());
+}
+function todayDay(){
+  const diff = Math.round((todayMidnight() - parseYmd(state.start)) / 86400000);
+  return diff + 1;
+}
+function dayObj(n){ return P.days.find(x => x.day === n); }
+function isDone(n){ return !!state.done[n]; }
+function doneCount(){ return P.days.filter(x => isDone(x.day)).length; }
+function streak(){
+  let d = todayDay();
+  if(!isDone(d)) d = d - 1;
+  let n = 0;
+  while(d >= 1 && d <= 30 && isDone(d)){ n++; d--; }
+  return n;
+}
+function weekday(d){
+  return ['周日','周一','周二','周三','周四','周五','周六'][d.getDay()];
+}
+function esc(s){
+  return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+}
+function toast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('show'), 1600);
+}
+function openSeg(i, play){
+  return 'index.html?book=3&seg=' + i + (play ? '&play=1' : '') + '&from=plan';
+}
+function fillLink(cid){
+  return 'quiz.html?tab=cloze&cid=' + encodeURIComponent(cid);
+}
+function itemHtml(it){
+  const no = it.n != null ? it.n : '·';
+  const txt = esc(it.t);
+  const acts = '<a class="a" href="' + openSeg(it.i, false) + '">背</a>' +
+    '<a class="a play" href="' + openSeg(it.i, true) + '">听</a>' +
+    (it.cid ? '<a class="a fill" href="' + fillLink(it.cid) + '">填</a>' : '');
+  return '<div class="item"><div class="no">' + esc(no) + '</div>' +
+    '<div class="txt" title="' + txt + '" onclick="this.classList.toggle(&apos;open&apos;)">' + txt + '</div>' +
+    '<div class="acts">' + acts + '</div></div>';
+}
+function groupsHtml(day){
+  if(!day.groups.length){
+    return '<div class="note">本日为综合复习日：按错题本与高频考点自行安排，建议先做错题，再默写主观题框架。</div>';
+  }
+  return day.groups.map(g => {
+    return '<div class="group"><div class="gh"><span>' + esc(g.name) + '</span>' +
+      '<span class="n">' + g.items.length + ' 条</span></div>' +
+      '<div class="items">' + g.items.map(itemHtml).join('') + '</div></div>';
+  }).join('');
+}
+function dayCard(day, title){
+  const d = dayObj(day);
+  if(!d) return '';
+  const done = isDone(day);
+  return '<div class="sec-title">' + esc(title) + '<span class="r">Day ' + day + ' · ' + esc(d.subject) + '</span></div>' +
+    '<div class="content">' + esc(d.content) + '</div>' +
+    '<div class="checkline">📌 检测：' + esc(d.check) + '</div>' +
+    '<div class="acts" style="display:flex;gap:9px;margin-top:14px;flex-wrap:wrap">' +
+      '<button class="btn ' + (done ? 'done' : '') + '" onclick="toggleDone(' + day + ')">' +
+        (done ? '✅ 已打卡 · 点击取消' : '✅ 完成今日打卡') + '</button>' +
+      '<button class="btn ghost" onclick="scrollTop()">回到今日</button>' +
+    '</div>' + groupsHtml(d);
+}
+
+function renderHero(){
+  const td = todayDay();
+  const d = new Date();
+  const inRange = td >= 1 && td <= 30;
+  const day = inRange ? td : (td < 1 ? 1 : 30);
+  const dd = dayObj(day);
+  const pct = Math.round(doneCount() / 30 * 100);
+  const done = isDone(day);
+  document.getElementById('hero').innerHTML =
+    '<div class="row"><div class="big">' + day + '<small>天</small></div>' +
+    '<div class="date">' + (d.getMonth() + 1) + '月' + d.getDate() + '日 · ' + weekday(d) +
+      (inRange ? '' : '（不在计划区间）') + '</div></div>' +
+    '<div class="subj">' + esc(dd.subject) + '</div>' +
+    '<div class="bar"><i style="width:' + pct + '%"></i></div>' +
+    '<div class="stats"><span><b>' + doneCount() + '</b>/30 已打卡</span>' +
+      '<span>连续 <b>' + streak() + '</b> 天</span>' +
+      '<span>今日复习 <b>' + reviewDays(day).length + '</b> 项</span></div>' +
+    '<div class="acts">' +
+      '<button class="btn ' + (done ? 'done' : '') + '" onclick="toggleDone(' + day + ')">' +
+        (done ? '✅ 今日已打卡' : '✅ 打卡第 ' + day + ' 天') + '</button>' +
+      '<button class="btn ghost" onclick="scrollToToday()">查看今日任务</button>' +
+    '</div>' +
+    '<details class="startbox"><summary>调整开始日期 / 查看计划说明</summary>' +
+      '<div class="row"><input type="date" id="startInput" value="' + esc(state.start) + '">' +
+      '<button onclick="resetStart()">恢复默认（11月16日 = 第1天）</button></div>' +
+      '<div class="note">第 1 天 = ' + esc(state.start) + '；今天按设备日期自动计算。复习节奏为 1 / 2 / 4 / 7 / 15 天。</div>' +
+    '</details>';
+  const inp = document.getElementById('startInput');
+  if(inp) inp.onchange = () => {
+    state.start = inp.value || P.start;
+    state.selected = null;
+    save(); render();
+    toast('已调整开始日期');
+  };
+}
+
+function reviewDays(day){
+  return [1, 2, 4, 7, 15].map(x => day - x).filter(x => x >= 1 && x <= 30);
+}
+function renderReview(){
+  const td = Math.min(30, Math.max(1, todayDay()));
+  const list = reviewDays(td);
+  const body = list.length ? list.map(n => {
+    const d = dayObj(n);
+    const ok = isDone(n);
+    return '<div class="revrow"><div class="d">Day ' + n + '</div>' +
+      '<div class="m">' + esc(d.subject) + ' · ' + esc(d.content.replace(/\n/g, ' / ').slice(0, 42)) + '</div>' +
+      '<span class="tag ' + (ok ? 'ok' : '') + '">' + (ok ? '已打卡' : '未打卡') + '</span>' +
+      '<a class="go" href="#" onclick="selectDay(' + n + ');return false">复习</a></div>';
+  }).join('') : '<div class="note">今天没有到期复习，专注新内容即可。</div>';
+  document.getElementById('reviewCard').innerHTML =
+    '<div class="sec-title">今日复习 · 艾宾浩斯<span class="r">1 / 2 / 4 / 7 / 15 天</span></div>' + body +
+    '<div class="note">复习时先遮住答案回忆，再点「背」逐条核对；错得多的条目加入收藏夹，明天再复习一次。</div>';
+}
+
+function renderOverview(){
+  const td = todayDay();
+  const sel = state.selected || td;
+  let cells = '';
+  for(let n = 1; n <= 30; n++){
+    const d = dayObj(n);
+    const cls = ['day'];
+    if(isDone(n)) cls.push('done');
+    if(n === td) cls.push('today');
+    if(n === sel) cls.push('sel');
+    if(n > td) cls.push('future');
+    cells += '<div class="' + cls.join(' ') + '" onclick="selectDay(' + n + ')">' +
+      '<b>' + n + '</b><span>' + esc(d.subject.replace('+习思想', '')) + '</span></div>';
+  }
+  document.getElementById('overviewCard').innerHTML =
+    '<div class="sec-title">30 天总览<span class="r">已打卡 ' + doneCount() + '/30</span></div>' +
+    '<div class="grid">' + cells + '</div>' +
+    '<div class="legend"><span><i class="l1"></i>已完成</span>' +
+      '<span><i class="l2"></i>今天</span><span><i class="l3"></i>未开始</span></div>';
+}
+
+function renderDetail(){
+  const td = todayDay();
+  const sel = state.selected;
+  const card = document.getElementById('detailCard');
+  if(!sel || sel === td){
+    card.innerHTML = '';
+    card.style.display = 'none';
+    return;
+  }
+  card.style.display = 'block';
+  const d = dayObj(sel);
+  card.innerHTML = dayCard(sel, 'Day ' + sel + ' · ' + d.subject) +
+    (d.generated ? '<div class="note">说明：原清单只提供 27 天，第 28-30 天为按复习规律补充的综合复习/模拟安排。</div>' : '');
+}
+
+function renderBanner(){
+  const td = todayDay();
+  const b = document.getElementById('banner');
+  if(td < 1){
+    b.innerHTML = '<div class="banner">计划尚未开始：开始日期为 ' + esc(state.start) + '。可在「调整开始日期」里修改。</div>';
+  }else if(td > 30){
+    b.innerHTML = '<div class="banner">30 天计划已结束。建议进入错题本做二轮复习，或重新调整开始日期开启新一轮。</div>';
+  }else{
+    b.innerHTML = '';
+  }
+}
+
+function render(){
+  const td = Math.min(30, Math.max(1, todayDay()));
+  renderHero();
+  renderBanner();
+  document.getElementById('todayCard').innerHTML = dayCard(td, '今日新学');
+  renderReview();
+  renderOverview();
+  renderDetail();
+}
+
+function toggleDone(day){
+  if(isDone(day)) delete state.done[day];
+  else state.done[day] = ymd(new Date());
+  save(); render();
+  toast(isDone(day) ? '已打卡 Day ' + day : '已取消 Day ' + day);
+}
+function selectDay(n){
+  state.selected = n;
+  render();
+  if(n === todayDay()){ scrollToToday(); return; }
+  const el = document.getElementById('detailCard');
+  if(el && el.style.display !== 'none') el.scrollIntoView({behavior:'smooth', block:'start'});
+}
+function scrollTop(){ window.scrollTo({top:0, behavior:'smooth'}); }
+function scrollToToday(){
+  const el = document.getElementById('todayCard');
+  if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+}
+function resetStart(){
+  state.start = P.start;
+  state.selected = null;
+  save(); render();
+  toast('已恢复默认开始日期');
+}
+
+document.getElementById('btnTheme').onclick = toggleTheme;
+applyTheme(document.documentElement.dataset.theme || 'dark');
+load();
+render();
+</script>
+</body>
+</html>

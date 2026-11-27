@@ -27,6 +27,9 @@ jobs:
         cd android
         gradle wrapper --gradle-version 8.5
 
+    - name: Validate data (audio / answers / plan)
+      run: python validate_data.py
+
     - name: Sync web assets → Android (inline data.json into index.html)
       run: python sync_android.py
 

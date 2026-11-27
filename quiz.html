@@ -233,6 +233,8 @@ body{min-height:100vh;overflow-x:hidden;padding-bottom:96px}
 /* ── 专注模式 ── */
 .focus-entry{margin-left:auto;padding:6px 12px;border-radius:12px;border:1px solid rgba(79,209,197,.35);
   background:rgba(79,209,197,.1);color:var(--accent2);font-size:12px;font-family:inherit;cursor:pointer}
+.plan-link{margin-left:6px;padding:6px 10px;border-radius:12px;border:1px solid rgba(90,169,255,.35);
+  background:rgba(90,169,255,.1);color:var(--accent2);font-size:12px;text-decoration:none;white-space:nowrap}
 .focusbar{display:none;position:fixed;top:0;left:0;right:0;z-index:150;
   padding:calc(var(--safe-top) + 10px) 14px 10px;
   background:linear-gradient(180deg,rgba(21,24,38,.98),rgba(11,12,18,.94));
@@ -304,6 +306,7 @@ body.focus-on{padding-top:calc(var(--safe-top) + 66px)}
 <header class="appbar">
   <div class="title"><b>考研训练营</b><span>制作人 LZH · 背诵 / 刷题 / 评估</span>
     <button class="focus-entry" id="focusBtn">🎯 专注</button>
+    <a class="plan-link" href="plan.html">📅 计划</a>
     <button class="theme-btn" id="btnTheme" title="切换日间/夜间">🌙</button>
   </div>
   <nav class="tabs" id="tabs">
@@ -1422,7 +1425,7 @@ function groupStats(kind, items, keyFn){
 }
 function barColor(acc){ return acc<0.5?'bad':acc<0.75?'warn':''; }
 /* ══════════════════ 学习记录备份 ══════════════════ */
-const BK_KEYS = ['kaoyan_player_v2', 'kaoyan_quiz_prog_v1', 'kaoyan_mastered_audio'];
+const BK_KEYS = ['kaoyan_player_v2', 'kaoyan_quiz_prog_v1', 'kaoyan_mastered_audio', 'kaoyan_fav_v1', 'kaoyan_plan_v1', 'kaoyan_theme'];
 let bkMode = 'export';
 function bkFb(msg, ok){
   const el = document.getElementById('backupFb');
@@ -1662,6 +1665,16 @@ function boot(){
   refreshMasteredAudio();
   clzBuildList(); chBuildList(); wdBuildList(); flBuildList(); mhBuildList(); esBuildList();
   bkInit();
+  // 深度链接：plan.html → quiz.html?tab=cloze&cid=c123
+  const q = new URLSearchParams(location.search);
+  const tab = q.get('tab');
+  const cid = q.get('cid');
+  if(tab) setTab(tab);
+  if(cid && CLZ.some(x=>x.id===cid)){
+    clzState.book='__all'; clzState.sub='__all'; clzState.status='all'; clzState.order='seq';
+    setTab('cloze');
+    clzBuildList(cid);
+  }
 }
 document.addEventListener('DOMContentLoaded',boot);
 if(document.readyState!=='loading') boot();

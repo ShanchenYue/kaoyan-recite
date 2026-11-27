@@ -75,7 +75,7 @@ else:
     print("  ⚠️  没有 audios 目录, 跳过")
 
 # 7. 复制其他静态文件
-for fname in ['sw.js', 'manifest.json', 'icon.svg', 'quiz.html', 'quiz_data.js', 'auth.js']:
+for fname in ['sw.js', 'manifest.json', 'icon.svg', 'quiz.html', 'quiz_data.js', 'plan.html', 'plan_data.js', 'auth.js']:
     src = os.path.join(APP_DIR, fname)
     if os.path.isfile(src):
         shutil.copy2(src, os.path.join(ASSETS, fname))

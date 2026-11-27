@@ -263,6 +263,12 @@ body { min-height: 100vh; padding-bottom: 140px; }
       📝 进入刷题训练营（挖空 / 选择 / 单词 / 填空 / 真题大题）
     </span>
   </a>
+  <a href="plan.html" style="display:block;text-align:center;margin-top:6px;text-decoration:none">
+    <span style="display:inline-block;padding:7px 18px;border-radius:20px;font-size:13px;
+      background:linear-gradient(135deg,#3ec9b0,#2f7fd8);color:#fff;font-weight:600">
+      📅 30天背诵计划 · 今日打卡
+    </span>
+  </a>
 </div>
 
 <!-- 书籍选择 -->
@@ -481,12 +487,34 @@ async function init() {
     // 恢复状态
     try { loadState(); } catch(e) { console.warn('loadState 失败:', e); }
 
+    // 深度链接：plan.html → index.html?book=3&seg=123[&play=1]
+    const params = new URLSearchParams(location.search);
+    const dlBook = parseInt(params.get('book'), 10);
+    const dlSeg = parseInt(params.get('seg'), 10);
+    if (!isNaN(dlBook) && state.data.books[dlBook]) {
+      state.bookIdx = dlBook;
+      state.favMode = false;
+      state.selectedSubs = null;
+      state.queuePos = 0;
+    }
+
     // 渲染UI
     renderBookPills();
     renderSubPills();
     rebuildQueue();
     renderList();
     showCurrent();
+
+    // 定位到指定段落
+    if (!isNaN(dlSeg) && dlSeg >= 0 && state.flatList[dlSeg]) {
+      let qi = state.queue.indexOf(dlSeg);
+      if (qi < 0) { state.queue.push(dlSeg); qi = state.queue.length - 1; }
+      state.queuePos = qi;
+      updateIdxInfo();
+      renderList();
+      showCurrent();
+      if (params.get('play') === '1') playSegment();
+    }
 
   } catch(e) {
     console.error('❌ init 失败:', e);

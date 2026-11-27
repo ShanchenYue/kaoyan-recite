@@ -417,12 +417,14 @@ def add_politics():
             nb = len(blanks)
             q2 = re.sub(r"_{3,}", lambda m: "〔%d〕" % (len(re.findall(r"_{3,}", q[:m.start()])) + 1), q)
             seg = ans[i] if i < len(ans) else ""
+            zb[0] += 1
+            if not seg.strip():
+                continue   # 答案缺失的题目不收录，避免“显示答案”空白（保留编号，后续 id 不漂移）
             parts = [x.strip() for x in re.split(r"[；;]", seg) if x.strip()]
             if len(parts) == nb:
                 a2 = "　".join("%d.%s" % (j + 1, p) for j, p in enumerate(parts))
             else:
                 a2 = seg
-            zb[0] += 1
             ITEMS.append({"id": "zf%03d" % zb[0], "subject": "政治",
                           "sub": "冲刺·第%d天" % day, "q": q2,
                           "a": a2, "tag": "冲刺填空"})
