@@ -13,6 +13,25 @@
   --text:#eceef6; --muted:#8b90a8; --gold:#fbbf24;
   --safe-top:env(safe-area-inset-top,0px); --safe-bottom:env(safe-area-inset-bottom,0px);
 }
+/* ☀️ 日间模式 */
+html[data-theme="light"]{
+  --bg:#f5f7fc; --card:#ffffff; --card2:#eef2fa; --line:#dbe1ec;
+  --accent:#e8564f; --accent2:#0f9d8f; --green:#0f9d72; --red:#dc4b4b;
+  --text:#202638; --muted:#6b7385; --gold:#a86b00;
+}
+html[data-theme="light"] .appbar{background:rgba(245,247,252,.95)}
+html[data-theme="light"] .answer .body,
+html[data-theme="light"] .wrow.wrong .txt,
+html[data-theme="light"] .wrow .m,
+html[data-theme="light"] .wcard .wstem{color:#384052}
+html[data-theme="light"] .opt .key{background:rgba(15,157,143,.12)}
+html[data-theme="light"] .bottom{background:linear-gradient(0deg,#f5f7fc 62%,rgba(245,247,252,0))}
+html[data-theme="light"] .card{box-shadow:0 2px 14px rgba(31,45,80,.05)}
+html[data-theme="light"] .mz{background:rgba(245,247,252,.98)}
+html[data-theme="light"] .mz .bar button{background:#fff;color:#202638}
+html[data-theme="light"] .seg button.active{box-shadow:0 1px 6px rgba(31,45,80,.12)}
+.theme-btn{margin-left:auto;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);
+  background:var(--card2);color:var(--text);font-size:15px;cursor:pointer;line-height:1}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
   font-family:-apple-system,"PingFang SC","MiSans","Microsoft YaHei",sans-serif}
@@ -176,6 +195,23 @@ body{min-height:100vh;overflow-x:hidden;padding-bottom:96px}
 .kbadge.k4{background:rgba(167,139,250,.13);color:#c4b5fd;border-color:rgba(167,139,250,.3)}
 .wcnt{margin-left:auto;font-size:11px;color:var(--red)}
 
+/* ── 错题卡片（新布局） ── */
+.wcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:10px}
+.wcard .whead{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:9px}
+.wcard .wmeta{font-size:11px;color:var(--muted)}
+.wcard .wstem{font-size:14.5px;line-height:1.78;white-space:pre-wrap;word-break:break-word}
+.wcard .wopts{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.wcard .wopt{font-size:13px;line-height:1.6;color:var(--muted);padding:6px 10px;border-radius:8px;
+  background:var(--card2);border:1px solid transparent}
+.wcard .wopt.ok{color:var(--green);border-color:rgba(52,211,153,.45);background:rgba(52,211,153,.1)}
+.wcard .wans{margin-top:10px;padding:10px 12px;border-radius:10px;font-size:13px;line-height:1.72;
+  background:rgba(79,209,197,.07);border:1px solid rgba(79,209,197,.28);color:var(--text)}
+.wcard .wans b{color:var(--accent2)}
+.wcard img.wthumb{width:100%;border-radius:10px;margin-top:8px;background:#fff;border:1px solid var(--line)}
+.wcard .wgo{margin-top:11px;padding:9px 14px;border-radius:10px;border:none;color:#fff;
+  background:linear-gradient(135deg,var(--accent),#ff9d6b);font-size:13.5px;font-weight:600;font-family:inherit}
+.wcard .wblank{color:var(--accent);border-bottom:2px solid var(--accent);padding:0 3px}
+
 /* ── 评估 ── */
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
 .kcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
@@ -262,11 +298,13 @@ body.focus-on{padding-top:calc(var(--safe-top) + 66px)}
 </style>
 </head>
 <body>
+<script>(function(){try{document.documentElement.dataset.theme=localStorage.getItem('kaoyan_theme')||'dark';}catch(e){}})();</script>
 <script src="auth.js"></script>
 
 <header class="appbar">
   <div class="title"><b>考研训练营</b><span>制作人 LZH · 背诵 / 刷题 / 评估</span>
     <button class="focus-entry" id="focusBtn">🎯 专注</button>
+    <button class="theme-btn" id="btnTheme" title="切换日间/夜间">🌙</button>
   </div>
   <nav class="tabs" id="tabs">
     <button data-tab="cloze" class="active">✏️ 挖空</button>
@@ -441,15 +479,28 @@ const PROG_KEY = 'kaoyan_quiz_prog_v1';
 function loadProg(){ try{ return JSON.parse(localStorage.getItem(PROG_KEY))||{} }catch(e){ return {} } }
 function saveProg(p){ var v=JSON.stringify(p); try{ if(window.KYStore) KYStore.save(PROG_KEY, v); else localStorage.setItem(PROG_KEY, v) }catch(e){} }
 let PROG = loadProg();
+/* 规则升级：选择题 / 公式套题 / 大题 一次答对即掌握（历史数据同步迁移） */
+(function migrateProg(){
+  let changed=false;
+  ['choice','math','essay'].forEach(k=>{
+    Object.values(PROG[k]||{}).forEach(r=>{ if(r.c>=1 && !r.m){ r.m=true; changed=true; } });
+  });
+  if(changed) saveProg(PROG);
+})();
 
 function getRec(kind,id){
   PROG[kind] = PROG[kind] || {};
   if(!PROG[kind][id]) PROG[kind][id] = {c:0,w:0,m:false};
   return PROG[kind][id];
 }
+/* 只有「知识点(挖空/填空)」和「单词」需要连续 3 次过关；
+   政治选择题、套卷、公式、大题一次正确即掌握 */
+const NEED = {cloze:3, word:3, fill:3, choice:1, math:1, essay:1};
+function needOf(kind){ return NEED[kind] || 3; }
 function markResult(kind,id,ok){
-  const r = getRec(kind,id);
-  if(ok){ r.c++; if(r.c>=3) r.m=true; } else { r.w++; }
+  const r = getRec(kind,id), need = needOf(kind);
+  if(ok){ r.c++; if(r.c>=need) r.m=true; }
+  else { r.w++; if(need===1) r.m=false; }
   saveProg(PROG);
   if(kind==='cloze') refreshMasteredAudio();
   return r;
@@ -458,6 +509,17 @@ function masteredCount(kind){ const d=PROG[kind]||{}; return Object.values(d).fi
 function wrongCount(kind){ const d=PROG[kind]||{}; return Object.values(d).filter(x=>x.w>0).length }
 function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]} return a }
 function esc(s){ return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])) }
+
+/* 日间 / 夜间主题 */
+function applyTheme(t){
+  document.documentElement.dataset.theme=t;
+  const b=document.getElementById('btnTheme');
+  if(b) b.textContent = t==='light' ? '☀️' : '🌙';
+  const m=document.querySelector('meta[name="theme-color"]');
+  if(m) m.setAttribute('content', t==='light' ? '#f5f7fc' : '#0b0c12');
+  try{ localStorage.setItem('kaoyan_theme', t); }catch(e){}
+}
+function toggleTheme(){ applyTheme(document.documentElement.dataset.theme==='light'?'dark':'light'); }
 
 function refreshMasteredAudio(){
   const arr=[];
@@ -517,6 +579,8 @@ function setTab(name){
   if(name==='words' && wdState.view==='list') renderWordsList();
 }
 document.querySelectorAll('#tabs [data-tab]').forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
+document.getElementById('btnTheme').onclick = toggleTheme;
+applyTheme(document.documentElement.dataset.theme || 'dark');
 
 /* ══════════════════ ① 挖空 ══════════════════ */
 const CLZ = (window.__QUIZ_CLOZE__ && window.__QUIZ_CLOZE__.items) || [];
@@ -734,7 +798,7 @@ function chShow(){
       <span class="chip a2">${multi?'多选':'单选'}</span>
       <span class="chip">${chState.idx+1}/${chState.list.length}</span>
       ${isDone?'<span class="chip" style="color:var(--green)">已作答</span>':''}
-      ${rec.c?`<span class="chip gold">已对 ${Math.min(rec.c,3)}/3</span>`:''}
+      ${rec.m?'<span class="chip gold">🎉 已掌握</span>':''}
       ${rec.w?`<span class="chip" style="color:var(--red)">错 ${rec.w}</span>`:''}
     </div>
     <div class="qtext">${esc(it.stem)}</div><div class="opts">`;
@@ -786,8 +850,8 @@ function chCheck(){
   const fb=document.getElementById('chFb');
   fb.className='feedback show '+(ok?'good':'bad');
   fb.innerHTML = ok
-    ? `✅ 正确！${rec.m?'🎉 已掌握':`连对 ${rec.c}/3`}　<span style="color:var(--muted)">即将进入下一题…</span>`
-    : `❌ 正确答案：<b>${esc(it.answer)}</b>`;
+    ? `✅ 正确！🎉 已掌握（选择题一次过关）　<span style="color:var(--muted)">即将进入下一题…</span>`
+    : `❌ 正确答案：<b>${esc(it.answer)}</b>　已收入错题本`;
   document.getElementById('chAns').classList.add('show');
   document.getElementById('chSubmit').disabled = true;
   chStatText();
@@ -1022,7 +1086,9 @@ function mhCatNames(){ return [...new Set(MATH.map(t=>t.cat))] }
 function mhCatLabel(c){ const t=MATH.find(x=>x.cat===c); return t? t.catName : c; }
 function mhTests(){ return MATH.filter(t=>t.cat===mhState.cat) }
 function mhScope(){
-  return MATH_PAGES.filter(p=> p.test.cat===mhState.cat && (mhState.test==='__all'||p.test.id===mhState.test));
+  const arr = MATH_PAGES.filter(p=> p.test.cat===mhState.cat && (mhState.test==='__all'||p.test.id===mhState.test));
+  // 「全部测试」不混入纯知识点阅读页
+  return mhState.test==='__all' ? arr.filter(p=>!p.test.note) : arr;
 }
 function mhBuildList(startId){
   let arr = filterStatus('math', mhScope(), mhState.status);
@@ -1036,7 +1102,7 @@ function mhRenderFilters(){
     mhCatNames().map(c=>({v:c,t:mhCatLabel(c)})), mhState.cat,
     v=>{ mhState.cat=v; mhState.test='__all'; mhBuildList(); });
   renderPills(document.getElementById('mathTestBar'),
-    [{v:'__all',t:'全部测试'}].concat(mhTests().map(t=>({v:t.id,t:'第'+t.no+'次'}))), mhState.test,
+    [{v:'__all',t:'全部测试'}].concat(mhTests().map(t=>({v:t.id,t:t.note?'📖 线代知识点':'第'+t.no+'次'}))), mhState.test,
     v=>{ mhState.test=v; mhBuildList(); }, 'soft');
   renderPills(document.getElementById('mathStatusBar'),
     [{v:'todo',t:'待练'},{v:'wrong',t:'只练错题'},{v:'all',t:'全部'}], mhState.status,
@@ -1048,7 +1114,7 @@ function mhStatText(){
   const total = mhScope().length, m = masteredCount('math');
   const pct = total? Math.round(m/total*100):0;
   document.getElementById('mathStat').innerHTML =
-    `<span>掌握 <b>${m}</b>/${MATH_PAGES.length}</span>
+    `<span>掌握 <b>${m}</b>/${MATH_PAGES.filter(x=>!x.test.note).length}</span>
      <div class="progress"><i style="width:${Math.min(100,pct)}%"></i></div>
      <span>错题 <b>${wrongCount('math')}</b> · 本轮 <b>${mhState.list.length}</b></span>`;
 }
@@ -1068,36 +1134,39 @@ function mhShow(){
     if(ans.length===p.test.pages.length) ansImgs = `<img src="${ans[p.n]}" loading="lazy">`;
     else ansImgs = ans.map(a=>`<img src="${a}" loading="lazy">`).join('');
   }
+  const isNote = !!p.test.note;
   let html=`<div class="card"><div class="meta">
       <span class="chip">${esc(p.test.title)}</span>
       <span class="chip a2">第 ${p.n+1}/${p.test.pages.length} 页</span>
       <span class="chip">${mhState.idx+1}/${mhState.list.length}</span>
-      ${rec.c?`<span class="chip gold">已对 ${Math.min(rec.c,3)}/3</span>`:''}
+      ${isNote?'<span class="chip gold">📖 知识点</span>':(rec.m?'<span class="chip gold">🎉 已掌握</span>':'')}
       ${rec.w?`<span class="chip" style="color:var(--red)">错 ${rec.w}</span>`:''}
     </div>
     <div class="mathwrap"><img src="${p.src}" id="mhImg" loading="lazy">
       <button class="zbtn" id="mhZoom">🔍 放大</button></div>
-    <div class="ansblock" id="mhAns"><div class="lbl">解析（共 ${ans.length} 页）</div>${ansImgs}</div>
+    ${isNote?'':`<div class="ansblock" id="mhAns"><div class="lbl">解析（共 ${ans.length} 页）</div>${ansImgs}</div>
     <div class="btnrow" id="mhJudge" style="display:none">
       <button class="btn green" id="mhOk">✅ 默写正确</button>
       <button class="btn red" id="mhNo">❌ 没记住</button>
     </div>
-    <div class="feedback" id="mhFb"></div>
+    <div class="feedback" id="mhFb"></div>`}
   </div>
   <div class="bottom">
     <button class="btn ghost mini" id="mhPrev">◀</button>
-    <button class="btn ghost" id="mhReveal">👁 显示答案</button>
+    ${isNote?'<button class="btn ghost" id="mhReveal" disabled>📖 阅读模式</button>':'<button class="btn ghost" id="mhReveal">👁 显示答案</button>'}
     <button class="btn ghost mini" id="mhNext">▶</button>
   </div>`;
   box.innerHTML = html;
   const img=document.getElementById('mhImg');
   document.getElementById('mhZoom').onclick=()=>mhZoom(p.src);
   img.onclick=()=>mhZoom(p.src);
-  document.getElementById('mhReveal').onclick=()=>mhReveal();
+  if(!isNote){
+    document.getElementById('mhReveal').onclick=()=>mhReveal();
+    document.getElementById('mhOk').onclick=()=>mhJudge(true);
+    document.getElementById('mhNo').onclick=()=>mhJudge(false);
+  }
   document.getElementById('mhPrev').onclick=()=>{ mhState.idx=(mhState.idx-1+mhState.list.length)%mhState.list.length; mhShow(); };
   document.getElementById('mhNext').onclick=()=>{ mhState.idx=(mhState.idx+1)%mhState.list.length; mhShow(); };
-  document.getElementById('mhOk').onclick=()=>mhJudge(true);
-  document.getElementById('mhNo').onclick=()=>mhJudge(false);
   mhStatText();
 }
 function mhReveal(){
@@ -1112,7 +1181,7 @@ function mhJudge(ok){
   const rec=markResult('math', p.id, ok);
   const fb=document.getElementById('mhFb');
   fb.className='feedback show '+(ok?'good':'bad');
-  fb.innerHTML = ok?`✅ 连对 ${rec.c}/3${rec.m?' 🎉 已掌握，移出题库':''}`:`❌ 已记入错题本，记得回看解析`;
+  fb.innerHTML = ok?`✅ 已掌握（公式套题一次过关）`:`❌ 已记入错题本，记得回看解析`;
   document.getElementById('mhJudge').style.display='none';
   mhStatText();
   if(ok && rec.m) setTimeout(()=>mhBuildList(), 1000);
@@ -1238,12 +1307,39 @@ function esJudge(ok){
 /* ══════════════════ ⑥ 错题本 ══════════════════ */
 const wrongState = { kind:'all' };
 const KIND_INFO = {
-  cloze:{name:'挖空', cls:'', items:()=>CLZ, text:x=>esc((x.template||'').replace(/〔\d+〕/g,'____')).slice(0,120)},
-  choice:{name:'选择', cls:'k2', items:()=>CH, text:x=>esc(x.stem).slice(0,120)},
-  word:{name:'单词', cls:'k3', items:()=>WD, text:x=>`${esc(x.word)} <span style="color:var(--muted)">— ${esc(x.meaning)}</span>`},
-  fill:{name:'填空', cls:'k4', items:()=>FL, text:x=>esc(x.q).slice(0,120)},
-  math:{name:'公式', cls:'k5', items:()=>MATH_PAGES, text:x=>esc(x.test.title+' · 第'+(x.n+1)+'页')},
-  essay:{name:'大题', cls:'k5', items:()=>ES, text:x=>esc(`第${x.no}题 `+(x.questions||x.material)).slice(0,120)}
+  cloze:{name:'挖空', cls:'', items:()=>CLZ,
+    meta:x=>esc(x.book||'')+(x.sub?' · '+esc(x.sub):''),
+    body:x=>`<div class="wstem">${esc(x.template||'').replace(/〔(\d+)〕/g,'<span class="wblank">〔$1〕</span>')}</div>
+      <div class="wans"><b>答案：</b>${esc((x.blanks||[]).join('；'))}</div>`},
+  choice:{name:'选择', cls:'k2', items:()=>CH,
+    meta:x=>esc(x.set.replace('肖八·',''))+' · 第'+x.no+'题'+(x.answer.length>1?' · 多选':' · 单选'),
+    body:x=>{
+      let o='';
+      ['A','B','C','D'].forEach(k=>{ if(x.options[k]!=null)
+        o+=`<div class="wopt ${x.answer.includes(k)?'ok':''}">${k}. ${esc(x.options[k])}</div>`; });
+      return `<div class="wstem">${esc(x.stem)}</div><div class="wopts">${o}</div>
+        <div class="wans"><b>正确答案：${esc(x.answer)}</b>${x.explain?'<br>'+esc(x.explain):''}</div>`;
+    }},
+  word:{name:'单词', cls:'k3', items:()=>WD,
+    meta:()=>'',
+    body:x=>`<div class="wstem"><b>${esc(x.word)}</b></div>
+      <div class="wans"><b>释义：</b>${esc(x.meaning)}</div>`},
+  fill:{name:'填空', cls:'k4', items:()=>FL,
+    meta:x=>esc(x.subject||'')+(x.sub?' · '+esc(x.sub):''),
+    body:x=>`<div class="wstem">${esc(x.q)}</div>
+      <div class="wans"><b>答案：</b>${esc(x.a)}</div>`},
+  math:{name:'公式', cls:'k5', items:()=>MATH_PAGES,
+    meta:x=>esc(x.test.title)+' · 第'+(x.n+1)+'页',
+    body:x=>{
+      const ans=x.test.answers||[];
+      const ai=ans.length? (ans.length===x.test.pages.length?ans[x.n]:ans[0]) : '';
+      return `<img class="wthumb" src="${x.src}" loading="lazy" alt="题目">
+        ${ai?`<img class="wthumb" src="${ai}" loading="lazy" alt="答案">`:''}`;
+    }},
+  essay:{name:'大题', cls:'k5', items:()=>ES,
+    meta:x=>esc(String(x.year))+'年 · 第'+esc(String(x.no))+'题',
+    body:x=>`<div class="wstem">${esc((x.material||'').slice(0,420))}${(x.material||'').length>420?'…':''}</div>
+      <div class="wans"><b>设问：</b>${esc(x.questions||'')}<br><b>答案要点：</b>${esc((x.answer||'').slice(0,400))}${(x.answer||'').length>400?'…':''}</div>`}
 };
 const KIND_BUILD = {cloze:clzBuildList, choice:chBuildList, word:wdBuildList, fill:flBuildList, math:mhBuildList, essay:esBuildList};
 const KIND_STATE = {cloze:clzState, choice:chState, word:wdState, fill:flState, math:mhState, essay:esState};
@@ -1272,25 +1368,27 @@ function renderWrongBook(){
 
   document.getElementById('wrongTotal').textContent = total+' 道';
   document.getElementById('wrongStat').innerHTML =
-    `<span>错得多排前面，点任意一题即可开始「只练错题」</span>`;
+    `<span>错得越多排得越前 · 每题都附正确答案与解析 · 点「重新练习」只刷错题</span>`;
   const box=document.getElementById('wrongList');
   if(!rows.length){
     box.innerHTML='<div class="empty">🎉 还没有错题记录<br>做错的题会自动收进这里</div>'; return;
   }
-  box.innerHTML = rows.map((row,i)=>{
+  box.innerHTML = rows.map(row=>{
     const info=KIND_INFO[row.k];
-    return `<div class="wrow wrong" data-k="${row.k}" data-id="${row.it.id}">
-      <div class="top">
+    return `<div class="wcard" data-k="${row.k}" data-id="${row.it.id}">
+      <div class="whead">
         <span class="kbadge ${info.cls}">${info.name}</span>
-        <span style="font-size:11px;color:var(--muted)">${row.k==='choice'?esc(row.it.set.replace('肖八·',''))+' · 第'+row.it.no+'题' : row.k==='math'?esc(row.it.test.title) : row.k==='essay'?esc(row.it.year+'年 · 第'+row.it.no+'题') : ''}</span>
+        <span class="wmeta">${info.meta(row.it)}</span>
         <span class="wcnt">错 ${row.r.w} 次 · 对 ${row.r.c} 次</span>
       </div>
-      <div class="txt">${info.text(row.it)}</div>
+      ${info.body(row.it)}
+      <button class="wgo">重新练习 →</button>
     </div>`;
   }).join('');
-  box.querySelectorAll('.wrow').forEach(el=>el.onclick=()=>{
-    practiceWrong(el.dataset.k, el.dataset.id);
+  box.querySelectorAll('.wcard').forEach(el=>{
+    el.querySelector('.wgo').onclick=()=>practiceWrong(el.dataset.k, el.dataset.id);
   });
+  renderMath(box);
 }
 function practiceWrong(kind, id){
   const st=KIND_STATE[kind];

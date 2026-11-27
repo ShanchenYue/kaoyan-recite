@@ -15,6 +15,8 @@ const BOOK_VOICES = [
   'zh-CN-YunxiNeural',     // 1: 肖190题 - 云希男声
   'zh-CN-XiaohanNeural',   // 2: 周年事件 - 晓涵女声
   'zh-CN-XiaoxiaoNeural',  // 3: 背诵包 - 晓晓女声
+  'zh-CN-YunjianNeural',   // 4: 重点时政·国内 - 云健男声
+  'zh-CN-XiaoyiNeural',    // 5: 重点时政·国际 - 晓伊女声
 ];
 
 const args = process.argv.slice(2);
@@ -29,7 +31,7 @@ const tasks = [];
 data.books.forEach((book, bi) => {
   if (book.is_scanned) return;
   if (targetBook >= 0 && bi !== targetBook) return;
-  const voice = BOOK_VOICES[bi % BOOK_VOICES.length];
+  const voice = book.audio_voice || BOOK_VOICES[bi % BOOK_VOICES.length];
   const bookDir = path.join(AUDIO_DIR, String(bi).padStart(2, '0'));
   fs.mkdirSync(bookDir, { recursive: true });
   book.segments.forEach((seg, si) => {

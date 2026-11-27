@@ -18,6 +18,26 @@
   --muted: #8888a0;
   --border: #333355;
 }
+/* ☀️ 日间模式 */
+html[data-theme="light"] {
+  --bg: #f3f6fc;
+  --card: #ffffff;
+  --card2: #eef2fa;
+  --accent: #e8564f;
+  --accent2: #0f9d8f;
+  --text: #202638;
+  --muted: #6b7385;
+  --border: #dbe2ef;
+}
+html[data-theme="light"] .now-playing {
+  background: linear-gradient(135deg, #ffffff 0%, #eef4ff 100%);
+  box-shadow: 0 4px 18px rgba(31, 45, 80, .06);
+}
+html[data-theme="light"] .controls {
+  box-shadow: 0 -6px 24px rgba(31, 45, 80, .08);
+}
+html[data-theme="light"] .toast { background: rgba(32, 38, 56, .92); }
+html[data-theme="light"] .btn.play { box-shadow: 0 4px 18px rgba(232, 86, 79, .28); }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text);
   font-family: -apple-system, "PingFang SC", "MiSans", "Microsoft YaHei", sans-serif;
@@ -140,8 +160,8 @@ body { min-height: 100vh; padding-bottom: 140px; }
   background: var(--card2); border-color: var(--accent);
 }
 .list-item .idx { font-size: 11px; color: var(--muted); }
-.list-item .ls { font-size: 14px; margin-top: 4px; line-height: 1.5;
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+.list-item .ls { font-size: 14px; margin-top: 6px; line-height: 1.6;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
   overflow: hidden; }
 
 /* 空状态 */
@@ -174,6 +194,32 @@ body { min-height: 100vh; padding-bottom: 140px; }
   padding: 20px;
 }
 
+/* 主题切换 */
+.theme-btn {
+  position: absolute; right: 14px; top: 14px; width: 36px; height: 36px;
+  border-radius: 50%; border: 1px solid var(--border); background: var(--card2);
+  color: var(--text); font-size: 16px; cursor: pointer; z-index: 3;
+}
+/* 当前内容操作 */
+.np-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.np-btn {
+  padding: 6px 12px; border-radius: 16px; border: 1px solid var(--border);
+  background: var(--card2); color: var(--text); font-size: 12px;
+  font-family: inherit; cursor: pointer;
+}
+.np-btn.on { color: var(--accent); border-color: var(--accent); background: rgba(255,107,107,.12); }
+.np-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+/* 列表项操作按钮 */
+.li-head { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.li-btns { display: flex; gap: 6px; }
+.mini {
+  width: 26px; height: 26px; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--card2); color: var(--text); font-size: 12px; line-height: 1;
+  cursor: pointer; padding: 0;
+}
+.mini.on { color: #f5b301; border-color: #f5b301; }
+.fav-pill { border-color: rgba(245,179,1,.55); }
+
 /* ── 平板 / 横屏适配 ── */
 @media (min-width: 820px) {
   .header, .section, .now-playing, .list, .footer-note {
@@ -199,6 +245,7 @@ body { min-height: 100vh; padding-bottom: 140px; }
 </style>
 </head>
 <body>
+<script>(function(){try{document.documentElement.dataset.theme=localStorage.getItem('kaoyan_theme')||'dark';}catch(e){}})();</script>
 <script src="auth.js"></script>
 
 <div class="loading" id="loading">
@@ -208,6 +255,7 @@ body { min-height: 100vh; padding-bottom: 140px; }
 
 <div class="header">
   <h1>🎧 考研训练营</h1>
+  <button class="theme-btn" id="btnTheme" title="切换日间/夜间模式">🌙</button>
   <div class="sub">听 · 背 · 练 一体化 · 制作人 LZH</div>
   <a href="quiz.html" style="display:block;text-align:center;margin-top:8px;text-decoration:none">
     <span style="display:inline-block;padding:7px 18px;border-radius:20px;font-size:13px;
@@ -231,9 +279,15 @@ body { min-height: 100vh; padding-bottom: 140px; }
 
 <!-- 当前播放 -->
 <div class="now-playing">
-  <div class="label">正在播放</div>
+  <div class="np-head">
+    <div class="label">当前内容</div>
+    <button class="np-btn" id="npFav">☆ 收藏</button>
+  </div>
   <div class="meta" id="nowMeta">—</div>
-  <div class="text" id="nowText">点击下方 ▶ 开始播放</div>
+  <div class="text" id="nowText">点击下方任意一条查看全文；需要听时再按「播放本条」</div>
+  <div class="np-actions">
+    <button class="np-btn" id="npPlay">🔊 播放本条音频</button>
+  </div>
   <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
 </div>
 
@@ -343,6 +397,59 @@ const state = {
 };
 
 const LS_KEY = 'kaoyan_player_v2';
+const FAV_KEY = 'kaoyan_fav_v1';
+state.favMode = false;   // 是否在「收藏夹」视图
+
+/* ── 收藏夹 ── */
+function favList() {
+  try { return JSON.parse(localStorage.getItem(FAV_KEY) || '[]'); } catch(e) { return []; }
+}
+function saveFav(arr) {
+  const s = JSON.stringify(arr);
+  if (window.KYStore) KYStore.save(FAV_KEY, s);
+  else try { localStorage.setItem(FAV_KEY, s); } catch(e) {}
+}
+function segFavId(seg) {
+  if (seg.audio) return seg.audio;
+  const t = (seg.text || '').slice(0, 60);
+  return 't:' + (seg._book || '') + '|' + t;
+}
+function isFav(seg) {
+  const id = segFavId(seg);
+  return favList().some(f => f.id === id);
+}
+function toggleFav(seg, bookName) {
+  let arr = favList();
+  const id = segFavId(seg);
+  const i = arr.findIndex(f => f.id === id);
+  if (i >= 0) {
+    arr.splice(i, 1);
+    toast('已取消收藏');
+  } else {
+    arr.push({
+      id,
+      book: bookName || seg._book || (state.data.books[state.bookIdx] || {}).main_category || '',
+      sub: seg.sub || '',
+      text: seg.text || '',
+      audio: seg.audio || ''
+    });
+    toast('已加入收藏夹');
+  }
+  saveFav(arr);
+}
+
+/* ── 日间 / 夜间主题 ── */
+function applyTheme(t) {
+  document.documentElement.dataset.theme = t;
+  const btn = document.getElementById('btnTheme');
+  if (btn) btn.textContent = t === 'light' ? '☀️' : '🌙';
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', t === 'light' ? '#f3f6fc' : '#1a1a2e');
+  try { localStorage.setItem('kaoyan_theme', t); } catch(e) {}
+}
+function toggleTheme() {
+  applyTheme(document.documentElement.dataset.theme === 'light' ? 'dark' : 'light');
+}
 
 /* ─────────────────────────────────────
  *  初始化
@@ -379,6 +486,7 @@ async function init() {
     renderSubPills();
     rebuildQueue();
     renderList();
+    showCurrent();
 
   } catch(e) {
     console.error('❌ init 失败:', e);
@@ -437,21 +545,41 @@ function hideLoading() {
 function renderBookPills() {
   const wrap = document.getElementById('bookPills');
   wrap.innerHTML = '';
+  // 收藏夹入口
+  const favEl = document.createElement('div');
+  favEl.className = 'pill fav-pill' + (state.favMode ? ' active' : '');
+  favEl.innerHTML = `⭐ 收藏夹<span class="count">${favList().length}</span>`;
+  favEl.onclick = () => {
+    state.favMode = true;
+    state.selectedSubs = null;
+    state.queuePos = 0;
+    stopAll();
+    renderBookPills();
+    renderSubPills();
+    rebuildQueue();
+    renderList();
+    showCurrent();
+    saveState();
+  };
+  wrap.appendChild(favEl);
+
   state.data.books.forEach((b, i) => {
     if (b.is_scanned) return; // 跳过扫描版
     const el = document.createElement('div');
-    el.className = 'pill' + (i === state.bookIdx ? ' active' : '');
+    el.className = 'pill' + (!state.favMode && i === state.bookIdx ? ' active' : '');
     el.innerHTML = `${b.main_category}<span class="count">${b.total_segments}</span>`;
     el.onclick = () => {
+      state.favMode = false;
       state.bookIdx = i;
       state.selectedSubs = null;
       state.queuePos = 0;
+      stopAll();
       renderBookPills();
       renderSubPills();
       rebuildQueue();
       renderList();
+      showCurrent();
       saveState();
-      stopSpeech();
     };
     wrap.appendChild(el);
   });
@@ -459,6 +587,10 @@ function renderBookPills() {
 
 function renderSubPills() {
   const wrap = document.getElementById('subPills');
+  if (state.favMode) {
+    document.getElementById('subSection').style.display = 'none';
+    return;
+  }
   const book = state.data.books[state.bookIdx];
   if (!book || !book.sub_categories.length) {
     document.getElementById('subSection').style.display = 'none';
@@ -497,6 +629,22 @@ function renderSubPills() {
 
 function rebuildQueue() {
   const book = state.data.books[state.bookIdx];
+
+  // 收藏夹视图：跨书籍播放
+  if (state.favMode) {
+    state.flatList = favList().map(f => ({
+      sub: f.sub || '', text: f.text || '', audio: f.audio || '',
+      _book: f.book || '收藏夹', _fav: true
+    }));
+    state.audioAvailable = state.flatList.some(s => s.audio);
+    state.queue = state.flatList.map((_, i) => i);
+    state.queuePos = Math.min(state.queuePos, Math.max(0, state.queue.length - 1));
+    if (state.queuePos < 0) state.queuePos = 0;
+    applyMode(state.mode);
+    updateIdxInfo();
+    return;
+  }
+
   let subs = state.selectedSubs;
   if (!subs || subs.length === 0) subs = null;
 
@@ -556,23 +704,84 @@ function updateIdxInfo() {
   document.getElementById('listCount').textContent = `· 共 ${total} 条`;
 }
 
+function esc(s) {
+  return (s || '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+}
+
+/* 选中一条：只显示文字，不自动播放 */
+function selectSegment(flatIdx, autoplay) {
+  const qi = state.queue.indexOf(flatIdx);
+  if (qi >= 0) state.queuePos = qi;
+  else { state.queue.push(flatIdx); state.queuePos = state.queue.length - 1; }
+  state.wasPaused = false;
+  stopOutputOnly();
+  updateIdxInfo();
+  renderList();
+  showCurrent();
+  saveState();
+  if (autoplay) playSegment();
+}
+
+/* 刷新「当前内容」卡片（不触发音频） */
+function showCurrent() {
+  const seg = getCurrentText();
+  const meta = document.getElementById('nowMeta');
+  const txt = document.getElementById('nowText');
+  const favBtn = document.getElementById('npFav');
+  if (!seg) {
+    meta.textContent = '—';
+    txt.textContent = '点击下方任意一条查看全文；需要听时再按「播放本条」';
+    if (favBtn) { favBtn.textContent = '☆ 收藏'; favBtn.classList.remove('on'); }
+    return;
+  }
+  const bookName = seg._book || (state.data.books[state.bookIdx] || {}).main_category || '';
+  meta.textContent = (state.favMode ? '⭐ 收藏夹 · ' : '🎧 ' + bookName + ' · ') +
+    (seg.sub || '未分类') + ` · #${state.queuePos + 1}/${state.queue.length}`;
+  txt.textContent = seg.text || '';
+  document.getElementById('progressFill').style.width = '0%';
+  if (favBtn) {
+    const on = isFav(seg);
+    favBtn.textContent = on ? '★ 已收藏' : '☆ 收藏';
+    favBtn.classList.toggle('on', on);
+  }
+}
+
 function renderList() {
   const list = document.getElementById('list');
   list.innerHTML = '';
   if (state.flatList.length === 0) {
-    list.innerHTML = '<div class="empty">当前筛选下没有知识点</div>';
+    list.innerHTML = '<div class="empty">' +
+      (state.favMode ? '收藏夹还是空的<br>在任意知识点右上角点 ☆ 即可收藏' : '当前筛选下没有知识点') +
+      '</div>';
     return;
   }
+  const favSet = new Set(favList().map(f => f.id));
   state.flatList.forEach((seg, i) => {
+    const active = i === state.queue[state.queuePos];
+    const fav = favSet.has(segFavId(seg));
     const el = document.createElement('div');
-    el.className = 'list-item' + (i === state.queue[state.queuePos] && state.isPlaying ? ' active' : '');
-    el.innerHTML = `<div class="idx">#${i+1} · ${seg.sub || '未分类'}</div>
-      <div class="ls">${seg.text}</div>`;
-    el.onclick = () => {
-      state.queuePos = state.queue.indexOf(i);
-      if (state.queuePos < 0) { state.queue.push(i); state.queuePos = state.queue.length - 1; }
+    el.className = 'list-item' + (active ? ' active' : '');
+    el.innerHTML = `<div class="li-head">
+        <div class="idx">#${i+1} · ${esc(seg.sub || '未分类')}${seg._book ? ' · ' + esc(seg._book) : ''}</div>
+        <div class="li-btns">
+          <button class="mini" data-act="play" title="播放">▶</button>
+          <button class="mini ${fav ? 'on' : ''}" data-act="fav" title="收藏">${fav ? '★' : '☆'}</button>
+        </div>
+      </div>
+      <div class="ls">${esc(seg.text)}</div>`;
+    el.onclick = () => selectSegment(i, false);
+    el.querySelector('[data-act="play"]').onclick = (e) => {
+      e.stopPropagation();
+      selectSegment(i, true);
+    };
+    el.querySelector('[data-act="fav"]').onclick = (e) => {
+      e.stopPropagation();
+      const bookName = seg._book || (state.favMode ? '收藏夹' : (state.data.books[state.bookIdx] || {}).main_category);
+      toggleFav(seg, bookName);
+      if (state.favMode) rebuildQueue();
+      renderBookPills();
       renderList();
-      play();
+      showCurrent();
     };
     list.appendChild(el);
   });
@@ -667,6 +876,7 @@ function clearAutoNext() {
 // 自动下一条 (区分顺序/乱序/随机)
 function autoNextSeg() {
   clearAutoNext();
+  if (!state.queue.length) return;
   if (state.mode === 'rand') {
     state.queuePos = Math.floor(Math.random() * state.flatList.length);
   } else {
@@ -686,12 +896,8 @@ function playSegment() {
   const seg = getCurrentText();
   if (!seg) { toast('没有可播放内容'); return; }
 
-  // 更新 UI
-  const book = state.data.books[state.bookIdx];
-  document.getElementById('nowMeta').textContent =
-    `🎧 ${book.main_category} · ${seg.sub || '未分类'} · #${state.queuePos+1}/${state.queue.length}`;
-  document.getElementById('nowText').textContent = seg.text;
-  document.getElementById('progressFill').style.width = '0%';
+  // 更新 UI（文字始终可见，与是否播放无关）
+  showCurrent();
 
   // 强制 audio, 无 MP3 则提示
   if (seg.audio && seg.audio.length > 3) {
@@ -863,6 +1069,7 @@ function togglePlay() {
 function next() {
   clearAutoNext();
   stopOutputOnly();
+  if (!state.queue.length) { toast('没有可播放内容'); return; }
   if (state.mode === 'rand') {
     state.queuePos = Math.floor(Math.random() * state.flatList.length);
   } else {
@@ -876,6 +1083,7 @@ function next() {
 function prev() {
   clearAutoNext();
   stopOutputOnly();
+  if (!state.queue.length) { toast('没有可播放内容'); return; }
   state.queuePos = (state.queuePos - 1 + state.queue.length) % state.queue.length;
   state.wasPaused = false;
   state.currentMode = null;
@@ -955,6 +1163,23 @@ document.querySelectorAll('.btn.mode').forEach(b => {
 document.getElementById('btnList').onclick = () => {
   window.scrollTo({ top: document.querySelector('.list').offsetTop - 100, behavior: 'smooth' });
 };
+document.getElementById('npPlay').onclick = () => {
+  if (!state.queue.length) { toast('没有可播放内容'); return; }
+  if (state.isPlaying) { togglePlay(); return; }
+  playSegment();
+};
+document.getElementById('npFav').onclick = () => {
+  const seg = getCurrentText();
+  if (!seg) { toast('请先选择一条'); return; }
+  const bookName = seg._book || (state.favMode ? '收藏夹' : (state.data.books[state.bookIdx] || {}).main_category);
+  toggleFav(seg, bookName);
+  if (state.favMode) rebuildQueue();
+  renderBookPills();
+  renderList();
+  showCurrent();
+};
+document.getElementById('btnTheme').onclick = toggleTheme;
+applyTheme(document.documentElement.dataset.theme || 'dark');
 
 // 初始化显示
 document.getElementById('btnSpeed').textContent = state.speed.toFixed(1) + 'x';

@@ -9,8 +9,8 @@ random.seed(42)
 
 # ── 关键词后接答案的模式 (捕获 2~14 个中文字符) ──
 KW_PATTERNS = [
-    r'[《]([^》]{2,30})[》]',
-    r'[“"]([^”"]{2,20})[”"]',
+    r'[《]([^》]{2,16})[》]',
+    r'[“"]([^”"]{2,14})[”"]',
     r'(\d{4})\s*年',
     r'(\d+(?:\.\d+)?\s*%)',
     r'(?:标志着|称之为|被称为|体现了|意味着|核心是|关键是|根本是|本质是|实质是|目的是|目标是|要求是|指的是|就是指|在于)'
@@ -52,6 +52,9 @@ def find_blanks(text):
                 continue
             # 不要挖到句首
             if s == 0:
+                continue
+            # 同一段不重复挖同一个答案
+            if ans in [x[2] for x in spans]:
                 continue
             spans.append((s, e, ans))
             for i in range(s, e):
@@ -109,7 +112,8 @@ def main():
         book_name = book.get('main_category', '')
         for seg in book.get('segments', []):
             sid += 1
-            it = make_item(seg, sid, book_name, seg.get('sub'))
+            # cid 为稳定编号，段落增删不会让历史掌握记录错位
+            it = make_item(seg, seg.get('cid', sid), book_name, seg.get('sub'))
             if it:
                 items.append(it)
 
